@@ -185,6 +185,26 @@
                                           ViewModel="{x:Bind ViewModel.ScreenTime, Mode=OneWay}"
                                           MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
                                           Visibility="{x:Bind IsScreenTimeVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:FileShelfView x:Name="MainFileShelfView"
+                                         ViewModel="{x:Bind ViewModel.FileShelf, Mode=OneWay}"
+                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                         Visibility="{x:Bind IsFileShelfVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:QuickDropView x:Name="MainQuickDropView"
+                                         ViewModel="{x:Bind ViewModel.QuickDrop, Mode=OneWay}"
+                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                         Visibility="{x:Bind IsQuickDropVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:FileConverterView x:Name="MainConverterView"
+                                             ViewModel="{x:Bind ViewModel.Converter, Mode=OneWay}"
+                                             MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                             Visibility="{x:Bind IsConverterVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:TransferManagerView x:Name="MainTransfersView"
+                                               ViewModel="{x:Bind ViewModel.Transfers, Mode=OneWay}"
+                                               MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                               Visibility="{x:Bind IsTransfersVisible(ViewModel.CurrentView), Mode=OneWay}" />
                 </Grid>
             </Grid>
         </Border>

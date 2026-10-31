@@ -459,6 +459,18 @@ public sealed partial class MainWindow : Window
     private Visibility IsScreenTimeVisible(string currentView) =>
         string.Equals(currentView, "ScreenTime", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
 
+    private Visibility IsFileShelfVisible(string currentView) =>
+        string.Equals(currentView, "FileShelf", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsQuickDropVisible(string currentView) =>
+        string.Equals(currentView, "QuickDrop", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsConverterVisible(string currentView) =>
+        string.Equals(currentView, "Converter", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsTransfersVisible(string currentView) =>
+        string.Equals(currentView, "Transfers", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();

@@ -48,6 +48,20 @@ public interface IDatabaseService
     Task<List<AppUsageRecord>> GetWeeklyUsageAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
     Task ClearUsageHistoryAsync(CancellationToken cancellationToken = default);
 
+    // File Shelf
+    Task<List<FileShelfItem>> GetFileShelfItemsAsync(CancellationToken cancellationToken = default);
+    Task<FileShelfItem?> GetFileShelfItemByIdAsync(string id, CancellationToken cancellationToken = default);
+    Task SaveFileShelfItemAsync(FileShelfItem item, CancellationToken cancellationToken = default);
+    Task RemoveFileShelfItemAsync(string id, CancellationToken cancellationToken = default);
+    Task ClearFileShelfAsync(CancellationToken cancellationToken = default);
+    Task UpdateFileShelfAccessAsync(string id, CancellationToken cancellationToken = default);
+    Task RemoveMissingShelfItemsAsync(CancellationToken cancellationToken = default);
+
+    // Transfer History
+    Task<List<TransferItem>> GetTransferHistoryAsync(int limit = 100, CancellationToken cancellationToken = default);
+    Task SaveTransferHistoryAsync(TransferItem item, CancellationToken cancellationToken = default);
+    Task ClearTransferHistoryAsync(CancellationToken cancellationToken = default);
+
     // Reset all data
     Task ClearAllDataAsync(CancellationToken cancellationToken = default);
 }

@@ -16,7 +16,7 @@ public sealed partial class MainViewModel : ObservableObject
     private bool _isExpanded;
 
     [ObservableProperty]
-    private string _currentView = "Home"; // "Home", "System", "Settings", "Clipboard", "Timer", "Notes", "Calendar", "Weather", "Links", "ScreenTime"
+    private string _currentView = "Home"; // "Home", "System", "Settings", "Clipboard", "Timer", "Notes", "Calendar", "Weather", "Links", "ScreenTime", "FileShelf", "QuickDrop", "Converter", "Transfers"
 
     public HomeViewModel Home { get; }
     public SystemViewModel System { get; }
@@ -28,6 +28,10 @@ public sealed partial class MainViewModel : ObservableObject
     public WeatherViewModel Weather { get; }
     public SavedLinksViewModel Links { get; }
     public ScreenTimeViewModel ScreenTime { get; }
+    public FileShelfViewModel FileShelf { get; }
+    public QuickDropViewModel QuickDrop { get; }
+    public FileConverterViewModel Converter { get; }
+    public TransferManagerViewModel Transfers { get; }
 
     public event Action<bool>? DockExpansionStateChanged;
 
@@ -42,6 +46,10 @@ public sealed partial class MainViewModel : ObservableObject
         WeatherViewModel weather,
         SavedLinksViewModel links,
         ScreenTimeViewModel screenTime,
+        FileShelfViewModel fileShelf,
+        QuickDropViewModel quickDrop,
+        FileConverterViewModel converter,
+        TransferManagerViewModel transfers,
         IEventBus eventBus,
         ILogger<MainViewModel> logger)
     {
@@ -55,10 +63,26 @@ public sealed partial class MainViewModel : ObservableObject
         Weather = weather;
         Links = links;
         ScreenTime = screenTime;
+        FileShelf = fileShelf;
+        QuickDrop = quickDrop;
+        Converter = converter;
+        Transfers = transfers;
         _eventBus = eventBus;
         _logger = logger;
 
         Home.NavigationRequested += OnHomeNavigationRequested;
+        FileShelf.RequestNavigate += target =>
+        {
+            if (target == "quickdrop") OpenQuickDrop();
+            else if (target == "converter")
+            {
+                if (FileShelf.SelectedItem != null)
+                {
+                    Converter.SetSourceFile(FileShelf.SelectedItem.Path);
+                }
+                OpenConverter();
+            }
+        };
     }
 
     public void SetDispatcherQueue(DispatcherQueue dispatcherQueue)
@@ -93,6 +117,18 @@ public sealed partial class MainViewModel : ObservableObject
                 break;
             case "ScreenTime":
                 OpenScreenTime();
+                break;
+            case "FileShelf":
+                OpenFileShelf();
+                break;
+            case "QuickDrop":
+                OpenQuickDrop();
+                break;
+            case "Converter":
+                OpenConverter();
+                break;
+            case "Transfers":
+                OpenTransfers();
                 break;
             default:
                 OpenHome();
@@ -192,6 +228,36 @@ public sealed partial class MainViewModel : ObservableObject
         SwitchView("ScreenTime");
         _ = ScreenTime.LoadUsageAsync();
         EnsureExpanded("OpenScreenTime");
+    }
+
+    [RelayCommand]
+    public void OpenFileShelf()
+    {
+        SwitchView("FileShelf");
+        _ = FileShelf.LoadItemsAsync();
+        EnsureExpanded("OpenFileShelf");
+    }
+
+    [RelayCommand]
+    public void OpenQuickDrop()
+    {
+        SwitchView("QuickDrop");
+        EnsureExpanded("OpenQuickDrop");
+    }
+
+    [RelayCommand]
+    public void OpenConverter()
+    {
+        SwitchView("Converter");
+        EnsureExpanded("OpenConverter");
+    }
+
+    [RelayCommand]
+    public void OpenTransfers()
+    {
+        SwitchView("Transfers");
+        _ = Transfers.LoadHistoryAsync();
+        EnsureExpanded("OpenTransfers");
     }
 
     [RelayCommand]

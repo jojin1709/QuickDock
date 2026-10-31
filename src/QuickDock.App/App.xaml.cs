@@ -19,10 +19,13 @@ using QuickDock.Modules.Network;
 using QuickDock.Modules.System;
 using QuickDock.Modules.Volume;
 using QuickDock.Modules.Productivity;
+using QuickDock.Modules.Files;
 using QuickDock.Services.Audio;
 using QuickDock.Services.Clipboard;
+using QuickDock.Services.Files;
 using QuickDock.Services.Media;
 using QuickDock.Services.Productivity;
+using QuickDock.Services.QuickDrop;
 using QuickDock.Services.ScreenTime;
 using QuickDock.Services.System;
 using QuickDock.Services.Time;
@@ -36,6 +39,7 @@ public partial class App : Application
     private Window? _window;
     private ILogger<App>? _logger;
 
+    public static Window? MainWindowInstance => (Current as App)?._window;
     public static IHost Host { get; private set; } = null!;
     public static IServiceProvider Services => Host.Services;
 
@@ -106,6 +110,20 @@ public partial class App : Application
                 services.AddSingleton<IQuickDockModule, TemporaryMessageModule>();
                 services.AddSingleton<IQuickDockModule, ScreenTimeModule>();
 
+                // Phase 6 File & Transfer Services
+                services.AddSingleton<IFileHashService, FileHashService>();
+                services.AddSingleton<IFilePreviewService, FilePreviewService>();
+                services.AddSingleton<IFileShelfService, FileShelfService>();
+                services.AddSingleton<IFileConversionService, FileConversionService>();
+                services.AddSingleton<IFileTransferManager, FileTransferManager>();
+                services.AddSingleton<IQuickDropService, QuickDropService>();
+
+                // Phase 6 File & Transfer Modules
+                services.AddSingleton<IQuickDockModule, FileShelfModule>();
+                services.AddSingleton<IQuickDockModule, QuickDropModule>();
+                services.AddSingleton<IQuickDockModule, FileConverterModule>();
+                services.AddSingleton<IQuickDockModule, TransferManagerModule>();
+
                 // ViewModels
                 services.AddSingleton<HomeViewModel>();
                 services.AddSingleton<SystemViewModel>();
@@ -117,6 +135,10 @@ public partial class App : Application
                 services.AddSingleton<WeatherViewModel>();
                 services.AddSingleton<SavedLinksViewModel>();
                 services.AddSingleton<ScreenTimeViewModel>();
+                services.AddSingleton<FileShelfViewModel>();
+                services.AddSingleton<QuickDropViewModel>();
+                services.AddSingleton<FileConverterViewModel>();
+                services.AddSingleton<TransferManagerViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 services.AddTransient<MainWindow>(sp =>

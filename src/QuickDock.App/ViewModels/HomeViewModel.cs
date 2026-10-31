@@ -416,7 +416,10 @@ public sealed partial class HomeViewModel : ObservableObject
         // Utilities
         _allModules.Add(new ModuleTileItem("quickdock.media", "Media", "System media transport session", "\uE8D6", "Utilities", "Active"));
         _allModules.Add(new ModuleTileItem("quickdock.network", "Network", "Adapters & connectivity", "\uEC27", "Utilities", "Active"));
-        _allModules.Add(new ModuleTileItem("quickdock.quickdrop", "QuickDrop", "Local file drop & transfer", "\uE898", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.fileshelf", "File Shelf", "Staging area, preview & drop", "\uE8B7", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.quickdrop", "QuickDrop", "Local Wi-Fi direct file transfer", "\uE898", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.converter", "Converter", "Image, zip & text conversions", "\uE8A5", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.transfers", "Transfers", "Active & completed file transfers", "\uE896", "Utilities", "Ready"));
 
         // Developer & AI
         _allModules.Add(new ModuleTileItem("quickdock.dev", "Dev Tools", "Formatters, UUID, base64", "\uEBE8", "Developer", "Ready"));
@@ -455,6 +458,18 @@ public sealed partial class HomeViewModel : ObservableObject
                 break;
             case "quickdock.screentime":
                 NavigationRequested?.Invoke("ScreenTime");
+                break;
+            case "quickdock.fileshelf":
+                NavigationRequested?.Invoke("FileShelf");
+                break;
+            case "quickdock.quickdrop":
+                NavigationRequested?.Invoke("QuickDrop");
+                break;
+            case "quickdock.converter":
+                NavigationRequested?.Invoke("Converter");
+                break;
+            case "quickdock.transfers":
+                NavigationRequested?.Invoke("Transfers");
                 break;
         }
     }

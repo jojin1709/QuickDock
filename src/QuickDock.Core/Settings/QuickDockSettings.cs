@@ -131,6 +131,29 @@ public sealed class ScreenTimeModuleSettings
     public int SamplingIntervalSeconds { get; set; } = 2;
 }
 
+public sealed class FileShelfModuleSettings
+{
+    public int MaxItems { get; set; } = 50;
+    public bool AutoRemoveMissing { get; set; } = false;
+}
+
+public sealed class QuickDropModuleSettings
+{
+    public bool IsEnabled { get; set; } = true;
+    public int SessionTimeoutMinutes { get; set; } = 10;
+    public long MaxFileSizeBytes { get; set; } = 2147483648L; // 2 GB
+    public int MaxSimultaneousTransfers { get; set; } = 3;
+    public bool AutoCloseAfterTransfer { get; set; } = false;
+    public int PreferredPort { get; set; } = 48271;
+}
+
+public sealed class FileConverterModuleSettings
+{
+    public string? DefaultOutputDirectory { get; set; }
+    public bool OverwriteExisting { get; set; } = false;
+    public int DefaultImageQuality { get; set; } = 90;
+}
+
 public sealed class QuickDockSettings
 {
     public AppearanceSettings Appearance { get; set; } = new();
@@ -144,6 +167,9 @@ public sealed class QuickDockSettings
     public CalendarModuleSettings Calendar { get; set; } = new();
     public WeatherModuleSettings Weather { get; set; } = new();
     public ScreenTimeModuleSettings ScreenTime { get; set; } = new();
+    public FileShelfModuleSettings FileShelf { get; set; } = new();
+    public QuickDropModuleSettings QuickDrop { get; set; } = new();
+    public FileConverterModuleSettings FileConverter { get; set; } = new();
 
     /// <summary>
     /// Key: ModuleId, Value: whether it is enabled.
@@ -162,8 +188,11 @@ public sealed class QuickDockSettings
         ["quickdock.links"] = true,
         ["quickdock.temporarymessage"] = true,
         ["quickdock.screentime"] = true,
-        ["quickdock.dev"] = true,
+        ["quickdock.fileshelf"] = true,
         ["quickdock.quickdrop"] = true,
+        ["quickdock.converter"] = true,
+        ["quickdock.transfers"] = true,
+        ["quickdock.dev"] = true,
         ["quickdock.ai"] = true
     };
 

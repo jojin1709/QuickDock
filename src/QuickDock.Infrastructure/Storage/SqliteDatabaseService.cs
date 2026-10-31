@@ -114,6 +114,29 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
                     updated_at TEXT NOT NULL
                 );
                 CREATE INDEX IF NOT EXISTS idx_usage_date_app ON app_usage(usage_date, app_name);
+
+                CREATE TABLE IF NOT EXISTS file_shelf (
+                    id TEXT PRIMARY KEY,
+                    path TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    size INTEGER NOT NULL,
+                    type TEXT NOT NULL,
+                    added_at TEXT NOT NULL,
+                    last_accessed TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS idx_shelf_added ON file_shelf(added_at);
+
+                CREATE TABLE IF NOT EXISTS transfer_history (
+                    id TEXT PRIMARY KEY,
+                    direction TEXT NOT NULL,
+                    filename TEXT NOT NULL,
+                    size INTEGER NOT NULL,
+                    timestamp TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    hash TEXT,
+                    error_message TEXT
+                );
+                CREATE INDEX IF NOT EXISTS idx_transfer_timestamp ON transfer_history(timestamp);
             ";
             await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             _initialized = true;
@@ -799,6 +822,206 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
 
     #endregion
 
+    #region File Shelf
+
+    public async Task<List<FileShelfItem>> GetFileShelfItemsAsync(CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        var list = new List<FileShelfItem>();
+
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, path, name, size, type, added_at, last_accessed FROM file_shelf ORDER BY added_at DESC";
+
+        using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var item = new FileShelfItem
+            {
+                Id = reader.GetString(0),
+                Path = reader.GetString(1),
+                Name = reader.GetString(2),
+                Size = reader.GetInt64(3),
+                Type = reader.GetString(4),
+                AddedAt = DateTimeOffset.Parse(reader.GetString(5)),
+                LastAccessed = DateTimeOffset.Parse(reader.GetString(6)),
+                IsMissing = !File.Exists(reader.GetString(1)) && !Directory.Exists(reader.GetString(1))
+            };
+            list.Add(item);
+        }
+
+        return list;
+    }
+
+    public async Task<FileShelfItem?> GetFileShelfItemByIdAsync(string id, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "SELECT id, path, name, size, type, added_at, last_accessed FROM file_shelf WHERE id = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+
+        using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            return new FileShelfItem
+            {
+                Id = reader.GetString(0),
+                Path = reader.GetString(1),
+                Name = reader.GetString(2),
+                Size = reader.GetInt64(3),
+                Type = reader.GetString(4),
+                AddedAt = DateTimeOffset.Parse(reader.GetString(5)),
+                LastAccessed = DateTimeOffset.Parse(reader.GetString(6)),
+                IsMissing = !File.Exists(reader.GetString(1)) && !Directory.Exists(reader.GetString(1))
+            };
+        }
+        return null;
+    }
+
+    public async Task SaveFileShelfItemAsync(FileShelfItem item, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO file_shelf (id, path, name, size, type, added_at, last_accessed)
+            VALUES (@id, @path, @name, @size, @type, @added_at, @last_accessed)
+            ON CONFLICT(id) DO UPDATE SET
+                path = excluded.path,
+                name = excluded.name,
+                size = excluded.size,
+                type = excluded.type,
+                last_accessed = excluded.last_accessed;
+        ";
+        cmd.Parameters.AddWithValue("@id", item.Id);
+        cmd.Parameters.AddWithValue("@path", item.Path);
+        cmd.Parameters.AddWithValue("@name", item.Name);
+        cmd.Parameters.AddWithValue("@size", item.Size);
+        cmd.Parameters.AddWithValue("@type", item.Type);
+        cmd.Parameters.AddWithValue("@added_at", item.AddedAt.ToString("O"));
+        cmd.Parameters.AddWithValue("@last_accessed", item.LastAccessed.ToString("O"));
+
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task RemoveFileShelfItemAsync(string id, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM file_shelf WHERE id = @id";
+        cmd.Parameters.AddWithValue("@id", id);
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task ClearFileShelfAsync(CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM file_shelf";
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task UpdateFileShelfAccessAsync(string id, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE file_shelf SET last_accessed = @now WHERE id = @id";
+        cmd.Parameters.AddWithValue("@now", DateTimeOffset.UtcNow.ToString("O"));
+        cmd.Parameters.AddWithValue("@id", id);
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task RemoveMissingShelfItemsAsync(CancellationToken cancellationToken = default)
+    {
+        var items = await GetFileShelfItemsAsync(cancellationToken).ConfigureAwait(false);
+        foreach (var item in items)
+        {
+            if (item.IsMissing)
+            {
+                await RemoveFileShelfItemAsync(item.Id, cancellationToken).ConfigureAwait(false);
+            }
+        }
+    }
+
+    #endregion
+
+    #region Transfer History
+
+    public async Task<List<TransferItem>> GetTransferHistoryAsync(int limit = 100, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        var list = new List<TransferItem>();
+
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            SELECT id, direction, filename, size, timestamp, status, hash, error_message
+            FROM transfer_history
+            ORDER BY timestamp DESC
+            LIMIT @limit";
+        cmd.Parameters.AddWithValue("@limit", limit);
+
+        using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+        {
+            var item = new TransferItem
+            {
+                Id = reader.GetString(0),
+                Direction = Enum.TryParse<TransferDirection>(reader.GetString(1), out var dir) ? dir : TransferDirection.Upload,
+                FileName = reader.GetString(2),
+                Size = reader.GetInt64(3),
+                Timestamp = DateTimeOffset.Parse(reader.GetString(4)),
+                Status = Enum.TryParse<TransferStatus>(reader.GetString(5), out var st) ? st : TransferStatus.Completed,
+                Hash = reader.IsDBNull(6) ? null : reader.GetString(6),
+                ErrorMessage = reader.IsDBNull(7) ? null : reader.GetString(7),
+                BytesTransferred = reader.GetInt64(3) // completed size
+            };
+            list.Add(item);
+        }
+
+        return list;
+    }
+
+    public async Task SaveTransferHistoryAsync(TransferItem item, CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = @"
+            INSERT INTO transfer_history (id, direction, filename, size, timestamp, status, hash, error_message)
+            VALUES (@id, @direction, @filename, @size, @timestamp, @status, @hash, @error_message)
+            ON CONFLICT(id) DO UPDATE SET
+                status = excluded.status,
+                hash = excluded.hash,
+                error_message = excluded.error_message;
+        ";
+        cmd.Parameters.AddWithValue("@id", item.Id);
+        cmd.Parameters.AddWithValue("@direction", item.Direction.ToString());
+        cmd.Parameters.AddWithValue("@filename", item.FileName);
+        cmd.Parameters.AddWithValue("@size", item.Size);
+        cmd.Parameters.AddWithValue("@timestamp", item.Timestamp.ToString("O"));
+        cmd.Parameters.AddWithValue("@status", item.Status.ToString());
+        cmd.Parameters.AddWithValue("@hash", (object?)item.Hash ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@error_message", (object?)item.ErrorMessage ?? DBNull.Value);
+
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    public async Task ClearTransferHistoryAsync(CancellationToken cancellationToken = default)
+    {
+        await InitializeAsync(cancellationToken).ConfigureAwait(false);
+        using var conn = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "DELETE FROM transfer_history";
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    #endregion
+
     public async Task ClearAllDataAsync(CancellationToken cancellationToken = default)
     {
         await InitializeAsync(cancellationToken).ConfigureAwait(false);
@@ -811,6 +1034,8 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
             DELETE FROM saved_links;
             DELETE FROM temporary_messages;
             DELETE FROM app_usage;
+            DELETE FROM file_shelf;
+            DELETE FROM transfer_history;
         ";
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }

@@ -15,6 +15,7 @@ public static class AppStoragePaths
     public static string LogsDirectory => Path.Combine(BaseDirectory, "Logs");
     public static string CacheDirectory => Path.Combine(BaseDirectory, "Cache");
     public static string DataDirectory => Path.Combine(BaseDirectory, "Data");
+    public static string QuickDropDirectory => Path.Combine(BaseDirectory, "QuickDrop");
 
     /// <summary>
     /// Ensures that all required application directories exist on disk.
@@ -25,6 +26,7 @@ public static class AppStoragePaths
         Directory.CreateDirectory(LogsDirectory);
         Directory.CreateDirectory(CacheDirectory);
         Directory.CreateDirectory(DataDirectory);
+        Directory.CreateDirectory(QuickDropDirectory);
     }
 }
 
