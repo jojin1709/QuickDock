@@ -22,6 +22,8 @@ public static class Program
             {
                 NativeMethods.PostMessageW(NativeMethods.HWND_BROADCAST, activateMsg, IntPtr.Zero, IntPtr.Zero);
             }
+            _instanceMutex.Dispose();
+            _instanceMutex = null;
             return;
         }
 
@@ -73,7 +75,14 @@ public static class Program
 
             if (_instanceMutex != null)
             {
-                _instanceMutex.ReleaseMutex();
+                try
+                {
+                    _instanceMutex.ReleaseMutex();
+                }
+                catch
+                {
+                    // Mutex may have already been released or abandoned
+                }
                 _instanceMutex.Dispose();
                 _instanceMutex = null;
             }

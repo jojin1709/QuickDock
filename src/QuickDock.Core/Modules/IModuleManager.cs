@@ -4,7 +4,7 @@ namespace QuickDock.Core.Modules;
 /// Orchestrates module lifecycle, lazy activation, and crash isolation.
 /// Prevents one broken module from terminating QuickDock.
 /// </summary>
-public interface IModuleManager
+public interface IModuleManager : IDisposable
 {
     /// <summary>
     /// Gets all registered modules.

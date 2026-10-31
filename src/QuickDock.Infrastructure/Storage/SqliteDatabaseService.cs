@@ -13,14 +13,16 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
     private readonly SemaphoreSlim _lock = new(1, 1);
     private bool _initialized;
 
+    private readonly string _databasePath;
+
     public SqliteDatabaseService(ILogger<SqliteDatabaseService> logger, string? dbPath = null)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         AppStoragePaths.EnsureDirectoriesExist();
-        var databasePath = dbPath ?? AppStoragePaths.DatabaseFile;
+        _databasePath = dbPath ?? AppStoragePaths.DatabaseFile;
         _connectionString = new SqliteConnectionStringBuilder
         {
-            DataSource = databasePath,
+            DataSource = _databasePath,
             Mode = SqliteOpenMode.ReadWriteCreate,
             Cache = SqliteCacheMode.Shared
         }.ToString();
@@ -31,7 +33,7 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
         var connection = new SqliteConnection(_connectionString);
         await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
         using var cmd = connection.CreateCommand();
-        cmd.CommandText = "PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;";
+        cmd.CommandText = "PRAGMA foreign_keys = ON; PRAGMA synchronous = NORMAL;";
         await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
         return connection;
     }
@@ -45,100 +47,33 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
         {
             if (_initialized) return;
 
-            using var connection = await OpenConnectionAsync(cancellationToken).ConfigureAwait(false);
-            using var cmd = connection.CreateCommand();
-            cmd.CommandText = @"
-                CREATE TABLE IF NOT EXISTS clipboard_items (
-                    id TEXT PRIMARY KEY,
-                    type INTEGER NOT NULL,
-                    content TEXT NOT NULL,
-                    preview TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL,
-                    is_pinned INTEGER NOT NULL DEFAULT 0,
-                    is_sensitive INTEGER NOT NULL DEFAULT 0,
-                    image_path TEXT
-                );
-                CREATE INDEX IF NOT EXISTS idx_clipboard_created ON clipboard_items(created_at);
-                CREATE INDEX IF NOT EXISTS idx_clipboard_pinned ON clipboard_items(is_pinned);
+            try
+            {
+                await CreateSchemaInternalAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 11 || ex.SqliteErrorCode == 26 || ex.Message.Contains("malformed", StringComparison.OrdinalIgnoreCase) || ex.Message.Contains("corrupt", StringComparison.OrdinalIgnoreCase) || ex.Message.Contains("not a database", StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogCritical(ex, "SQLite database corruption detected! Initiating automatic recovery by backing up corrupt database.");
+                SqliteConnection.ClearAllPools();
 
-                CREATE TABLE IF NOT EXISTS notes (
-                    id TEXT PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    content TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL,
-                    is_pinned INTEGER NOT NULL DEFAULT 0,
-                    is_archived INTEGER NOT NULL DEFAULT 0
-                );
-                CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated_at);
-                CREATE INDEX IF NOT EXISTS idx_notes_pinned ON notes(is_pinned);
+                var corruptBackup = Path.Combine(AppStoragePaths.RootDirectory, $"quickdock_corrupt_{DateTime.UtcNow:yyyyMMdd_HHmmss}_{Guid.NewGuid():N}.db");
+                if (File.Exists(_databasePath))
+                {
+                    try
+                    {
+                        File.Move(_databasePath, corruptBackup, overwrite: true);
+                    }
+                    catch (Exception moveEx)
+                    {
+                        _logger.LogError(moveEx, "Failed to move corrupted database to backup.");
+                        try { File.Delete(_databasePath); } catch { }
+                    }
+                }
 
-                CREATE TABLE IF NOT EXISTS calendar_events (
-                    id TEXT PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    description TEXT NOT NULL,
-                    event_date TEXT NOT NULL,
-                    start_time TEXT NOT NULL,
-                    end_time TEXT NOT NULL,
-                    created_at TEXT NOT NULL
-                );
-                CREATE INDEX IF NOT EXISTS idx_calendar_date ON calendar_events(event_date);
+                await CreateSchemaInternalAsync(cancellationToken).ConfigureAwait(false);
+                _logger.LogInformation("Recovered from corrupted database. New healthy database initialized.");
+            }
 
-                CREATE TABLE IF NOT EXISTS saved_links (
-                    id TEXT PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    url TEXT NOT NULL,
-                    description TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    updated_at TEXT NOT NULL,
-                    is_pinned INTEGER NOT NULL DEFAULT 0
-                );
-                CREATE INDEX IF NOT EXISTS idx_links_updated ON saved_links(updated_at);
-
-                CREATE TABLE IF NOT EXISTS temporary_messages (
-                    id TEXT PRIMARY KEY,
-                    content TEXT NOT NULL,
-                    created_at TEXT NOT NULL,
-                    expires_at TEXT NOT NULL,
-                    is_dismissed INTEGER NOT NULL DEFAULT 0
-                );
-                CREATE INDEX IF NOT EXISTS idx_temp_msg_expires ON temporary_messages(expires_at);
-
-                CREATE TABLE IF NOT EXISTS app_usage (
-                    id TEXT PRIMARY KEY,
-                    usage_date TEXT NOT NULL,
-                    app_name TEXT NOT NULL,
-                    window_title TEXT NOT NULL,
-                    duration_seconds INTEGER NOT NULL DEFAULT 0,
-                    updated_at TEXT NOT NULL
-                );
-                CREATE INDEX IF NOT EXISTS idx_usage_date_app ON app_usage(usage_date, app_name);
-
-                CREATE TABLE IF NOT EXISTS file_shelf (
-                    id TEXT PRIMARY KEY,
-                    path TEXT NOT NULL,
-                    name TEXT NOT NULL,
-                    size INTEGER NOT NULL,
-                    type TEXT NOT NULL,
-                    added_at TEXT NOT NULL,
-                    last_accessed TEXT NOT NULL
-                );
-                CREATE INDEX IF NOT EXISTS idx_shelf_added ON file_shelf(added_at);
-
-                CREATE TABLE IF NOT EXISTS transfer_history (
-                    id TEXT PRIMARY KEY,
-                    direction TEXT NOT NULL,
-                    filename TEXT NOT NULL,
-                    size INTEGER NOT NULL,
-                    timestamp TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    hash TEXT,
-                    error_message TEXT
-                );
-                CREATE INDEX IF NOT EXISTS idx_transfer_timestamp ON transfer_history(timestamp);
-            ";
-            await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
             _initialized = true;
             _logger.LogInformation("SqliteDatabaseService initialized successfully.");
         }
@@ -146,6 +81,112 @@ public sealed class SqliteDatabaseService : IDatabaseService, IDisposable
         {
             _lock.Release();
         }
+    }
+
+    private async Task CreateSchemaInternalAsync(CancellationToken cancellationToken)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync(cancellationToken).ConfigureAwait(false);
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = @"
+            PRAGMA journal_mode = WAL;
+            PRAGMA synchronous = NORMAL;
+            PRAGMA cache_size = -2000;
+
+            CREATE TABLE IF NOT EXISTS clipboard_items (
+                id TEXT PRIMARY KEY,
+                type INTEGER NOT NULL,
+                content TEXT NOT NULL,
+                preview TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                is_pinned INTEGER NOT NULL DEFAULT 0,
+                is_sensitive INTEGER NOT NULL DEFAULT 0,
+                image_path TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_clipboard_created ON clipboard_items(created_at);
+            CREATE INDEX IF NOT EXISTS idx_clipboard_pinned ON clipboard_items(is_pinned);
+            CREATE INDEX IF NOT EXISTS idx_clipboard_pinned_created ON clipboard_items(is_pinned DESC, created_at DESC);
+
+            CREATE TABLE IF NOT EXISTS notes (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                is_pinned INTEGER NOT NULL DEFAULT 0,
+                is_archived INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(updated_at);
+            CREATE INDEX IF NOT EXISTS idx_notes_pinned ON notes(is_pinned);
+            CREATE INDEX IF NOT EXISTS idx_notes_pinned_updated ON notes(is_pinned DESC, updated_at DESC);
+
+            CREATE TABLE IF NOT EXISTS calendar_events (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL,
+                event_date TEXT NOT NULL,
+                start_time TEXT NOT NULL,
+                end_time TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_calendar_date ON calendar_events(event_date);
+
+            CREATE TABLE IF NOT EXISTS saved_links (
+                id TEXT PRIMARY KEY,
+                title TEXT NOT NULL,
+                url TEXT NOT NULL,
+                description TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                is_pinned INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE INDEX IF NOT EXISTS idx_links_updated ON saved_links(updated_at);
+
+            CREATE TABLE IF NOT EXISTS temporary_messages (
+                id TEXT PRIMARY KEY,
+                content TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                expires_at TEXT NOT NULL,
+                is_dismissed INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE INDEX IF NOT EXISTS idx_temp_msg_expires ON temporary_messages(expires_at);
+            CREATE INDEX IF NOT EXISTS idx_temp_msg_active ON temporary_messages(is_dismissed, expires_at);
+
+            CREATE TABLE IF NOT EXISTS app_usage (
+                id TEXT PRIMARY KEY,
+                usage_date TEXT NOT NULL,
+                app_name TEXT NOT NULL,
+                window_title TEXT NOT NULL,
+                duration_seconds INTEGER NOT NULL DEFAULT 0,
+                updated_at TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_usage_date_app ON app_usage(usage_date, app_name);
+
+            CREATE TABLE IF NOT EXISTS file_shelf (
+                id TEXT PRIMARY KEY,
+                path TEXT NOT NULL,
+                name TEXT NOT NULL,
+                size INTEGER NOT NULL,
+                type TEXT NOT NULL,
+                added_at TEXT NOT NULL,
+                last_accessed TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_shelf_added ON file_shelf(added_at);
+
+            CREATE TABLE IF NOT EXISTS transfer_history (
+                id TEXT PRIMARY KEY,
+                direction TEXT NOT NULL,
+                filename TEXT NOT NULL,
+                size INTEGER NOT NULL,
+                timestamp TEXT NOT NULL,
+                status TEXT NOT NULL,
+                hash TEXT,
+                error_message TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_transfer_timestamp ON transfer_history(timestamp);
+        ";
+        await cmd.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
     }
 
     #region Clipboard

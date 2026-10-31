@@ -27,6 +27,46 @@ public static class AppStoragePaths
         Directory.CreateDirectory(CacheDirectory);
         Directory.CreateDirectory(DataDirectory);
         Directory.CreateDirectory(QuickDropDirectory);
+
+        CleanupStaleTemporaryFiles();
+    }
+
+    /// <summary>
+    /// Safely purges stale temporary files older than the specified age (default: 24 hours).
+    /// </summary>
+    public static void CleanupStaleTemporaryFiles(TimeSpan? olderThan = null)
+    {
+        try
+        {
+            var cutoff = DateTime.UtcNow.Subtract(olderThan ?? TimeSpan.FromHours(24));
+            string[] searchDirs = [BaseDirectory, CacheDirectory, DataDirectory, QuickDropDirectory];
+
+            foreach (var dir in searchDirs)
+            {
+                if (!Directory.Exists(dir)) continue;
+
+                var tmpFiles = Directory.EnumerateFiles(dir, "*.tmp", SearchOption.TopDirectoryOnly);
+                foreach (var file in tmpFiles)
+                {
+                    try
+                    {
+                        var fi = new FileInfo(file);
+                        if (fi.CreationTimeUtc < cutoff)
+                        {
+                            File.Delete(file);
+                        }
+                    }
+                    catch
+                    {
+                        // File may be locked by active writer
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Best effort cleanup on startup
+        }
     }
 }
 

@@ -133,4 +133,22 @@ public sealed class ClockModule : ModuleBase
             // Expected on module stop
         }
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            try
+            {
+                _timerCts?.Cancel();
+                _periodicTimer?.Dispose();
+                _timerCts?.Dispose();
+            }
+            catch { }
+            _periodicTimer = null;
+            _timerCts = null;
+            _timerTask = null;
+        }
+        base.Dispose(disposing);
+    }
 }

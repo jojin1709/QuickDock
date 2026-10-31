@@ -211,9 +211,9 @@ public sealed class WindowsClipboardService : IClipboardService
         return await _databaseService.GetClipboardItemsAsync(maxItems, search, filterType).ConfigureAwait(false);
     }
 
-    public Task CopyItemToClipboardAsync(ClipboardItem item)
+    public async Task CopyItemToClipboardAsync(ClipboardItem item)
     {
-        if (item == null) return Task.CompletedTask;
+        if (item == null) return;
 
         _isInternalCopy = true;
         var package = new DataPackage();
@@ -230,14 +230,13 @@ public sealed class WindowsClipboardService : IClipboardService
             case ClipboardContentType.Image:
                 if (!string.IsNullOrEmpty(item.Content) && File.Exists(item.Content))
                 {
-                    var file = StorageFile.GetFileFromPathAsync(item.Content).GetAwaiter().GetResult();
+                    var file = await StorageFile.GetFileFromPathAsync(item.Content);
                     package.SetBitmap(RandomAccessStreamReference.CreateFromFile(file));
                 }
                 break;
         }
 
         global::Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(package);
-        return Task.CompletedTask;
     }
 
     public async Task SetPinnedAsync(string id, bool isPinned)

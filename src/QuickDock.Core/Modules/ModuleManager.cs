@@ -194,5 +194,21 @@ public sealed class ModuleManager : IModuleManager
 
         module.IsEnabled = false;
     }
+
+    public void Dispose()
+    {
+        foreach (var module in _modules.Values)
+        {
+            try
+            {
+                module.Dispose();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Exception disposing module '{ModuleId}'.", module.Id);
+            }
+        }
+        _modules.Clear();
+    }
 }
 

@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[Phase 9 Settings & Personalization Release](docs/PHASE_9_SETTINGS_PERSONALIZATION.md):** 12 comprehensive configuration sections, granular section & global reset with data preservation, schema-validated JSON backup/export with credential scrubbing, conflict-aware global shortcut manager, and storage inspector are now live. See the [verification report](docs/PHASE_9_SETTINGS_PERSONALIZATION.md#14-test-verification-matrix) (184 passing tests, 0 warnings).
+> **[Phase 10 Performance & Reliability Release](docs/PHASE_10_PERFORMANCE_RELIABILITY.md):** Zero-polling idle execution, lazy module startup, process tree auto-kill, SQLite database corruption recovery, dynamic Serilog level switching, and on-demand diagnostics are now live. See the [verification report](docs/PHASE_10_PERFORMANCE_RELIABILITY.md#6-test-verification-matrix) (194 passing tests, 0 warnings).
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-184%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-194%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 
@@ -32,7 +32,7 @@ dotnet run --project src/QuickDock.App
 
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
-<a href="docs/PHASE_9_SETTINGS_PERSONALIZATION.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+<a href="docs/PHASE_10_PERFORMANCE_RELIABILITY.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
 
 </div>
 
@@ -357,6 +357,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 | **[Phase 7 Guide](docs/PHASE_7_DEVELOPER_TOOLKIT.md)** | Developer Toolkit | Git, Docker, Terminal, JSON/JWT, Regex, QR, HTTP client, Ports/Processes |
 | **[Phase 8 Guide](docs/PHASE_8_NETWORK_SECURITY.md)** | Network & Security Toolkit | Defensive diagnostics, DNS, sockets, TLS, headers, Firewall, Defender, integrity |
 | **[Phase 9 Guide](docs/PHASE_9_SETTINGS_PERSONALIZATION.md)** | Settings & Personalization | 12 settings sections, backdrop switching, hotkey manager, storage inspector, JSON backup |
+| **[Phase 10 Guide](docs/PHASE_10_PERFORMANCE_RELIABILITY.md)** | Performance & Reliability | Zero idle polling, crash containment, database self-healing, process safety |
 
 ---
 

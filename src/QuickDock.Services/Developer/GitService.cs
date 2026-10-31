@@ -335,62 +335,19 @@ public sealed class GitService : IGitService
             };
         }
 
-        var startInfo = new ProcessStartInfo
+        var runResult = await QuickDock.Core.Utilities.ProcessExecutionHelper.RunProcessAsync(
+            gitPath,
+            arguments,
+            workingDirectory,
+            TimeSpan.FromSeconds(30),
+            cancellationToken).ConfigureAwait(false);
+
+        return new GitCommandResult
         {
-            FileName = gitPath,
-            WorkingDirectory = !string.IsNullOrWhiteSpace(workingDirectory) && Directory.Exists(workingDirectory) ? workingDirectory : Environment.CurrentDirectory,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            StandardOutputEncoding = Encoding.UTF8,
-            StandardErrorEncoding = Encoding.UTF8
+            Success = runResult.Success,
+            Output = runResult.Output,
+            ErrorOutput = runResult.ErrorOutput,
+            ExitCode = runResult.ExitCode
         };
-
-        foreach (var arg in arguments)
-        {
-            startInfo.ArgumentList.Add(arg);
-        }
-
-        try
-        {
-            using var process = new Process { StartInfo = startInfo };
-            process.Start();
-
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
-            var stderrTask = process.StandardError.ReadToEndAsync(cancellationToken);
-
-            await process.WaitForExitAsync(cancellationToken);
-
-            string stdout = await stdoutTask;
-            string stderr = await stderrTask;
-
-            return new GitCommandResult
-            {
-                Success = process.ExitCode == 0,
-                Output = stdout,
-                ErrorOutput = stderr,
-                ExitCode = process.ExitCode
-            };
-        }
-        catch (OperationCanceledException)
-        {
-            return new GitCommandResult
-            {
-                Success = false,
-                ErrorOutput = "Operation canceled by user.",
-                ExitCode = -2
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error executing Git command: {Args}", string.Join(" ", arguments));
-            return new GitCommandResult
-            {
-                Success = false,
-                ErrorOutput = ex.Message,
-                ExitCode = -3
-            };
-        }
     }
 }

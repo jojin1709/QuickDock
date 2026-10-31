@@ -4,7 +4,7 @@ namespace QuickDock.Core.Modules;
 /// Standard contract for all QuickDock modular components.
 /// Modules follow lazy-load lifecycle semantics: "Core stays alive. Modules do not."
 /// </summary>
-public interface IQuickDockModule
+public interface IQuickDockModule : IDisposable
 {
     /// <summary>
     /// Unique identifier for the module (e.g. "quickdock.clock", "quickdock.clipboard").

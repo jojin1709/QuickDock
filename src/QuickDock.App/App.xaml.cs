@@ -79,6 +79,7 @@ public partial class App : Application
                 services.AddSingleton<IWindowPositioningService, WindowPositioningService>();
                 services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
                 services.AddSingleton<ISystemTrayService, SystemTrayService>();
+                services.AddSingleton<IPerformanceDiagnosticsService, PerformanceDiagnosticsService>();
 
                 // ClockModule registered directly and as IQuickDockModule
                 services.AddSingleton<ClockModule>();
@@ -222,6 +223,13 @@ public partial class App : Application
         UnhandledException += (s, e) =>
         {
             _logger?.LogError(e.Exception, "Unhandled application exception caught at UI boundary.");
+            e.Handled = true;
+        };
+
+        TaskScheduler.UnobservedTaskException += (s, e) =>
+        {
+            _logger?.LogError(e.Exception, "Unobserved task exception caught in background thread.");
+            e.SetObserved();
         };
     }
 

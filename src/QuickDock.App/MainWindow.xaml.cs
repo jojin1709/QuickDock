@@ -268,11 +268,14 @@ public sealed partial class MainWindow : Window
     {
         ViewModel.Home.UpdateTime(DateTime.Now);
 
-        _metricsCounter++;
-        if (_metricsCounter >= 3)
+        if (ViewModel.IsExpanded)
         {
-            _metricsCounter = 0;
-            ViewModel.Home.RefreshMetrics();
+            _metricsCounter++;
+            if (_metricsCounter >= 3)
+            {
+                _metricsCounter = 0;
+                ViewModel.Home.RefreshMetrics();
+            }
         }
     }
 
@@ -337,6 +340,8 @@ public sealed partial class MainWindow : Window
 
         if (isExpanded)
         {
+            _metricsCounter = 0;
+            ViewModel.Home.RefreshMetrics();
             BringToFront();
         }
         else

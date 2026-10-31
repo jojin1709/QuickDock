@@ -28,6 +28,12 @@ public sealed class GlobalHotkeyService : IGlobalHotkeyService
         if (_isDisposed) throw new ObjectDisposedException(nameof(GlobalHotkeyService));
         if (hWnd == IntPtr.Zero) return false;
 
+        // Idempotent: unregister any previous hook before re-registering
+        if (_isRegistered || _hWnd != IntPtr.Zero)
+        {
+            Unregister();
+        }
+
         _hWnd = hWnd;
         _onTriggered = onTriggered;
 

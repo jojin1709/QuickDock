@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
+using QuickDock.Core.Events;
 using QuickDock.Core.Interfaces;
 using QuickDock.Core.Modules;
 using QuickDock.Core.Settings;
+using QuickDock.Infrastructure.Logging;
 using Serilog;
 
 namespace QuickDock.Infrastructure.Services;
@@ -13,6 +15,7 @@ public sealed class AppLifecycleService : IAppLifecycleService
 {
     private readonly ISettingsManager _settingsManager;
     private readonly IModuleManager _moduleManager;
+    private readonly IEventBus _eventBus;
     private readonly ILogger<AppLifecycleService> _logger;
     private int _isShuttingDown;
 
@@ -23,10 +26,12 @@ public sealed class AppLifecycleService : IAppLifecycleService
     public AppLifecycleService(
         ISettingsManager settingsManager,
         IModuleManager moduleManager,
+        IEventBus eventBus,
         ILogger<AppLifecycleService> logger)
     {
         _settingsManager = settingsManager ?? throw new ArgumentNullException(nameof(settingsManager));
         _moduleManager = moduleManager ?? throw new ArgumentNullException(nameof(moduleManager));
+        _eventBus = eventBus ?? throw new ArgumentNullException(nameof(eventBus));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -37,6 +42,14 @@ public sealed class AppLifecycleService : IAppLifecycleService
         // 1. Load settings
         var settings = await _settingsManager.LoadAsync(cancellationToken).ConfigureAwait(false);
 
+        // Configure logging level from settings
+        QuickDockLogging.SetLoggingLevel(settings.Developer.LogLevel);
+        _eventBus.Subscribe<SettingsChangedEvent>((e, ct) =>
+        {
+            QuickDockLogging.SetLoggingLevel(e.Settings.Developer.LogLevel);
+            return Task.CompletedTask;
+        });
+
         // 2. Sync enabled flags to registered modules
         foreach (var module in _moduleManager.Modules)
         {
@@ -45,9 +58,6 @@ public sealed class AppLifecycleService : IAppLifecycleService
                 module.IsEnabled = isEnabled;
             }
         }
-
-        // 3. Initialize all enabled modules (lazy start happens on demand)
-        await _moduleManager.InitializeAllEnabledAsync(cancellationToken).ConfigureAwait(false);
 
         _logger.LogInformation("QuickDock core startup sequence completed successfully.");
     }
@@ -68,6 +78,7 @@ public sealed class AppLifecycleService : IAppLifecycleService
         {
             // Stop all active modules
             await _moduleManager.StopAllRunningAsync(cts.Token).ConfigureAwait(false);
+            _moduleManager.Dispose();
         }
         catch (Exception ex)
         {

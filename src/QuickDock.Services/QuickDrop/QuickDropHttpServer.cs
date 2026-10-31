@@ -525,6 +525,19 @@ public sealed class QuickDropHttpServer : IDisposable
     public void Dispose()
     {
         Stop();
+        if (_listenerTask != null)
+        {
+            try
+            {
+                _listenerTask.Wait(TimeSpan.FromMilliseconds(500));
+            }
+            catch
+            {
+                // Task cancellation or completion
+            }
+            _listenerTask = null;
+        }
         _cts?.Dispose();
+        _cts = null;
     }
 }

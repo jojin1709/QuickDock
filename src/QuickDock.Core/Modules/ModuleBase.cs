@@ -179,5 +179,16 @@ public abstract class ModuleBase : IQuickDockModule
     protected virtual Task OnInitializeAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     protected virtual Task OnStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     protected virtual Task OnStopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        // Base cleanup hook for derived modules
+    }
 }
 
