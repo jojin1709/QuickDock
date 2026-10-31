@@ -20,18 +20,20 @@
 
 It docks subtly at the top center of your display, providing instant access to real-time hardware telemetry, productivity utilities, developer toolkits, file staging, and zero-cloud peer-to-peer device transfers at the press of a hotkey. **Real Win32 telemetry. Zero Electron overhead.**
 
-**This repository contains QuickDock: the complete open-source native Windows utility, built from source.**
+**This repository contains QuickDock: the native Windows 11 utility and productivity dock, authored by JOJIN JOHN. This software is proprietary and strictly NOT open source.**
 
-<p><strong>Launch QuickDock</strong></p>
+<p><strong>Download & Run QuickDock</strong></p>
 
 ```powershell
-dotnet run --project src/QuickDock.App
+# Download QuickDock-v1.0.0-win-x64.zip from Releases, extract, and run:
+.\QuickDock.App.exe
 ```
 
 <sub>Press <code>Ctrl + Space</code> or mouse over the top-center edge to expand your dock.</sub>
 
 ---
 
+<a href="https://www.linkedin.com/in/jojin-john/"><img src="https://img.shields.io/badge/LinkedIn-JOJIN%20JOHN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" height="35" alt="LinkedIn JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
 <a href="docs/RELEASE_1.0.0.md"><img src="https://img.shields.io/badge/Docs-Release%201.0.0-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
@@ -374,8 +376,11 @@ Detailed engineering specifications, design choices, and verification logs for e
 ### **JOJIN JOHN**
 *Software Engineer & Security Researcher*
 
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-JOJIN%20JOHN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/jojin-john/)
 [![GitHub](https://img.shields.io/badge/GitHub-jojin1709-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jojin1709)
 [![Repository](https://img.shields.io/badge/Repository-QuickDock-0078D4?style=for-the-badge&logo=git&logoColor=white)](https://github.com/jojin1709/QuickDock)
+
+For inquiries, permissions, or questions, reach out via [LinkedIn](https://www.linkedin.com/in/jojin-john/).
 
 </div>
 
@@ -409,6 +414,19 @@ No. The built-in fullscreen detection service monitors the active foreground win
 
 ---
 
-## 📄 License
+## 📄 License & Terms of Use
 
-This project is licensed under the [MIT License](LICENSE).
+**Copyright © 2026 JOJIN JOHN. All Rights Reserved.**
+
+> [!CAUTION]
+> **PROPRIETARY SOFTWARE — NOT OPEN SOURCE**  
+> This software, its source code, design, icons, and architecture are the exclusive intellectual property of **JOJIN JOHN**.
+> 
+> - **No Copying or Cloning:** You may **NOT** copy, clone (`git clone`), fork, mirror, scrape, or distribute this repository or its source code.
+> - **No Reverse Engineering or AI Tools:** Decompiling, reverse engineering, disassembling, using extraction/reproduction tools, or training AI/LLM models on this work is strictly forbidden.
+> - **End-User Application Use Only:** Users are granted permission only to run the official pre-compiled QuickDock application binary (`QuickDock.App.exe`) from the [Official Releases](https://github.com/jojin1709/QuickDock/releases).
+> - **Bug Reports:** If you discover any bugs or issues, you are welcome to report them via [GitHub Issues](https://github.com/jojin1709/QuickDock/issues).
+> - **Permissions & Inquiries:** For commercial permissions, licensing inquiries, or questions, contact JOJIN JOHN on [LinkedIn](https://www.linkedin.com/in/jojin-john/).
+> - **Legal Enforcement & Bans:** Any unauthorized copying, distribution, or intellectual property theft will result in platform bans, DMCA takedowns, and aggressive legal action under international copyright laws.
+
+See the full [LICENSE](LICENSE) agreement for complete legal terms.

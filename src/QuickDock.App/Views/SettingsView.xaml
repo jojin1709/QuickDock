@@ -1169,6 +1169,7 @@
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
                                             <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
                                         </Grid.RowDefinitions>
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Version:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -1180,8 +1181,11 @@
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="License:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.LicenseText, Mode=OneWay}" FontSize="11" FontWeight="Medium" />
 
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text=".NET Core:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Grid.Row="3" Grid.Column="1" Text="{x:Bind ViewModel.DotNetVersion, Mode=OneWay}" FontSize="11" FontWeight="Medium" />
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Contact:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <HyperlinkButton Grid.Row="3" Grid.Column="1" Content="JOJIN JOHN (LinkedIn)" NavigateUri="{x:Bind ViewModel.LinkedInUrl, Mode=OneWay}" Padding="0" FontSize="11" />
+
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text=".NET Core:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.DotNetVersion, Mode=OneWay}" FontSize="11" FontWeight="Medium" />
                                     </Grid>
 
                                     <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">

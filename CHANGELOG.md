@@ -81,6 +81,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Self-contained, unpackaged Windows 11 x64 distribution.
   - Zero developer machine path dependencies.
   - Clean `%LOCALAPPDATA%\QuickDock\` storage model with graceful upgrade and uninstall support.
+  - Automated GitHub Actions Release workflow (`.github/workflows/release.yml`) for standalone Windows binary packaging.
+  - Proprietary EULA License protecting intellectual property against unauthorized cloning, copying, or reverse engineering.
   - 224 automated unit and security tests passing with 0 warnings and 0 errors.
 
 [1.0.0]: https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0
+

@@ -1,0 +1,93 @@
+name: Release QuickDock Windows 11 Application
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g. v1.0.0)'
+        required: false
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Package Windows Standalone Binary
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore QuickDock.slnx
+
+      - name: Execute Automated Test Suite
+        run: dotnet test tests/QuickDock.Core.Tests/QuickDock.Core.Tests.csproj -c Release --no-restore --logger "console;verbosity=normal"
+
+      - name: Publish Self-Contained WinUI 3 (win-x64)
+        run: |
+          dotnet publish src/QuickDock.App/QuickDock.App.csproj -c Release -r win-x64 --self-contained true -o ./publish/QuickDock-win-x64
+
+      - name: Ensure WinUI 3 Resources PRI Deployment
+        shell: pwsh
+        run: |
+          if (Test-Path ./src/QuickDock.App/bin/Release/net10.0-windows10.0.26100.0/win-x64/resources.pri) {
+            Copy-Item -Path ./src/QuickDock.App/bin/Release/net10.0-windows10.0.26100.0/win-x64/resources.pri -Destination ./publish/QuickDock-win-x64/ -Force
+          }
+          # Verify binary presence
+          if (-not (Test-Path ./publish/QuickDock-win-x64/QuickDock.App.exe)) {
+            Write-Error "QuickDock.App.exe was not found in publish directory."
+            exit 1
+          }
+
+      - name: Create Release Distribution Archive
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path ./dist
+          $tag = "${{ github.ref_name }}"
+          if ([string]::IsNullOrWhiteSpace($tag) -or $tag -notmatch '^v\d') {
+            $tag = "${{ github.event.inputs.tag_name }}"
+          }
+          if ([string]::IsNullOrWhiteSpace($tag)) {
+            $tag = "v1.0.0"
+          }
+          $zipName = "QuickDock-$tag-win-x64.zip"
+          Write-Host "Compressing ./publish/QuickDock-win-x64 into ./dist/$zipName"
+          Compress-Archive -Path ./publish/QuickDock-win-x64/* -DestinationPath "./dist/$zipName" -CompressionLevel Optimal -Force
+          
+          # Generate SHA-256 Checksum
+          $hash = (Get-FileHash -Path "./dist/$zipName" -Algorithm SHA256).Hash
+          "$hash *$zipName" | Out-File -FilePath ./dist/SHA256SUMS.txt -Encoding utf8
+          Write-Host "Archive SHA-256: $hash"
+
+      - name: Upload Build Artifacts to GitHub Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuickDock-StandAlone-Binary
+          path: ./dist/*
+          retention-days: 30
+
+      - name: Publish Release Assets to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ./dist/*.zip
+            ./dist/SHA256SUMS.txt
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

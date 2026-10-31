@@ -4,7 +4,8 @@
 **Target Platform:** Windows 11 / Windows 10 (Build 19045+)  
 **Architecture:** x64  
 **Developer:** JOJIN JOHN  
-**License:** MIT License  
+**Contact / LinkedIn:** [https://www.linkedin.com/in/jojin-john/](https://www.linkedin.com/in/jojin-john/)  
+**License:** Proprietary (All Rights Reserved) — See [LICENSE](LICENSE)  
 **GitHub Repository:** [https://github.com/jojin1709/QuickDock](https://github.com/jojin1709/QuickDock)  
 
 ---
@@ -190,7 +191,7 @@ To completely remove QuickDock:
 
 | Artifact | Architecture | File Size | SHA-256 Checksum |
 | :--- | :--- | :--- | :--- |
-| **`QuickDock-v1.0.0-win-x64.zip`** | x64 | **109.13 MB** (114,427,330 B) | `484B2303AA551071ECC99B8AC21FD9067E0602DC242FA1CABA9A2F6C3B6B0D66` |
+| **`QuickDock-v1.0.0-win-x64.zip`** | x64 | **109.13 MB** (114,427,071 B) | `B6A5389D9F6A31899E70B2F6ECCAAE01C86CBFC21CAEAEC2316F509108AEE318` |
 
 ---
 
@@ -198,4 +199,7 @@ To completely remove QuickDock:
 
 **Developer:** JOJIN JOHN  
 **GitHub Profile:** [https://github.com/jojin1709](https://github.com/jojin1709)  
-**License:** [MIT License](LICENSE)
+**LinkedIn:** [https://www.linkedin.com/in/jojin-john/](https://www.linkedin.com/in/jojin-john/)  
+**License:** [Proprietary License (All Rights Reserved)](LICENSE) — Strictly not open source. Unauthorized copying, cloning, or reverse engineering is prohibited.
+
+

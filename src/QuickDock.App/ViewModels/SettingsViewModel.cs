@@ -294,22 +294,25 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     // About
     [ObservableProperty]
-    private string _appVersion = "1.0.0 (Phase 9 Personalization)";
+    private string _appVersion = "1.0.0";
 
     [ObservableProperty]
     private string _developerName = "JOJIN JOHN";
 
     [ObservableProperty]
-    private string _copyrightText = "Copyright © 2026 QuickDock. All rights reserved.";
+    private string _copyrightText = "Copyright © 2026 JOJIN JOHN. All rights reserved.";
 
     [ObservableProperty]
-    private string _licenseText = "MIT License";
+    private string _licenseText = "Proprietary (All Rights Reserved)";
 
     [ObservableProperty]
     private string _gitHubRepoUrl = "https://github.com/jojin1709/QuickDock";
 
     [ObservableProperty]
-    private string _docsUrl = "docs/PHASE_9_SETTINGS_PERSONALIZATION.md";
+    private string _linkedInUrl = "https://www.linkedin.com/in/jojin-john/";
+
+    [ObservableProperty]
+    private string _docsUrl = "docs/RELEASE_1.0.0.md";
 
     [ObservableProperty]
     private string _dotNetVersion = Environment.Version.ToString();
@@ -413,7 +416,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
         Add("Accessibility", "Accessibility", "Reduced Motion & Text Scaling", "Adjust text zoom factor and respect system accessibility.", "accessibility text scale zoom font contrast reduced motion");
 
-        Add("About", "About", "QuickDock Information", "View version, author, license, updates, and open-source documentation.", "about version author jojin john copyright github license update");
+        Add("About", "About", "QuickDock Information", "View version, author, license, updates, and release documentation.", "about version author jojin john copyright github license update linkedin");
     }
 
     public void LoadSettings()

@@ -1,21 +1,41 @@
-MIT License
+QUICKDOCK PROPRIETARY SOFTWARE LICENSE AND TERMS OF USE
+Copyright (c) 2026 JOJIN JOHN. All Rights Reserved.
 
-Copyright (c) 2026 JOJIN JOHN
+IMPORTANT — READ CAREFULLY BEFORE DOWNLOADING, ACCESSING, CLONING, OR USING QUICKDOCK:
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software and its associated source code, binaries, documentation, graphic designs, icons, algorithms, and architectural implementations (collectively, the "Software") are the exclusive intellectual property and proprietary work of JOJIN JOHN ("Author", "Copyright Owner").
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+THIS SOFTWARE IS NOT OPEN SOURCE. IT IS PROPRIETARY SOFTWARE.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+By accessing, downloading, viewing, running, or interacting with any portion of the Software or its repository, you agree to be bound by the terms and conditions of this Agreement. If you do not agree to these terms, do not download, clone, inspect, or use the Software.
+
+1. PROHIBITION ON COPYING, CLONING, FORKING, AND REDISTRIBUTION
+   - You may NOT copy, git clone, fork, mirror, download source code, archive, scrape, redistribute, publish, transmit, sublicense, rent, lease, or resell this repository, its source code, or any part thereof in any form or media without prior express written permission from JOJIN JOHN.
+   - Any public or private reposting, copying, or mirroring of this source code or its assets is strictly prohibited and constitutes willful copyright infringement.
+
+2. PROHIBITION ON REVERSE ENGINEERING, REPRODUCTION TOOLS & AI TRAINING
+   - You may NOT decompile, disassemble, reverse engineer, extract ASTs, decrypt, analyze bytecode, or use decompilers, disassemblers, memory scanners, reflection tools, or any software extraction or reproduction tools on the binaries or source code.
+   - You may NOT use this software, its architecture, or its source code to train, fine-tune, prompt, evaluate, or benchmark artificial intelligence (AI), machine learning models, large language models (LLMs), or automated code-generation agents.
+   - You may NOT create derivative works, copycat utilities, clones, or competitive products based on the design, architecture, or code of QuickDock.
+
+3. LIMITED PERMITTED END-USER USE
+   - Users are granted a limited, personal, revocable, non-exclusive, non-transferable license solely to execute and run the official pre-compiled QuickDock application binaries (QuickDock.App.exe) as released by the Author for personal desktop evaluation.
+   - You may ONLY use the compiled application. Source code access or retention does not convey any rights to modify, recompile, or distribute the Software.
+
+4. BUG REPORTING & DEFECT NOTIFICATION
+   - Users who encounter bugs, security vulnerabilities, or performance defects are encouraged to submit reports via the official GitHub repository issue tracker (https://github.com/jojin1709/QuickDock/issues) or reach out directly to the Author.
+
+5. AUTHOR INQUIRIES & PERMISSION REQUESTS
+   - For licensing inquiries, commercial permissions, collaboration, or questions regarding the Software, contact the Author directly:
+     JOJIN JOHN
+     LinkedIn: https://www.linkedin.com/in/jojin-john/
+     GitHub: https://github.com/jojin1709
+
+6. ENFORCEMENT, PLATFORM BANS & LEGAL ACTION
+   - Any violation of this Agreement—including but not limited to unauthorized cloning, distribution, theft of code, reverse engineering, or infringement of intellectual property rights—will result in:
+     (a) Immediate and permanent revocation of any license to use the application;
+     (b) Platform abuse reports, DMCA takedown notices, and account bans across repository hosting platforms, web hosts, and distribution channels; and
+     (c) Immediate pursuit of all available legal remedies, including statutory damages, injunctive relief, and civil and criminal legal action under applicable national and international copyright, trade secret, and intellectual property laws.
+
+7. DISCLAIMER OF WARRANTY & LIMITATION OF LIABILITY
+   - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR OR COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
