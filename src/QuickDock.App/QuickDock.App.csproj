@@ -53,7 +53,8 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">False</PublishTrimmed>
   </PropertyGroup>
-  <Target Name="EnsureResourcesPri" AfterTargets="Build">
+  <Target Name="EnsureResourcesPri" AfterTargets="Build;Publish">
     <Copy SourceFiles="$(TargetDir)QuickDock.App.pri" DestinationFiles="$(TargetDir)resources.pri" Condition="Exists('$(TargetDir)QuickDock.App.pri')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(PublishDir)QuickDock.App.pri" DestinationFiles="$(PublishDir)resources.pri" Condition="'$(PublishDir)' != '' and Exists('$(PublishDir)QuickDock.App.pri')" SkipUnchangedFiles="true" />
   </Target>
 </Project>

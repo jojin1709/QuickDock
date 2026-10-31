@@ -3,6 +3,17 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <!-- Versioning -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0</InformationalVersion>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Product>QuickDock</Product>
+    <Company>JOJIN JOHN</Company>
+    <Authors>JOJIN JOHN</Authors>
+    <Copyright>Copyright © 2026 JOJIN JOHN. All rights reserved.</Copyright>
+    <Description>High-performance, native Windows 11 utility dock and productivity control layer.</Description>
     <!-- Suppress advisory NU1903 for local embedded sqlite until upstream updates bundle, and MVVMTK0045 WinRT AOT warning -->
     <NoWarn>$(NoWarn);NU1903;MVVMTK0045</NoWarn>
   </PropertyGroup>

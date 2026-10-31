@@ -19,4 +19,7 @@ $RECYCLE.BIN/
 crash.txt
 startup.txt
 *.tmp
+[Pp]ublish/
+[Dd]ist/
+
 

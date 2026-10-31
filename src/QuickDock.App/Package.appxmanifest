@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -6,19 +6,18 @@
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  xmlns:systemai="http://schemas.microsoft.com/appx/manifest/systemai/windows10"
-  IgnorableNamespaces="uap uap10 rescap systemai">
+  IgnorableNamespaces="uap uap10 rescap">
 
   <Identity
-    Name="132B28A1-6718-4C17-97FD-F1CDB19089BB"
-    Publisher="CN=AppPublisher"
+    Name="QuickDock"
+    Publisher="CN=JOJIN JOHN"
     Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="132B28A1-6718-4C17-97FD-F1CDB19089BB" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>QuickDock.App</DisplayName>
-    <PublisherDisplayName>AppPublisher</PublisherDisplayName>
+    <DisplayName>QuickDock</DisplayName>
+    <PublisherDisplayName>JOJIN JOHN</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <uap10:PackageIntegrity>
       <uap10:Content Enforcement="on"/>
@@ -39,8 +38,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="QuickDock.App"
-        Description="QuickDock.App"
+        DisplayName="QuickDock"
+        Description="High-performance native Windows 11 utility dock and productivity control layer."
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
@@ -52,6 +51,5 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
-    <systemai:Capability Name="systemAIModels"/>
   </Capabilities>
 </Package>
