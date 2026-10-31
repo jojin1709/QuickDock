@@ -37,6 +37,16 @@ public sealed partial class SettingsView : UserControl
         InitializeComponent();
     }
 
-    private string FormatHoverDelay(SettingsViewModel? vm) => vm != null ? $"{vm.HoverDelayMs} ms" : "150 ms";
-}
+    private Visibility IsSectionVisible(string selectedSection, string targetSection) =>
+        string.Equals(selectedSection, targetSection, StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
 
+    private Visibility HasSearchResults(int count) => count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    private Visibility NoSearchResults(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsCustomAccentVisible(int accentIndex) => accentIndex == 5 ? Visibility.Visible : Visibility.Collapsed;
+    private Visibility HasEditingShortcut(ShortcutDisplayItem? item) => item != null ? Visibility.Visible : Visibility.Collapsed;
+    private Visibility HasStatusMessage(string? msg) => !string.IsNullOrWhiteSpace(msg) ? Visibility.Visible : Visibility.Collapsed;
+
+    private string FormatHoverDelay(int delayMs) => $"{delayMs} ms";
+    private string FormatSeconds(int seconds) => $"{seconds} s";
+}

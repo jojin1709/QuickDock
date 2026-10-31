@@ -95,3 +95,4 @@ public sealed partial class NetworkSecurityView : UserControl
         if (ViewModel != null) _ = ViewModel.InitializeSectionAsync("Report");
     }
 }
+

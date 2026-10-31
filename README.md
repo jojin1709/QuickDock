@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[Phase 8 Network & Security Toolkit Release](docs/PHASE_8_NETWORK_SECURITY.md):** Defensive network diagnostics, DNS resolver, active connection & port inspection, TLS inspector, HTTP security headers, Windows Firewall & Defender monitors, file integrity verification, and security posture reporting are now live. See the [verification report](docs/PHASE_8_NETWORK_SECURITY.md#14-test-verification-matrix) (166 passing tests, 0 warnings).
+> **[Phase 9 Settings & Personalization Release](docs/PHASE_9_SETTINGS_PERSONALIZATION.md):** 12 comprehensive configuration sections, granular section & global reset with data preservation, schema-validated JSON backup/export with credential scrubbing, conflict-aware global shortcut manager, and storage inspector are now live. See the [verification report](docs/PHASE_9_SETTINGS_PERSONALIZATION.md#14-test-verification-matrix) (184 passing tests, 0 warnings).
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-166%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-184%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 
@@ -32,7 +32,7 @@ dotnet run --project src/QuickDock.App
 
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
-<a href="docs/PHASE_8_NETWORK_SECURITY.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+<a href="docs/PHASE_9_SETTINGS_PERSONALIZATION.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
 
 </div>
 
@@ -205,6 +205,15 @@ dotnet test --configuration Release
 - **Local Security Posture & File Integrity**: Evaluates UAC, BitLocker, secure boot, guest accounts, and cryptographic hash verification with tamper detection.
 - **Defensive Security Reports**: Exportable Markdown / JSON security audits summarizing network and host posture.
 
+### ⚙️ Settings & Personalization
+- **12 Comprehensive Configuration Sections**: General, Appearance, Dock, Modules, Shortcuts, Notifications, Privacy, Storage, Network, Developer, Accessibility, and About.
+- **Visual & Material Personalization**: Real-time Mica, Acrylic, and Solid backdrop selection, dark/light/system theme toggling, custom accent colors, dock sizing (Compact, Normal, Large), and Top / Bottom screen positioning.
+- **Shortcuts & Conflict Management**: Dynamic global hotkey registration (`RegisterHotKey`) with duplicate hotkey conflict detection, modifier requirements, and instant in-app remapping.
+- **Module Lifecycle Control**: Fine-grained module enablement/disablement grouped by category (Productivity, Files, Developer, Network & Security) honoring the core lifecycle rule.
+- **Storage Footprint & Safe Cleanup**: Transparent disk breakdown (Database, Cache, Logs, Temp, Shelf) with targeted cache/log clearing and protected user data retention.
+- **Backup, Export & Secure Import**: Schema-validated JSON backup (`schemaVersion: 1`) with automatic sensitive credential scrubbing (Weather API keys, tokens) and atomic validation on restore.
+- **Granular Reset System**: Reset individual sections or restore all preferences to defaults while strictly preserving user notes, bookmarks, and database records.
+
 ---
 
 ## 🏗️ Architecture & Design Philosophy
@@ -319,6 +328,7 @@ flowchart TD
 | **Network & Security** | **Security Posture** | Active | Local host hardening audit: UAC, BitLocker, Secure Boot, Guest accounts |
 | **Network & Security** | **File Integrity** | Active | Cryptographic baseline hashing & automated tamper detection |
 | **Network & Security** | **Security Audit Report** | Active | Structured Markdown and JSON audit export for compliance |
+| **Settings** | **Settings & Personalization** | Active | JSON settings engine, Win32 `RegisterHotKey`, Windows App SDK backdrops |
 
 ---
 
@@ -346,6 +356,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 | **[Phase 6 Guide](docs/PHASE_6_FILE_TRANSFER.md)** | File & Transfer System | File Shelf, QuickDrop HTTP engine, QR pairing, Zip-Slip safe extractor |
 | **[Phase 7 Guide](docs/PHASE_7_DEVELOPER_TOOLKIT.md)** | Developer Toolkit | Git, Docker, Terminal, JSON/JWT, Regex, QR, HTTP client, Ports/Processes |
 | **[Phase 8 Guide](docs/PHASE_8_NETWORK_SECURITY.md)** | Network & Security Toolkit | Defensive diagnostics, DNS, sockets, TLS, headers, Firewall, Defender, integrity |
+| **[Phase 9 Guide](docs/PHASE_9_SETTINGS_PERSONALIZATION.md)** | Settings & Personalization | 12 settings sections, backdrop switching, hotkey manager, storage inspector, JSON backup |
 
 ---
 

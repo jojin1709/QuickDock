@@ -1,18 +1,21 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using QuickDock.Core.Interfaces;
+using QuickDock.Core.Settings;
 
 namespace QuickDock.Infrastructure.Windows;
 
 public sealed class NotificationService : INotificationService
 {
     private readonly ILogger<NotificationService> _logger;
+    private readonly ISettingsManager? _settingsManager;
     private IntPtr _trayHwnd = IntPtr.Zero;
     private int _trayIconId = 1;
 
-    public NotificationService(ILogger<NotificationService> logger)
+    public NotificationService(ILogger<NotificationService> logger, ISettingsManager? settingsManager = null)
     {
         _logger = logger;
+        _settingsManager = settingsManager;
     }
 
     public void RegisterTrayHandle(IntPtr hWnd, int iconId = 1)
@@ -23,6 +26,27 @@ public sealed class NotificationService : INotificationService
 
     public void ShowNotification(string title, string message, string? action = null)
     {
+        if (_settingsManager != null)
+        {
+            var notif = _settingsManager.CurrentSettings.Notifications;
+            if (!notif.Enabled)
+            {
+                _logger.LogDebug("Notification suppressed (global notifications disabled): [{Title}] {Message}", title, message);
+                return;
+            }
+
+            if (title.Contains("Timer", StringComparison.OrdinalIgnoreCase) && !notif.TimerNotifications)
+                return;
+            if (title.Contains("Pomodoro", StringComparison.OrdinalIgnoreCase) && !notif.PomodoroNotifications)
+                return;
+            if (title.Contains("QuickDrop", StringComparison.OrdinalIgnoreCase) && !notif.QuickDropNotifications)
+                return;
+            if (title.Contains("Transfer", StringComparison.OrdinalIgnoreCase) && !notif.TransferNotifications)
+                return;
+            if (title.Contains("Security", StringComparison.OrdinalIgnoreCase) && !notif.SecurityNotifications)
+                return;
+        }
+
         _logger.LogInformation("QuickDock Notification: [{Title}] {Message}", title, message);
 
         try

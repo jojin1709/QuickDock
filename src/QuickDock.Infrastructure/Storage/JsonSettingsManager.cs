@@ -88,6 +88,165 @@ public sealed class JsonSettingsManager : ISettingsManager
         await SaveAsync(defaultSettings, "Reset", cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task ResetSectionAsync(string sectionName, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(sectionName);
+        var settings = _currentSettings;
+        var defaults = new QuickDockSettings();
+
+        switch (sectionName.Trim().ToLowerInvariant())
+        {
+            case "appearance":
+                settings.Appearance = defaults.Appearance;
+                break;
+            case "dock":
+            case "behavior":
+                settings.Behavior = defaults.Behavior;
+                break;
+            case "general":
+                settings.General = defaults.General;
+                break;
+            case "modules":
+                settings.EnabledModules = new Dictionary<string, bool>(defaults.EnabledModules, StringComparer.OrdinalIgnoreCase);
+                break;
+            case "shortcuts":
+                settings.Shortcuts = defaults.Shortcuts;
+                break;
+            case "notifications":
+                settings.Notifications = defaults.Notifications;
+                break;
+            case "privacy":
+                settings.Privacy = defaults.Privacy;
+                break;
+            case "network":
+                settings.Network = defaults.Network;
+                break;
+            case "developer":
+                settings.Developer = defaults.Developer;
+                break;
+            case "accessibility":
+                settings.Accessibility = defaults.Accessibility;
+                break;
+            case "all":
+                settings = defaults;
+                break;
+            default:
+                _logger.LogWarning("Unknown settings section to reset: {Section}", sectionName);
+                return;
+        }
+
+        await SaveAsync(settings, sectionName, cancellationToken).ConfigureAwait(false);
+    }
+
+    public Task<string> ExportSettingsJsonAsync(CancellationToken cancellationToken = default)
+    {
+        // Clone current settings to prevent mutation
+        var serialized = JsonSerializer.Serialize(_currentSettings, JsonOptions);
+        var clone = JsonSerializer.Deserialize<QuickDockSettings>(serialized, JsonOptions) ?? new QuickDockSettings();
+
+        // Security boundary: sanitize and strip sensitive credentials
+        clone.Weather.ApiKey = string.Empty;
+        if (clone.CustomModuleConfig.Count > 0)
+        {
+            var keysToRemove = clone.CustomModuleConfig.Keys
+                .Where(k => k.Contains("token", StringComparison.OrdinalIgnoreCase) ||
+                            k.Contains("secret", StringComparison.OrdinalIgnoreCase) ||
+                            k.Contains("key", StringComparison.OrdinalIgnoreCase) ||
+                            k.Contains("password", StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            foreach (var k in keysToRemove)
+            {
+                clone.CustomModuleConfig.Remove(k);
+            }
+        }
+
+        var exportContainer = new
+        {
+            schemaVersion = 1,
+            application = "QuickDock",
+            exportedAtUtc = DateTime.UtcNow,
+            settings = clone
+        };
+
+        var json = JsonSerializer.Serialize(exportContainer, JsonOptions);
+        return Task.FromResult(json);
+    }
+
+    public async Task<SettingsImportResult> ImportSettingsJsonAsync(string json, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return new SettingsImportResult(false, "Import failed: Configuration payload is empty.");
+        }
+
+        if (json.Length > 5 * 1024 * 1024)
+        {
+            return new SettingsImportResult(false, "Import failed: Configuration file exceeds maximum 5 MB threshold.");
+        }
+
+        try
+        {
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            // Validate schema version
+            if (root.TryGetProperty("schemaVersion", out var versionElement))
+            {
+                int version = versionElement.GetInt32();
+                if (version != 1)
+                {
+                    return new SettingsImportResult(false, $"Import failed: Unsupported schema version {version}. Expected version 1.");
+                }
+            }
+
+            QuickDockSettings? importedSettings = null;
+            if (root.TryGetProperty("settings", out var settingsElement))
+            {
+                importedSettings = JsonSerializer.Deserialize<QuickDockSettings>(settingsElement.GetRawText(), JsonOptions);
+            }
+            else
+            {
+                // Fallback direct root deserialize
+                importedSettings = JsonSerializer.Deserialize<QuickDockSettings>(json, JsonOptions);
+            }
+
+            if (importedSettings == null)
+            {
+                return new SettingsImportResult(false, "Import failed: Unable to deserialize valid QuickDock settings.");
+            }
+
+            // Clamping and boundary validation
+            importedSettings.Behavior.HoverDelayMs = Math.Clamp(importedSettings.Behavior.HoverDelayMs, 50, 2000);
+            importedSettings.Appearance.Opacity = Math.Clamp(importedSettings.Appearance.Opacity, 0.2, 1.0);
+            importedSettings.Accessibility.TextScalePercent = Math.Clamp(importedSettings.Accessibility.TextScalePercent, 100, 200);
+            importedSettings.Network.RequestTimeoutSeconds = Math.Clamp(importedSettings.Network.RequestTimeoutSeconds, 5, 120);
+            importedSettings.Network.DnsTimeoutSeconds = Math.Clamp(importedSettings.Network.DnsTimeoutSeconds, 1, 30);
+            importedSettings.Network.HttpTimeoutSeconds = Math.Clamp(importedSettings.Network.HttpTimeoutSeconds, 2, 60);
+            importedSettings.Network.TlsTimeoutSeconds = Math.Clamp(importedSettings.Network.TlsTimeoutSeconds, 2, 30);
+            importedSettings.Developer.ProcessMonitorRefreshRateSeconds = Math.Clamp(importedSettings.Developer.ProcessMonitorRefreshRateSeconds, 2, 30);
+
+            // Strip sensitive credentials on import
+            importedSettings.Weather.ApiKey = string.Empty;
+
+            // Save validated settings
+            await SaveAsync(importedSettings, "Import", cancellationToken).ConfigureAwait(false);
+            _logger.LogInformation("Successfully imported and validated QuickDock configuration.");
+
+            return new SettingsImportResult(true, null, importedSettings.EnabledModules.Count);
+        }
+        catch (JsonException jex)
+        {
+            _logger.LogWarning(jex, "Failed to parse imported JSON settings.");
+            return new SettingsImportResult(false, $"Import failed: Malformed JSON syntax. {jex.Message}");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error importing settings.");
+            return new SettingsImportResult(false, $"Import failed: {ex.Message}");
+        }
+    }
+
     private async Task SaveInternalAsync(QuickDockSettings settings, CancellationToken cancellationToken)
     {
         var directory = Path.GetDirectoryName(_filePath);

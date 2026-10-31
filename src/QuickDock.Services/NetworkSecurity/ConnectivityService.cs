@@ -149,3 +149,4 @@ public sealed class ConnectivityService : IConnectivityService
         return result.IsReachable;
     }
 }
+

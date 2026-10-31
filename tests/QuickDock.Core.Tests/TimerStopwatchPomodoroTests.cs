@@ -32,6 +32,18 @@ public class MockSettingsManager : ISettingsManager
         CurrentSettings = new QuickDockSettings();
         return Task.CompletedTask;
     }
+    public Task ResetSectionAsync(string sectionName, CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+    public Task<string> ExportSettingsJsonAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult("{}");
+    }
+    public Task<SettingsImportResult> ImportSettingsJsonAsync(string json, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(new SettingsImportResult(true));
+    }
 }
 
 public class TimerStopwatchPomodoroTests

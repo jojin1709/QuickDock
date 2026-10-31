@@ -189,3 +189,4 @@ public sealed class RoutingNeighborService : IRoutingNeighborService
         public static extern uint GetIpNetTable(IntPtr pIpNetTable, ref int pdwSize, bool bOrder);
     }
 }
+

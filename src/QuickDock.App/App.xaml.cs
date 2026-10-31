@@ -22,6 +22,7 @@ using QuickDock.Modules.Productivity;
 using QuickDock.Modules.Files;
 using QuickDock.Modules.Developer;
 using QuickDock.Modules.NetworkSecurity;
+using QuickDock.Services.Storage;
 using QuickDock.Services.Audio;
 using QuickDock.Services.Clipboard;
 using QuickDock.Services.Files;
@@ -70,6 +71,8 @@ public partial class App : Application
                 services.AddSingleton<IStartupService, StartupService>();
                 services.AddSingleton<IFullscreenService, FullscreenDetectionService>();
                 services.AddSingleton<INotificationService, NotificationService>();
+                services.AddSingleton<IStorageManagerService, StorageManagerService>();
+                services.AddSingleton<IShortcutManagerService, ShortcutManagerService>();
                 services.AddSingleton<ISystemMetricsService, SystemMetricsService>();
                 services.AddSingleton<IAudioService, CoreAudioService>();
                 services.AddSingleton<IMediaService, WindowsMediaService>();

@@ -264,3 +264,4 @@ public sealed class NetworkOverviewService : INetworkOverviewService
         return $"{speedBitsPerSec} bps";
     }
 }
+

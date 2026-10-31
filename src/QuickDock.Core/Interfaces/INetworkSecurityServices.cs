@@ -80,3 +80,4 @@ public interface ISecurityReportService
 {
     Task<SecurityReportResult> GenerateReportAsync(SecurityReportRequest request, CancellationToken cancellationToken = default);
 }
+

@@ -196,11 +196,13 @@ public sealed partial class MainWindow : Window
         Closed += OnWindowClosed;
 
         ApplyTheme(_settingsManager.CurrentSettings.Appearance.Theme);
+        ApplyBackdrop(_settingsManager.CurrentSettings.Appearance.Backdrop);
         _eventBus.Subscribe<SettingsChangedEvent>((e, ct) =>
         {
             DispatcherQueue.TryEnqueue(() =>
             {
                 ApplyTheme(e.Settings.Appearance.Theme);
+                ApplyBackdrop(e.Settings.Appearance.Backdrop);
                 _positioningService.SetAlwaysOnTop(_hWnd, e.Settings.Behavior.AlwaysOnTop);
                 _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
             });
@@ -405,6 +407,23 @@ public sealed partial class MainWindow : Window
                 AppTheme.Dark => ElementTheme.Dark,
                 _ => ElementTheme.Default
             };
+        }
+    }
+
+    private void ApplyBackdrop(BackdropType backdrop)
+    {
+        try
+        {
+            SystemBackdrop = backdrop switch
+            {
+                BackdropType.Acrylic => new DesktopAcrylicBackdrop(),
+                BackdropType.Solid => null,
+                _ => new MicaBackdrop()
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "Backdrop fallback applied.");
         }
     }
 

@@ -580,3 +580,4 @@ public sealed partial class NetworkSecurityViewModel : ObservableObject
         Clipboard.SetContent(dataPackage);
     }
 }
+

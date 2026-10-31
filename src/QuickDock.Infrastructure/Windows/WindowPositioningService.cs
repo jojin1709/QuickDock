@@ -33,11 +33,18 @@ public sealed class WindowPositioningService : IWindowPositioningService
     {
         if (scaleFactor <= 0) scaleFactor = 1.0;
 
+        double sizeMultiplier = _settingsManager.CurrentSettings.Behavior.Size switch
+        {
+            DockSize.Compact => 0.85,
+            DockSize.Large => 1.15,
+            _ => 1.0
+        };
+
         int baseW = isExpanded ? BaseExpandedWidth : BaseIdleWidth;
         int baseH = isExpanded ? BaseExpandedHeight : BaseIdleHeight;
 
-        int w = (int)Math.Round(baseW * scaleFactor);
-        int h = (int)Math.Round(baseH * scaleFactor);
+        int w = (int)Math.Round(baseW * scaleFactor * sizeMultiplier);
+        int h = (int)Math.Round(baseH * scaleFactor * sizeMultiplier);
 
         return (w, h);
     }
@@ -51,11 +58,20 @@ public sealed class WindowPositioningService : IWindowPositioningService
         if (scaleFactor <= 0) scaleFactor = 1.0;
 
         var (width, height) = GetDockDimensions(isExpanded, scaleFactor);
-        int scaledTopMargin = (int)Math.Round(topMargin * scaleFactor);
+        int scaledMargin = (int)Math.Round(topMargin * scaleFactor);
 
         // Center horizontally on the target monitor's work area
         int x = workX + (workWidth - width) / 2;
-        int y = workY + scaledTopMargin;
+
+        int y;
+        if (_settingsManager.CurrentSettings.Behavior.Position == DockPosition.Bottom)
+        {
+            y = workY + workHeight - height - scaledMargin;
+        }
+        else
+        {
+            y = workY + scaledMargin;
+        }
 
         return (x, y, width, height);
     }
