@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="QuickDock.App.Views.HomeView"
+    x:Name="RootHomeView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:QuickDock.App.Controls"
+    xmlns:vm="using:QuickDock.App.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="12">
+        <Grid.RowDefinitions>
+            <!-- Header bar with clock, search, metrics, settings -->
+            <RowDefinition Height="Auto" />
+            <!-- Scrollable modules section -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Top Header Controls -->
+        <Grid Grid.Row="0" ColumnSpacing="12" Margin="4,0,4,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Time & Date -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <TextBlock Text="{x:Bind ViewModel.CurrentTime, Mode=OneWay}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                <TextBlock Text="{x:Bind ViewModel.CurrentDate, Mode=OneWay}"
+                           FontSize="11"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+
+            <!-- Search Filter -->
+            <TextBox Grid.Column="1"
+                     PlaceholderText="Search modules..."
+                     Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     VerticalAlignment="Center"
+                     MaxWidth="280"
+                     CornerRadius="{StaticResource SearchBoxCornerRadius}">
+            </TextBox>
+
+            <!-- Real System Metrics Status Bar -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.CpuMetricText, Mode=OneWay}"
+                                              DotBrush="{ThemeResource StatusAccentBrush}" />
+                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.MemoryMetricText, Mode=OneWay}"
+                                              DotBrush="{ThemeResource StatusAccentBrush}" />
+                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.BatteryMetricText, Mode=OneWay}"
+                                              DotBrush="{ThemeResource StatusActiveBrush}" />
+            </StackPanel>
+
+            <!-- Settings Button -->
+            <Button Grid.Column="3"
+                    ToolTipService.ToolTip="Settings"
+                    Command="{x:Bind MainViewModel.OpenSettingsCommand, Mode=OneWay}"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Padding="8"
+                    CornerRadius="6"
+                    VerticalAlignment="Center">
+                <FontIcon Glyph="&#xE713;" FontSize="16" />
+            </Button>
+        </Grid>
+
+        <!-- Module Catalog Scroll Area -->
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="0,0,8,0">
+            <StackPanel Spacing="16">
+
+                <!-- System Controls -->
+                <StackPanel Visibility="{x:Bind HasSystemModules(ViewModel), Mode=OneWay}">
+                    <controls:QuickDockSection Title="System Controls" Badge="3" />
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredSystemModules, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ModuleTileItem">
+                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
+                                                              Title="{x:Bind Title}"
+                                                              Subtitle="{x:Bind Subtitle}"
+                                                              StatusText="{x:Bind StatusText}" />
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </StackPanel>
+
+                <!-- Productivity Section -->
+                <StackPanel Visibility="{x:Bind HasProductivityModules(ViewModel), Mode=OneWay}">
+                    <controls:QuickDockSection Title="Productivity" Badge="4" />
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredProductivityModules, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ModuleTileItem">
+                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
+                                                              Title="{x:Bind Title}"
+                                                              Subtitle="{x:Bind Subtitle}"
+                                                              StatusText="{x:Bind StatusText}" />
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </StackPanel>
+
+                <!-- Utilities Section -->
+                <StackPanel Visibility="{x:Bind HasUtilityModules(ViewModel), Mode=OneWay}">
+                    <controls:QuickDockSection Title="Utilities" Badge="4" />
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredUtilityModules, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ModuleTileItem">
+                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
+                                                              Title="{x:Bind Title}"
+                                                              Subtitle="{x:Bind Subtitle}"
+                                                              StatusText="{x:Bind StatusText}" />
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </StackPanel>
+
+                <!-- Developer & Advanced Section -->
+                <StackPanel Visibility="{x:Bind HasDeveloperModules(ViewModel), Mode=OneWay}">
+                    <controls:QuickDockSection Title="Developer &amp; AI" Badge="3" />
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredDeveloperModules, Mode=OneWay}">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ModuleTileItem">
+                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
+                                                              Title="{x:Bind Title}"
+                                                              Subtitle="{x:Bind Subtitle}"
+                                                              StatusText="{x:Bind StatusText}" />
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

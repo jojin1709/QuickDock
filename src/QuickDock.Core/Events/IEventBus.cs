@@ -23,3 +23,4 @@ public interface IEventBus
     IDisposable Subscribe<TEvent>(Func<TEvent, CancellationToken, Task> handler)
         where TEvent : class, IEvent;
 }
+

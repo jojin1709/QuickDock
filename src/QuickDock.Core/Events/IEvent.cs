@@ -10,3 +10,4 @@ public interface IEvent
     /// </summary>
     DateTimeOffset Timestamp { get; }
 }
+

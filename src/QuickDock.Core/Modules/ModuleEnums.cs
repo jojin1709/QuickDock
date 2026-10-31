@@ -28,3 +28,4 @@ public enum ModuleCategory
     AI,
     Other
 }
+

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#F4F4F5" />
+  <!-- Left block -->
+  <rect x="120" y="208" width="64" height="136" rx="18" fill="#18181B" />
+  <!-- Center block (taller) -->
+  <rect x="224" y="120" width="64" height="224" rx="18" fill="#18181B" />
+  <!-- Right block -->
+  <rect x="328" y="208" width="64" height="136" rx="18" fill="#18181B" />
+  <!-- Horizontal base -->
+  <rect x="96" y="368" width="320" height="40" rx="20" fill="#18181B" />
+</svg>

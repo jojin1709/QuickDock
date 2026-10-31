@@ -93,3 +93,4 @@ public sealed class AppLifecycleService : IAppLifecycleService
         ShutdownRequested?.Invoke(this, EventArgs.Empty);
     }
 }
+

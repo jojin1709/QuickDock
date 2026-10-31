@@ -85,3 +85,4 @@ public sealed class QuickDockSettings
     /// </summary>
     public Dictionary<string, string> CustomModuleConfig { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }
+

@@ -106,3 +106,4 @@ public sealed class JsonSettingsManager : ISettingsManager
         _logger.LogDebug("Configuration saved atomically to {Path}.", _filePath);
     }
 }
+

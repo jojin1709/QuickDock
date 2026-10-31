@@ -56,3 +56,4 @@ public interface IQuickDockModule
     /// </summary>
     Task StopAsync(CancellationToken cancellationToken = default);
 }
+

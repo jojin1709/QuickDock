@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using QuickDock.App.ViewModels;
 using QuickDock.Core.Events;
 using QuickDock.Core.Interfaces;
 using QuickDock.Core.Modules;
@@ -9,7 +11,9 @@ using QuickDock.Core.Settings;
 using QuickDock.Infrastructure.Logging;
 using QuickDock.Infrastructure.Services;
 using QuickDock.Infrastructure.Storage;
+using QuickDock.Infrastructure.Windows;
 using QuickDock.Modules.Clock;
+using QuickDock.Services.System;
 
 namespace QuickDock.App;
 
@@ -39,10 +43,49 @@ public partial class App : Application
                 services.AddSingleton<IModuleManager, ModuleManager>();
                 services.AddSingleton<IAppLifecycleService, AppLifecycleService>();
 
+                // Windows Shell & Native Services
+                services.AddSingleton<ISystemMetricsService, SystemMetricsService>();
+                services.AddSingleton<IWindowPositioningService, WindowPositioningService>();
+                services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
+                services.AddSingleton<ISystemTrayService, SystemTrayService>();
+
+                // ViewModels
+                services.AddSingleton<HomeViewModel>();
+                services.AddSingleton<SettingsViewModel>();
+                services.AddSingleton<MainViewModel>();
+
+                // Modules
                 services.AddSingleton<IQuickDockModule, ClockModule>();
 
-                services.AddTransient<MainWindow>();
-                services.AddTransient<MainPage>();
+                services.AddTransient<MainWindow>(sp =>
+                {
+                    _logger?.LogInformation("MainWindow factory lambda starting...");
+                    var vm = sp.GetRequiredService<MainViewModel>();
+                    _logger?.LogInformation("Factory got MainViewModel");
+                    var pos = sp.GetRequiredService<IWindowPositioningService>();
+                    _logger?.LogInformation("Factory got IWindowPositioningService");
+                    var hotkey = sp.GetRequiredService<IGlobalHotkeyService>();
+                    _logger?.LogInformation("Factory got IGlobalHotkeyService");
+                    var tray = sp.GetRequiredService<ISystemTrayService>();
+                    _logger?.LogInformation("Factory got ISystemTrayService");
+                    var settings = sp.GetRequiredService<ISettingsManager>();
+                    _logger?.LogInformation("Factory got ISettingsManager");
+                    var bus = sp.GetRequiredService<IEventBus>();
+                    _logger?.LogInformation("Factory got IEventBus");
+                    var logger = sp.GetRequiredService<ILogger<MainWindow>>();
+                    try
+                    {
+                        _logger?.LogInformation("Calling new MainWindow(...)");
+                        var win = new MainWindow(vm, pos, hotkey, tray, settings, bus, logger);
+                        _logger?.LogInformation("new MainWindow(...) returned successfully!");
+                        return win;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Exception thrown inside new MainWindow(...)!");
+                        throw;
+                    }
+                });
             })
             .Build();
 
@@ -56,15 +99,30 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var lifecycle = Services.GetRequiredService<IAppLifecycleService>();
-        await lifecycle.StartAsync().ConfigureAwait(true);
-
-        _window = Services.GetRequiredService<MainWindow>();
-        _window.Closed += async (s, e) =>
+        try
         {
-            await lifecycle.StopAsync().ConfigureAwait(false);
-        };
+            var lifecycle = Services.GetRequiredService<IAppLifecycleService>();
+            await lifecycle.StartAsync();
 
-        _window.Activate();
+            _logger?.LogInformation("Resolving MainViewModel...");
+            var vm = Services.GetRequiredService<MainViewModel>();
+            _logger?.LogInformation("MainViewModel resolved.");
+
+            _logger?.LogInformation("Resolving MainWindow...");
+            _window = Services.GetRequiredService<MainWindow>();
+            _logger?.LogInformation("MainWindow resolved.");
+
+            _window.Closed += async (s, e) =>
+            {
+                await lifecycle.StopAsync();
+            };
+
+            _window.Activate();
+            _logger?.LogInformation("QuickDock MainWindow activated successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Failed to launch QuickDock MainWindow.");
+        }
     }
 }

@@ -27,6 +27,7 @@ public static class QuickDockLogging
                 retainedFileCountLimit: 14,
                 fileSizeLimitBytes: 10 * 1024 * 1024,
                 rollOnFileSizeLimit: true,
+                buffered: false,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
     }
@@ -38,3 +39,4 @@ public static class QuickDockLogging
         builder.AddSerilog(dispose: true);
     }
 }
+

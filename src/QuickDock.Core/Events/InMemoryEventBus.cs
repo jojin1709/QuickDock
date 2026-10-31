@@ -113,3 +113,4 @@ public sealed class InMemoryEventBus : IEventBus
         }
     }
 }
+

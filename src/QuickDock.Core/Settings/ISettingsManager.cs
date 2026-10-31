@@ -25,3 +25,4 @@ public interface ISettingsManager
     /// </summary>
     Task ResetToDefaultsAsync(CancellationToken cancellationToken = default);
 }
+

@@ -180,3 +180,4 @@ public abstract class ModuleBase : IQuickDockModule
     protected virtual Task OnStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     protected virtual Task OnStopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
+

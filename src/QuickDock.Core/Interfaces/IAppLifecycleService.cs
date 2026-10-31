@@ -30,3 +30,4 @@ public interface IAppLifecycleService
     /// </summary>
     void RequestShutdown();
 }
+

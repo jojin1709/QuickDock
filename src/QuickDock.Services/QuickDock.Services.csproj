@@ -12,3 +12,4 @@
     <ProjectReference Include="..\QuickDock.Infrastructure\QuickDock.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
+

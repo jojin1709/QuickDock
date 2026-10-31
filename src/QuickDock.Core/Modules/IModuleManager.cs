@@ -51,3 +51,4 @@ public interface IModuleManager
     /// </summary>
     Task DisableModuleAsync(string moduleId, CancellationToken cancellationToken = default);
 }
+

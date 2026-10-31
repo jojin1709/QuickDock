@@ -195,3 +195,4 @@ public sealed class ModuleManager : IModuleManager
         module.IsEnabled = false;
     }
 }
+

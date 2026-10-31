@@ -129,3 +129,4 @@ public sealed record AppVisibilityChangedEvent(
     public AppVisibilityChangedEvent(bool isExpanded, string trigger)
         : this(isExpanded, trigger, DateTimeOffset.UtcNow) { }
 }
+

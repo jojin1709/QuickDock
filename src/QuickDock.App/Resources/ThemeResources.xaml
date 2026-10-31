@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Theme Dictionaries for Light, Dark, HighContrast -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Default">
+            <!-- Dark Mode Default -->
+            <SolidColorBrush x:Key="DockBackgroundBrush" Color="#F0181818" />
+            <SolidColorBrush x:Key="DockBorderBrush" Color="#28FFFFFF" />
+            <SolidColorBrush x:Key="CardBackgroundBrush" Color="#18FFFFFF" />
+            <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#25FFFFFF" />
+            <SolidColorBrush x:Key="CardPressedBackgroundBrush" Color="#12FFFFFF" />
+            <SolidColorBrush x:Key="TileStrokeBrush" Color="#1FFFFFFF" />
+            <SolidColorBrush x:Key="PillBackgroundBrush" Color="#1EFFFFFF" />
+            <SolidColorBrush x:Key="SubtleDividerBrush" Color="#1AFFFFFF" />
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <!-- Light Mode -->
+            <SolidColorBrush x:Key="DockBackgroundBrush" Color="#F5F8F8F8" />
+            <SolidColorBrush x:Key="DockBorderBrush" Color="#20000000" />
+            <SolidColorBrush x:Key="CardBackgroundBrush" Color="#0A000000" />
+            <SolidColorBrush x:Key="CardHoverBackgroundBrush" Color="#14000000" />
+            <SolidColorBrush x:Key="CardPressedBackgroundBrush" Color="#08000000" />
+            <SolidColorBrush x:Key="TileStrokeBrush" Color="#15000000" />
+            <SolidColorBrush x:Key="PillBackgroundBrush" Color="#0E000000" />
+            <SolidColorBrush x:Key="SubtleDividerBrush" Color="#12000000" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+
+    <!-- Corner Radiuses -->
+    <CornerRadius x:Key="DockCornerRadius">18</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="PillCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="TileCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="SearchBoxCornerRadius">14</CornerRadius>
+
+    <!-- Semantic Status Brushes -->
+    <SolidColorBrush x:Key="StatusActiveBrush" Color="#107C41" />
+    <SolidColorBrush x:Key="StatusWarningBrush" Color="#D83B01" />
+    <SolidColorBrush x:Key="StatusAccentBrush" Color="#0078D4" />
+    <SolidColorBrush x:Key="StatusNeutralBrush" Color="#8A8886" />
+
+</ResourceDictionary>
+

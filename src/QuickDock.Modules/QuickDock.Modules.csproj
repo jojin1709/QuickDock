@@ -12,3 +12,4 @@
     <ProjectReference Include="..\QuickDock.Services\QuickDock.Services.csproj" />
   </ItemGroup>
 </Project>
+

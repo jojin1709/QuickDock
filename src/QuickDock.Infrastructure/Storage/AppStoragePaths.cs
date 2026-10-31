@@ -27,3 +27,4 @@ public static class AppStoragePaths
         Directory.CreateDirectory(DataDirectory);
     }
 }
+

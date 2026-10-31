@@ -108,3 +108,4 @@ public class SettingsManagerTests : IDisposable
         Assert.Equal("Ctrl+Space", restored.Behavior.GlobalHotkey);
     }
 }
+

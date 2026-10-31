@@ -24,5 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\QuickDock.Core\QuickDock.Core.csproj" />
     <ProjectReference Include="..\..\src\QuickDock.Infrastructure\QuickDock.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\QuickDock.Services\QuickDock.Services.csproj" />
+    <ProjectReference Include="..\..\src\QuickDock.Modules\QuickDock.Modules.csproj" />
   </ItemGroup>
 </Project>

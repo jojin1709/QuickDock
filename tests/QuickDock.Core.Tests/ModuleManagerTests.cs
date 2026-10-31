@@ -192,3 +192,4 @@ public class ModuleManagerTests
         Assert.Equal(ModuleState.Initialized, stoppedModule.State);
     }
 }
+
