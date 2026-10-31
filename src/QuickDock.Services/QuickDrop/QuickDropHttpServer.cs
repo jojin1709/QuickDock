@@ -24,6 +24,52 @@ public sealed class QuickDropHttpServer : IDisposable
 
     public event EventHandler<TransferItem>? FileReceived;
 
+    public const long MaxUploadSizeBytes = 5L * 1024 * 1024 * 1024; // 5 GB
+
+    private static readonly HashSet<string> ReservedDosDeviceNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+    };
+
+    public static bool TimingSafeTokenEquals(string? a, string? b)
+    {
+        if (a == null || b == null) return false;
+        byte[] aBytes = Encoding.UTF8.GetBytes(a);
+        byte[] bBytes = Encoding.UTF8.GetBytes(b);
+        if (aBytes.Length != bBytes.Length) return false;
+        return CryptographicOperations.FixedTimeEquals(aBytes, bBytes);
+    }
+
+    public static string SanitizeUploadedFileName(string originalName)
+    {
+        var sanitizedName = Path.GetFileName(originalName);
+        if (string.IsNullOrWhiteSpace(sanitizedName))
+        {
+            return $"upload_{Guid.NewGuid():N}.bin";
+        }
+
+        var invalidChars = Path.GetInvalidFileNameChars();
+        var sb = new StringBuilder(sanitizedName.Length);
+        foreach (char c in sanitizedName)
+        {
+            if (!invalidChars.Contains(c) && c != '/' && c != '\\')
+            {
+                sb.Append(c);
+            }
+        }
+        sanitizedName = sb.ToString().Trim();
+
+        string nameWithoutExt = Path.GetFileNameWithoutExtension(sanitizedName);
+        if (string.IsNullOrWhiteSpace(sanitizedName) || ReservedDosDeviceNames.Contains(nameWithoutExt))
+        {
+            return $"upload_{Guid.NewGuid():N}{Path.GetExtension(sanitizedName)}";
+        }
+
+        return sanitizedName;
+    }
+
     public QuickDropHttpServer(
         IFileTransferManager transferManager,
         INotificationService notificationService,
@@ -159,10 +205,10 @@ public sealed class QuickDropHttpServer : IDisposable
 
                 var token = queryParams.GetValueOrDefault("token");
 
-                // Validate session and token
+                // Validate session and token using constant-time comparison
                 if (CurrentSession == null || !CurrentSession.IsActive ||
                     DateTimeOffset.UtcNow > CurrentSession.ExpiresAt ||
-                    !string.Equals(token, CurrentSession.Token, StringComparison.Ordinal))
+                    !TimingSafeTokenEquals(token, CurrentSession.Token))
                 {
                     await SendResponseAsync(stream, 403, "text/plain", "Forbidden: Invalid or expired pairing token.").ConfigureAwait(false);
                     return;
@@ -273,17 +319,26 @@ public sealed class QuickDropHttpServer : IDisposable
 
     private async Task HandleFileUploadAsync(NetworkStream networkStream, string originalName, long contentLength, CancellationToken cancellationToken)
     {
-        // Sanitize file name to prevent path traversal
-        var sanitizedName = Path.GetFileName(originalName);
-        if (string.IsNullOrWhiteSpace(sanitizedName))
+        // Enforce maximum upload payload limit
+        if (contentLength <= 0 || contentLength > MaxUploadSizeBytes)
         {
-            sanitizedName = $"upload_{Guid.NewGuid():N}.bin";
+            await SendResponseAsync(networkStream, 400, "text/plain", $"Invalid or excessive content length (max {MaxUploadSizeBytes / (1024 * 1024 * 1024)}GB).").ConfigureAwait(false);
+            return;
         }
 
-        var targetDir = AppStoragePaths.QuickDropDirectory;
+        // Sanitize file name to prevent path traversal and DOS reserved device collisions
+        var sanitizedName = SanitizeUploadedFileName(originalName);
+
+        var targetDir = Path.GetFullPath(AppStoragePaths.QuickDropDirectory);
         Directory.CreateDirectory(targetDir);
 
-        var targetPath = Path.Combine(targetDir, $"{Guid.NewGuid():N}_{sanitizedName}");
+        var targetPath = Path.GetFullPath(Path.Combine(targetDir, $"{Guid.NewGuid():N}_{sanitizedName}"));
+        if (!targetPath.StartsWith(targetDir, StringComparison.OrdinalIgnoreCase))
+        {
+            await SendResponseAsync(networkStream, 400, "text/plain", "Invalid upload file path.").ConfigureAwait(false);
+            return;
+        }
+
         var transfer = _transferManager.RegisterTransfer(TransferDirection.Upload, sanitizedName, contentLength);
 
         using var incrementalHash = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);

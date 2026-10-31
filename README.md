@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[Phase 10 Performance & Reliability Release](docs/PHASE_10_PERFORMANCE_RELIABILITY.md):** Zero-polling idle execution, lazy module startup, process tree auto-kill, SQLite database corruption recovery, dynamic Serilog level switching, and on-demand diagnostics are now live. See the [verification report](docs/PHASE_10_PERFORMANCE_RELIABILITY.md#6-test-verification-matrix) (194 passing tests, 0 warnings).
+> **[Phase 11 Testing & Security Audit Release](docs/PHASE_11_TESTING_SECURITY_AUDIT.md):** Comprehensive threat modeling, constant-time cryptographic token verification, Zip Slip & Zip Bomb defense, DOS device name sanitization, shell metacharacter injection protection, process termination safeguards, and 100% parameterized SQL persistence verified. See the [security audit report](docs/PHASE_11_TESTING_SECURITY_AUDIT.md#5-security-verification-matrix) (224 passing tests, 0 warnings, 0 errors).
 
 <div align="center">
 
@@ -10,8 +10,9 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-194%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-224%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
+[![Security](https://img.shields.io/badge/Security-Audited%20%26%20Hardened-green?style=for-the-badge&logo=securityscorecard&logoColor=white)](docs/PHASE_11_TESTING_SECURITY_AUDIT.md)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 
 ### QuickDock is a high-performance, native Windows 11 utility dock and productivity control layer.
@@ -32,7 +33,7 @@ dotnet run --project src/QuickDock.App
 
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
-<a href="docs/PHASE_10_PERFORMANCE_RELIABILITY.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+<a href="docs/PHASE_11_TESTING_SECURITY_AUDIT.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
 
 </div>
 
@@ -337,9 +338,11 @@ flowchart TD
 QuickDock is engineered under a strict **Zero-Telemetry, Local-First** commitment:
 
 - **100% Offline & Private**: Notes, clipboard history, calendar events, bookmarks, and files stay on your machine. No accounts, no analytics, no cloud sync, and no third-party tracking.
+- **Timing-Safe Authentication**: QuickDrop token validation utilizes `CryptographicOperations.FixedTimeEquals` to prevent timing side-channel attacks during device pairing.
+- **DOS Device & Traversal Immunity**: Filename sanitization neutralizes DOS reserved device names (`CON`, `PRN`, `AUX`, `NUL`, `COM1..9`, `LPT1..9`) and prevents path traversal escapes.
+- **Zip Slip & Zip Bomb Defense**: Extraction pipelines reject directory traversal sequences (`../`), cap entry counts at 10,000, and halt if decompressed byte thresholds (2 GB) are exceeded.
+- **Process & Command Defense**: Working directory paths are scrubbed for shell metacharacters (`"`, `&`, `|`, `;`), and process termination safeguards protect core system processes and the QuickDock host PID.
 - **Sensitive Data Masking**: Clipboard entries containing AWS keys, GitHub tokens, OpenAI keys, JWTs, and private keys are flagged and masked automatically in the UI.
-- **Zip Slip Exploit Prevention**: Archive extractions rigorously validate destination target paths, discarding files containing directory traversal sequences (`../`).
-- **Path Traversal Protection**: QuickDrop endpoints use server-generated GUID file mapping. Remote clients cannot access arbitrary disk directories.
 - **Local Network Boundary**: QuickDrop server binds strictly to private LAN adapters (`192.168.x.x`, `10.x.x.x`) and shuts down automatically when the transfer session completes.
 
 ---
@@ -358,6 +361,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 | **[Phase 8 Guide](docs/PHASE_8_NETWORK_SECURITY.md)** | Network & Security Toolkit | Defensive diagnostics, DNS, sockets, TLS, headers, Firewall, Defender, integrity |
 | **[Phase 9 Guide](docs/PHASE_9_SETTINGS_PERSONALIZATION.md)** | Settings & Personalization | 12 settings sections, backdrop switching, hotkey manager, storage inspector, JSON backup |
 | **[Phase 10 Guide](docs/PHASE_10_PERFORMANCE_RELIABILITY.md)** | Performance & Reliability | Zero idle polling, crash containment, database self-healing, process safety |
+| **[Phase 11 Guide](docs/PHASE_11_TESTING_SECURITY_AUDIT.md)** | Testing & Security Audit | Threat model, timing-safe tokens, Zip Bomb guards, command injection mitigation |
 
 ---
 

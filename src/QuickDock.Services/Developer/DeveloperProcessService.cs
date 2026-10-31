@@ -97,7 +97,11 @@ public sealed class DeveloperProcessService : IDeveloperProcessService
 
     public bool TerminateProcess(int processId)
     {
-        if (processId <= 4) return false; // Prevent killing system processes (Idle, System)
+        if (processId <= 4 || processId == Environment.ProcessId)
+        {
+            _logger.LogWarning("Refusing to terminate protected process {Pid} (System or QuickDock host).", processId);
+            return false;
+        }
 
         try
         {

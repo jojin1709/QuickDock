@@ -10,6 +10,9 @@ namespace QuickDock.Services.Files;
 
 public sealed class FileConversionService : IFileConversionService
 {
+    public const int MaxArchiveEntries = 10_000;
+    public const long MaxDecompressedBytes = 2L * 1024 * 1024 * 1024; // 2 GB
+
     private readonly ILogger<FileConversionService> _logger;
 
     private static readonly HashSet<string> SupportedImageFormats = new(StringComparer.OrdinalIgnoreCase)
@@ -170,6 +173,14 @@ public sealed class FileConversionService : IFileConversionService
             int extracted = 0;
             int total = archive.Entries.Count;
 
+            if (total > MaxArchiveEntries)
+            {
+                _logger.LogWarning("ZIP bomb protection triggered: entry count {Total} exceeds maximum {Max}", total, MaxArchiveEntries);
+                throw new SecurityException($"ZIP archive contains {total} entries, exceeding the maximum safe limit of {MaxArchiveEntries}.");
+            }
+
+            long totalDecompressedBytes = 0;
+
             foreach (var entry in archive.Entries)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -180,6 +191,13 @@ public sealed class FileConversionService : IFileConversionService
                 {
                     _logger.LogWarning("Zip Slip attempt detected! Entry: {EntryName}", entry.FullName);
                     throw new SecurityException($"Malicious ZIP entry detected: '{entry.FullName}' traverses outside destination directory.");
+                }
+
+                totalDecompressedBytes += entry.Length;
+                if (totalDecompressedBytes > MaxDecompressedBytes)
+                {
+                    _logger.LogWarning("ZIP bomb protection triggered: decompressed size {Bytes} exceeds maximum {Max}", totalDecompressedBytes, MaxDecompressedBytes);
+                    throw new SecurityException($"ZIP archive decompressed size exceeds maximum safe threshold of {MaxDecompressedBytes / (1024 * 1024 * 1024)} GB.");
                 }
 
                 // If it's a directory entry

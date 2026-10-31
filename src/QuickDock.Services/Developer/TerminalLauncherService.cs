@@ -16,6 +16,29 @@ public sealed class TerminalLauncherService : ITerminalLauncherService
         _logger = logger;
     }
 
+    private static readonly char[] DangerousPathChars = ['"', '\r', '\n', '&', '|', ';', '<', '>', '^', '%', '`'];
+
+    public static string SanitizeWorkingDirectory(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        if (path.IndexOfAny(DangerousPathChars) >= 0)
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        }
+
+        try
+        {
+            string fullPath = Path.GetFullPath(path);
+            return Directory.Exists(fullPath) ? fullPath : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        }
+        catch
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        }
+    }
+
     public bool CanLaunch(TerminalType type)
     {
         return type switch
@@ -29,9 +52,7 @@ public sealed class TerminalLauncherService : ITerminalLauncherService
 
     public bool LaunchTerminal(TerminalLaunchRequest request)
     {
-        string workDir = !string.IsNullOrWhiteSpace(request.WorkingDirectory) && Directory.Exists(request.WorkingDirectory)
-            ? request.WorkingDirectory
-            : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string workDir = SanitizeWorkingDirectory(request.WorkingDirectory);
 
         try
         {
@@ -62,7 +83,7 @@ public sealed class TerminalLauncherService : ITerminalLauncherService
                 case TerminalType.CommandPrompt:
                 default:
                     psi.FileName = "cmd.exe";
-                    psi.Arguments = $"/K \"cd /d \"{workDir}\"\"";
+                    psi.Arguments = string.Empty; // Shell starts in psi.WorkingDirectory safely
                     break;
             }
 

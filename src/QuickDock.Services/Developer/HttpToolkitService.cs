@@ -15,6 +15,7 @@ namespace QuickDock.Services.Developer;
 
 public sealed class HttpToolkitService : IHttpToolkitService
 {
+    public const int MaxHttpResponseBodyBytes = 5 * 1024 * 1024; // 5 MB limit
     private readonly HttpClient _httpClient;
     private readonly ILogger<HttpToolkitService> _logger;
     private static readonly JsonSerializerOptions PrettyJsonOptions = new() { WriteIndented = true };
@@ -38,14 +39,39 @@ public sealed class HttpToolkitService : IHttpToolkitService
         }
 
         string targetUrl = request.Url.Trim();
+        if (targetUrl.Contains("://", StringComparison.Ordinal) || targetUrl.Contains(':'))
+        {
+            if (Uri.TryCreate(targetUrl, UriKind.Absolute, out var uri) &&
+                uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+            {
+                return new HttpResponseModel
+                {
+                    StatusCode = 0,
+                    StatusText = "Invalid Scheme",
+                    ErrorMessage = "Only http and https protocols are supported."
+                };
+            }
+        }
+
         if (!targetUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
             !targetUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             targetUrl = "https://" + targetUrl;
         }
 
+        if (!Uri.TryCreate(targetUrl, UriKind.Absolute, out var parsedUri) ||
+            (parsedUri.Scheme != Uri.UriSchemeHttp && parsedUri.Scheme != Uri.UriSchemeHttps))
+        {
+            return new HttpResponseModel
+            {
+                StatusCode = 0,
+                StatusText = "Invalid Scheme",
+                ErrorMessage = "Only http and https protocols are supported."
+            };
+        }
+
         var method = new HttpMethod(request.Method.ToUpperInvariant());
-        using var httpRequest = new HttpRequestMessage(method, targetUrl);
+        using var httpRequest = new HttpRequestMessage(method, parsedUri);
 
         // Add headers (excluding content headers)
         foreach (var (key, value) in request.Headers)
@@ -72,11 +98,41 @@ public sealed class HttpToolkitService : IHttpToolkitService
         var sw = Stopwatch.StartNew();
         try
         {
-            using var response = await _httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseContentRead, cts.Token);
+            using var response = await _httpClient.SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead, cts.Token);
             sw.Stop();
 
-            string body = await response.Content.ReadAsStringAsync(cts.Token);
-            long contentLength = response.Content.Headers.ContentLength ?? Encoding.UTF8.GetByteCount(body);
+            // Read response body safely with size bounding to avoid memory exhaustion
+            using var stream = await response.Content.ReadAsStreamAsync(cts.Token).ConfigureAwait(false);
+            using var ms = new MemoryStream();
+            byte[] buffer = new byte[8192];
+            int read;
+            bool truncated = false;
+            long totalRead = 0;
+
+            while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cts.Token).ConfigureAwait(false)) > 0)
+            {
+                if (totalRead + read > MaxHttpResponseBodyBytes)
+                {
+                    int allowed = MaxHttpResponseBodyBytes - (int)totalRead;
+                    if (allowed > 0)
+                    {
+                        ms.Write(buffer, 0, allowed);
+                        totalRead += allowed;
+                    }
+                    truncated = true;
+                    break;
+                }
+                ms.Write(buffer, 0, read);
+                totalRead += read;
+            }
+
+            string body = Encoding.UTF8.GetString(ms.ToArray());
+            if (truncated)
+            {
+                body += $"\r\n\r\n[Response body truncated at {MaxHttpResponseBodyBytes / (1024 * 1024)} MB limit by QuickDock Security Policy]";
+            }
+
+            long contentLength = response.Content.Headers.ContentLength ?? totalRead;
 
             var responseHeaders = new Dictionary<string, string>();
             foreach (var h in response.Headers)
