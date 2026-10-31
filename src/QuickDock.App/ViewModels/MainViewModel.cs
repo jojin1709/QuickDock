@@ -32,6 +32,7 @@ public sealed partial class MainViewModel : ObservableObject
     public QuickDropViewModel QuickDrop { get; }
     public FileConverterViewModel Converter { get; }
     public TransferManagerViewModel Transfers { get; }
+    public DeveloperViewModel Developer { get; }
 
     public event Action<bool>? DockExpansionStateChanged;
 
@@ -50,6 +51,7 @@ public sealed partial class MainViewModel : ObservableObject
         QuickDropViewModel quickDrop,
         FileConverterViewModel converter,
         TransferManagerViewModel transfers,
+        DeveloperViewModel developer,
         IEventBus eventBus,
         ILogger<MainViewModel> logger)
     {
@@ -67,6 +69,7 @@ public sealed partial class MainViewModel : ObservableObject
         QuickDrop = quickDrop;
         Converter = converter;
         Transfers = transfers;
+        Developer = developer;
         _eventBus = eventBus;
         _logger = logger;
 
@@ -129,6 +132,28 @@ public sealed partial class MainViewModel : ObservableObject
                 break;
             case "Transfers":
                 OpenTransfers();
+                break;
+            case "Developer":
+            case "Git":
+                OpenDeveloper("Git");
+                break;
+            case "Docker":
+                OpenDeveloper("Docker");
+                break;
+            case "Terminal":
+                OpenDeveloper("Terminal");
+                break;
+            case "DevTools":
+                OpenDeveloper("Tools");
+                break;
+            case "Http":
+                OpenDeveloper("Http");
+                break;
+            case "LocalDev":
+                OpenDeveloper("LocalDev");
+                break;
+            case "Processes":
+                OpenDeveloper("Processes");
                 break;
             default:
                 OpenHome();
@@ -258,6 +283,14 @@ public sealed partial class MainViewModel : ObservableObject
         SwitchView("Transfers");
         _ = Transfers.LoadHistoryAsync();
         EnsureExpanded("OpenTransfers");
+    }
+
+    [RelayCommand]
+    public void OpenDeveloper(string section = "Git")
+    {
+        SwitchView("Developer");
+        _ = Developer.InitializeSectionAsync(section);
+        EnsureExpanded("OpenDeveloper");
     }
 
     [RelayCommand]

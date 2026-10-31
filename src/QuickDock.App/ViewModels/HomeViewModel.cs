@@ -422,9 +422,13 @@ public sealed partial class HomeViewModel : ObservableObject
         _allModules.Add(new ModuleTileItem("quickdock.transfers", "Transfers", "Active & completed file transfers", "\uE896", "Utilities", "Ready"));
 
         // Developer & AI
-        _allModules.Add(new ModuleTileItem("quickdock.dev", "Dev Tools", "Formatters, UUID, base64", "\uEBE8", "Developer", "Ready"));
-        _allModules.Add(new ModuleTileItem("quickdock.security", "Security", "Hash verify & permissions", "\uEA18", "Developer", "Ready"));
-        _allModules.Add(new ModuleTileItem("quickdock.ai", "AI Services", "Local and cloud assistants", "\uE946", "Developer", "Optional"));
+        _allModules.Add(new ModuleTileItem("quickdock.git", "Git", "Branches, commits, status, diff", "\uE710", "Developer", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.docker", "Docker", "Containers, images, logs", "\uE7B8", "Developer", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.terminal", "Terminal", "Launch WT, PowerShell, Cmd", "\uE756", "Developer", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.dev", "Dev Tools", "JSON, JWT, Base64, Hash, UUID, QR", "\uEBE8", "Developer", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.http", "HTTP Client", "API tester, REST requests", "\uE774", "Developer", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.localdev", "Localhost & Ports", "Listening ports & local servers", "\uEC27", "Developer", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.processes", "Process Monitor", "Developer processes & PID inspector", "\uE9D9", "Developer", "Ready"));
     }
 
     [RelayCommand]
@@ -470,6 +474,27 @@ public sealed partial class HomeViewModel : ObservableObject
                 break;
             case "quickdock.transfers":
                 NavigationRequested?.Invoke("Transfers");
+                break;
+            case "quickdock.git":
+                NavigationRequested?.Invoke("Git");
+                break;
+            case "quickdock.docker":
+                NavigationRequested?.Invoke("Docker");
+                break;
+            case "quickdock.terminal":
+                NavigationRequested?.Invoke("Terminal");
+                break;
+            case "quickdock.dev":
+                NavigationRequested?.Invoke("DevTools");
+                break;
+            case "quickdock.http":
+                NavigationRequested?.Invoke("Http");
+                break;
+            case "quickdock.localdev":
+                NavigationRequested?.Invoke("LocalDev");
+                break;
+            case "quickdock.processes":
+                NavigationRequested?.Invoke("Processes");
                 break;
         }
     }

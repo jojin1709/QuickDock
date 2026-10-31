@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[Phase 6 File & Transfer Release](docs/PHASE_6_FILE_TRANSFER.md):** QuickDrop peer-to-peer Wi-Fi file sharing via QR code, local File Shelf staging, Zip-Slip protected archive extraction, and image transcoding are now live. See the [verification report](docs/PHASE_6_FILE_TRANSFER.md#verification-results) (109 passing tests, 0 warnings).
+> **[Phase 7 Developer Toolkit Release](docs/PHASE_7_DEVELOPER_TOOLKIT.md):** Git integration, Docker manager, Terminal launcher, JSON/JWT offline tools, Regex tester, QR generator, HTTP REST client, and local port/process monitors are now live. See the [verification report](docs/PHASE_7_DEVELOPER_TOOLKIT.md#verification-results) (139 passing tests, 0 warnings).
 
 <div align="center">
 
@@ -10,13 +10,13 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-109%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-139%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 
 ### QuickDock is a high-performance, native Windows 11 utility dock and productivity control layer.
 
-It docks subtly at the top center of your display, providing instant access to real-time hardware telemetry, productivity utilities, file staging, and zero-cloud peer-to-peer device transfers at the press of a hotkey. **Real Win32 telemetry. Zero Electron overhead.**
+It docks subtly at the top center of your display, providing instant access to real-time hardware telemetry, productivity utilities, developer toolkits, file staging, and zero-cloud peer-to-peer device transfers at the press of a hotkey. **Real Win32 telemetry. Zero Electron overhead.**
 
 **This repository contains QuickDock: the complete open-source native Windows utility, built from source.**
 
@@ -32,7 +32,7 @@ dotnet run --project src/QuickDock.App
 
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
-<a href="docs/PHASE_6_FILE_TRANSFER.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+<a href="docs/PHASE_7_DEVELOPER_TOOLKIT.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
 
 </div>
 
@@ -178,6 +178,20 @@ dotnet test --configuration Release
   - Text encoding converter supporting UTF-8, UTF-16, and ASCII.
 - **Transfer Manager**: Real-time progress bars, transfer speed indicators (MB/s), and persistent SQLite transfer history with verified SHA-256 integrity checksums.
 
+### 🛠️ Developer Toolkit
+- **Git Toolkit**: Inspect branch status, staged/unstaged files, commit history, and diffs; run commit, stage, unstage, push, pull, and fetch operations safely via direct CLI invocation with `ArgumentList`.
+- **Docker Toolkit**: Inspect Docker engine state, local containers (start, stop, restart, logs, inspect, remove), and images without background polling.
+- **Terminal Launcher**: One-click launcher for Windows Terminal, PowerShell, or Command Prompt at the project folder, active Git repo, or custom path with optional elevation.
+- **Offline Dev Utilities**:
+  - **JSON Formatter**: Indent, minify, and validate JSON with line/column syntax error reporting.
+  - **JWT Decoder & Inspector**: Decode header/payload claims, calculate expiration, and optionally verify HMAC-SHA256 signatures locally.
+  - **Encoding & Hashing**: Instant Base64/URL encoding and cryptographic hashing (MD5, SHA-1, SHA-256, SHA-384, SHA-512) for text and streaming large files.
+  - **UUID & Timestamps**: Batch UUID v4 generation and Unix epoch seconds/milliseconds bidirectional conversions.
+  - **Regex Evaluator**: Live regex testing with match groups, replacement preview, and ReDoS timeout protection.
+  - **QR Generator**: Offline vector QR generation for text, URLs, and Wi-Fi configurations.
+- **HTTP / REST Client**: Execute GET, POST, PUT, PATCH, DELETE, and HEAD requests with custom headers, JSON body formatting, round-trip timing, and size metrics.
+- **Localhost & Process Monitor**: Inspect active TCP listening sockets via native Windows `GetExtendedTcpTable`, associate listening ports with PIDs and process names, and open `http://localhost:<PORT>` in your default browser.
+
 ---
 
 ## 🏗️ Architecture & Design Philosophy
@@ -273,6 +287,13 @@ flowchart TD
 | **File Transfer** | **QuickDrop** | Active | In-process lightweight HTTP server with QR pairing |
 | **File Transfer** | **File Converter** | Active | `System.Drawing` image transcoding & Zip-Slip safe compression |
 | **File Transfer** | **Transfer Manager**| Active | Streaming async pipeline with SHA-256 validation |
+| **Developer** | **Git Toolkit** | Active | Native CLI via `ProcessStartInfo.ArgumentList` with safe diff & staging |
+| **Developer** | **Docker Toolkit** | Active | Container lifecycle, logs, inspect, and local image viewer |
+| **Developer** | **Terminal Launcher** | Active | Windows Terminal, PowerShell, and CMD with working dir support |
+| **Developer** | **Dev Utilities** | Active | Offline JSON, JWT, Base64/URL, Hash, UUID, Timestamp, Regex, QR |
+| **Developer** | **HTTP / REST Client** | Active | Shared `HttpClient` REST runner with JSON response formatter |
+| **Developer** | **Localhost & Ports** | Active | Native Win32 `GetExtendedTcpTable` listening socket inspector |
+| **Developer** | **Process Monitor** | Active | Process memory & listening port mapping with safe termination |
 
 ---
 
@@ -298,6 +319,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 | **[Phase 4 Guide](docs/PHASE_4_CORE_UTILITIES.md)** | Core Utility Modules | Real hardware sensors, WASAPI audio, GSMTC media sessions |
 | **[Phase 5 Guide](docs/PHASE_5_PRODUCTIVITY_MODULES.md)** | Productivity Modules | Clipboard manager, Timers, Notes, Calendar, Weather, Screen time |
 | **[Phase 6 Guide](docs/PHASE_6_FILE_TRANSFER.md)** | File & Transfer System | File Shelf, QuickDrop HTTP engine, QR pairing, Zip-Slip safe extractor |
+| **[Phase 7 Guide](docs/PHASE_7_DEVELOPER_TOOLKIT.md)** | Developer Toolkit | Git, Docker, Terminal, JSON/JWT, Regex, QR, HTTP client, Ports/Processes |
 
 ---
 

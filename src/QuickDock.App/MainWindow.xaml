@@ -205,6 +205,11 @@
                                                ViewModel="{x:Bind ViewModel.Transfers, Mode=OneWay}"
                                                MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
                                                Visibility="{x:Bind IsTransfersVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:DeveloperView x:Name="MainDeveloperView"
+                                         ViewModel="{x:Bind ViewModel.Developer, Mode=OneWay}"
+                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                         Visibility="{x:Bind IsDeveloperVisible(ViewModel.CurrentView), Mode=OneWay}" />
                 </Grid>
             </Grid>
         </Border>

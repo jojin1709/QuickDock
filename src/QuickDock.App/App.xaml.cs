@@ -20,9 +20,11 @@ using QuickDock.Modules.System;
 using QuickDock.Modules.Volume;
 using QuickDock.Modules.Productivity;
 using QuickDock.Modules.Files;
+using QuickDock.Modules.Developer;
 using QuickDock.Services.Audio;
 using QuickDock.Services.Clipboard;
 using QuickDock.Services.Files;
+using QuickDock.Services.Developer;
 using QuickDock.Services.Media;
 using QuickDock.Services.Productivity;
 using QuickDock.Services.QuickDrop;
@@ -124,6 +126,31 @@ public partial class App : Application
                 services.AddSingleton<IQuickDockModule, FileConverterModule>();
                 services.AddSingleton<IQuickDockModule, TransferManagerModule>();
 
+                // Phase 7 Developer Services
+                services.AddSingleton<IGitService, GitService>();
+                services.AddSingleton<IDockerService, DockerService>();
+                services.AddSingleton<ITerminalLauncherService, TerminalLauncherService>();
+                services.AddSingleton<IJsonToolkitService, JsonToolkitService>();
+                services.AddSingleton<IJwtToolkitService, JwtToolkitService>();
+                services.AddSingleton<IEncodingToolkitService, EncodingToolkitService>();
+                services.AddSingleton<IDeveloperHashService, DeveloperHashService>();
+                services.AddSingleton<IUuidToolkitService, UuidToolkitService>();
+                services.AddSingleton<ITimestampToolkitService, TimestampToolkitService>();
+                services.AddSingleton<IRegexToolkitService, RegexToolkitService>();
+                services.AddSingleton<IQrGeneratorService, QrGeneratorService>();
+                services.AddSingleton<IHttpToolkitService, HttpToolkitService>();
+                services.AddSingleton<ILocalDevelopmentService, LocalDevelopmentService>();
+                services.AddSingleton<IDeveloperProcessService, DeveloperProcessService>();
+
+                // Phase 7 Developer Modules
+                services.AddSingleton<IQuickDockModule, GitModule>();
+                services.AddSingleton<IQuickDockModule, DockerModule>();
+                services.AddSingleton<IQuickDockModule, TerminalModule>();
+                services.AddSingleton<IQuickDockModule, DeveloperToolsModule>();
+                services.AddSingleton<IQuickDockModule, HttpToolkitModule>();
+                services.AddSingleton<IQuickDockModule, LocalDevModule>();
+                services.AddSingleton<IQuickDockModule, ProcessMonitorModule>();
+
                 // ViewModels
                 services.AddSingleton<HomeViewModel>();
                 services.AddSingleton<SystemViewModel>();
@@ -139,6 +166,7 @@ public partial class App : Application
                 services.AddSingleton<QuickDropViewModel>();
                 services.AddSingleton<FileConverterViewModel>();
                 services.AddSingleton<TransferManagerViewModel>();
+                services.AddSingleton<DeveloperViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 services.AddTransient<MainWindow>(sp =>

@@ -471,6 +471,9 @@ public sealed partial class MainWindow : Window
     private Visibility IsTransfersVisible(string currentView) =>
         string.Equals(currentView, "Transfers", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
 
+    private Visibility IsDeveloperVisible(string currentView) =>
+        string.Equals(currentView, "Developer", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();
