@@ -26,3 +26,4 @@ public class StartupServiceTests
         Assert.EndsWith("\" --silent", actual);
     }
 }
+

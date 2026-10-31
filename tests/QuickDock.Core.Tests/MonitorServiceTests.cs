@@ -67,3 +67,4 @@ public class MonitorServiceTests
         Assert.Equal(120, info.Dpi);
     }
 }
+

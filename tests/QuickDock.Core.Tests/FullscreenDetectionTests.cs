@@ -65,3 +65,4 @@ public class FullscreenDetectionTests
         Assert.False(result);
     }
 }
+

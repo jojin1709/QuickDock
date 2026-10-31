@@ -56,3 +56,4 @@ public sealed class NotificationService : INotificationService
         return str.Length <= maxLen ? str : str[..maxLen];
     }
 }
+

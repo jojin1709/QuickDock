@@ -218,3 +218,4 @@ public sealed class MonitorService : IMonitorService
         MonitorsChanged?.Invoke(this, EventArgs.Empty);
     }
 }
+

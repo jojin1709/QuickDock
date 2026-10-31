@@ -139,3 +139,4 @@ graph TD
   - Primary process launch succeeds and captures Mutex.
   - Secondary process launch detects existing instance and exits immediately with code 0.
   - Full application lifecycle, logging, and settings persistence verified.
+

@@ -12,7 +12,14 @@ using QuickDock.Infrastructure.Logging;
 using QuickDock.Infrastructure.Services;
 using QuickDock.Infrastructure.Storage;
 using QuickDock.Infrastructure.Windows;
+using QuickDock.Modules.Battery;
 using QuickDock.Modules.Clock;
+using QuickDock.Modules.Media;
+using QuickDock.Modules.Network;
+using QuickDock.Modules.System;
+using QuickDock.Modules.Volume;
+using QuickDock.Services.Audio;
+using QuickDock.Services.Media;
 using QuickDock.Services.System;
 
 namespace QuickDock.App;
@@ -49,17 +56,28 @@ public partial class App : Application
                 services.AddSingleton<IFullscreenService, FullscreenDetectionService>();
                 services.AddSingleton<INotificationService, NotificationService>();
                 services.AddSingleton<ISystemMetricsService, SystemMetricsService>();
+                services.AddSingleton<IAudioService, CoreAudioService>();
+                services.AddSingleton<IMediaService, WindowsMediaService>();
                 services.AddSingleton<IWindowPositioningService, WindowPositioningService>();
                 services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
                 services.AddSingleton<ISystemTrayService, SystemTrayService>();
 
+                // ClockModule registered directly and as IQuickDockModule
+                services.AddSingleton<ClockModule>();
+                services.AddSingleton<IQuickDockModule>(sp => sp.GetRequiredService<ClockModule>());
+
+                // Other Core Utility Modules
+                services.AddSingleton<IQuickDockModule, SystemModule>();
+                services.AddSingleton<IQuickDockModule, VolumeModule>();
+                services.AddSingleton<IQuickDockModule, MediaModule>();
+                services.AddSingleton<IQuickDockModule, BatteryModule>();
+                services.AddSingleton<IQuickDockModule, NetworkModule>();
+
                 // ViewModels
                 services.AddSingleton<HomeViewModel>();
+                services.AddSingleton<SystemViewModel>();
                 services.AddSingleton<SettingsViewModel>();
                 services.AddSingleton<MainViewModel>();
-
-                // Modules
-                services.AddSingleton<IQuickDockModule, ClockModule>();
 
                 services.AddTransient<MainWindow>(sp =>
                 {

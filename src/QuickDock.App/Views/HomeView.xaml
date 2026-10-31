@@ -43,7 +43,7 @@
                      PlaceholderText="Search modules..."
                      Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      VerticalAlignment="Center"
-                     MaxWidth="280"
+                     MaxWidth="260"
                      CornerRadius="{StaticResource SearchBoxCornerRadius}">
             </TextBox>
 
@@ -55,6 +55,8 @@
                                               DotBrush="{ThemeResource StatusAccentBrush}" />
                 <controls:QuickDockStatusPill Text="{x:Bind ViewModel.BatteryMetricText, Mode=OneWay}"
                                               DotBrush="{ThemeResource StatusActiveBrush}" />
+                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.VolumeMetricText, Mode=OneWay}"
+                                              DotBrush="{ThemeResource StatusInactiveBrush}" />
             </StackPanel>
 
             <!-- Settings Button -->
@@ -75,7 +77,122 @@
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled"
                       Padding="0,0,8,0">
-            <StackPanel Spacing="16">
+            <StackPanel Spacing="14">
+
+                <!-- Quick Controls: Volume & Media -->
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Volume Card -->
+                    <Border Grid.Column="0"
+                            Background="{ThemeResource CardBackgroundBrush}"
+                            BorderBrush="{ThemeResource TileStrokeBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource CardCornerRadius}"
+                            Padding="12,10">
+                        <Grid ColumnSpacing="10" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Mute Toggle Button -->
+                            <Button Grid.Column="0"
+                                    Command="{x:Bind ViewModel.ToggleMuteCommand, Mode=OneWay}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Padding="6"
+                                    CornerRadius="6"
+                                    VerticalAlignment="Center"
+                                    ToolTipService.ToolTip="Toggle Mute">
+                                <FontIcon Glyph="{x:Bind ViewModel.VolumeGlyph, Mode=OneWay}" FontSize="15"
+                                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            </Button>
+
+                            <!-- Volume Slider & Device Label -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                <TextBlock Text="{x:Bind ViewModel.AudioDeviceName, Mode=OneWay}"
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <Slider Value="{x:Bind ViewModel.VolumeLevel, Mode=TwoWay}"
+                                        Minimum="0" Maximum="100" StepFrequency="1"
+                                        Margin="0,-6,0,-6" />
+                            </StackPanel>
+
+                            <!-- Volume % Text -->
+                            <TextBlock Grid.Column="2"
+                                       Text="{x:Bind ViewModel.VolumeMetricText, Mode=OneWay}"
+                                       FontWeight="SemiBold" FontSize="12"
+                                       VerticalAlignment="Center" Width="40" TextAlignment="Right" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Media Controller Card -->
+                    <Border Grid.Column="1"
+                            Background="{ThemeResource CardBackgroundBrush}"
+                            BorderBrush="{ThemeResource TileStrokeBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource CardCornerRadius}"
+                            Padding="12,10">
+                        <Grid ColumnSpacing="10" VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Media Icon -->
+                            <Border Grid.Column="0"
+                                    Background="{ThemeResource PillBackgroundBrush}"
+                                    BorderBrush="{ThemeResource TileStrokeBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Width="32" Height="32">
+                                <FontIcon Glyph="&#xE8D6;" FontSize="14"
+                                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+
+                            <!-- Media Track & Artist -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{x:Bind ViewModel.MediaTitle, Mode=OneWay}"
+                                           FontWeight="SemiBold" FontSize="12"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{x:Bind ViewModel.MediaArtist, Mode=OneWay}"
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+
+                            <!-- Transport Controls -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                                <Button Command="{x:Bind ViewModel.SkipPreviousCommand, Mode=OneWay}"
+                                        Background="Transparent" BorderBrush="Transparent"
+                                        Padding="6" CornerRadius="6"
+                                        ToolTipService.ToolTip="Previous Track">
+                                    <FontIcon Glyph="&#xE892;" FontSize="12" />
+                                </Button>
+                                <Button Command="{x:Bind ViewModel.TogglePlayPauseCommand, Mode=OneWay}"
+                                        Background="{ThemeResource PillBackgroundBrush}"
+                                        BorderBrush="{ThemeResource TileStrokeBrush}"
+                                        Padding="8,6" CornerRadius="6"
+                                        ToolTipService.ToolTip="Play / Pause">
+                                    <FontIcon Glyph="{x:Bind ViewModel.PlayPauseGlyph, Mode=OneWay}" FontSize="12"
+                                              Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                                </Button>
+                                <Button Command="{x:Bind ViewModel.SkipNextCommand, Mode=OneWay}"
+                                        Background="Transparent" BorderBrush="Transparent"
+                                        Padding="6" CornerRadius="6"
+                                        ToolTipService.ToolTip="Next Track">
+                                    <FontIcon Glyph="&#xE893;" FontSize="12" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
 
                 <!-- System Controls -->
                 <StackPanel Visibility="{x:Bind HasSystemModules(ViewModel), Mode=OneWay}">
@@ -89,7 +206,9 @@
                                 <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
                                                               Title="{x:Bind Title}"
                                                               Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}" />
+                                                              StatusText="{x:Bind StatusText}"
+                                                              Tapped="OnTileTapped"
+                                                              Tag="{x:Bind}" />
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
@@ -107,7 +226,9 @@
                                 <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
                                                               Title="{x:Bind Title}"
                                                               Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}" />
+                                                              StatusText="{x:Bind StatusText}"
+                                                              Tapped="OnTileTapped"
+                                                              Tag="{x:Bind}" />
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
@@ -115,7 +236,7 @@
 
                 <!-- Utilities Section -->
                 <StackPanel Visibility="{x:Bind HasUtilityModules(ViewModel), Mode=OneWay}">
-                    <controls:QuickDockSection Title="Utilities" Badge="4" />
+                    <controls:QuickDockSection Title="Utilities" Badge="3" />
                     <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredUtilityModules, Mode=OneWay}">
                         <ItemsRepeater.Layout>
                             <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
@@ -125,7 +246,9 @@
                                 <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
                                                               Title="{x:Bind Title}"
                                                               Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}" />
+                                                              StatusText="{x:Bind StatusText}"
+                                                              Tapped="OnTileTapped"
+                                                              Tag="{x:Bind}" />
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
@@ -143,7 +266,9 @@
                                 <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
                                                               Title="{x:Bind Title}"
                                                               Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}" />
+                                                              StatusText="{x:Bind StatusText}"
+                                                              Tapped="OnTileTapped"
+                                                              Tag="{x:Bind}" />
                             </DataTemplate>
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>

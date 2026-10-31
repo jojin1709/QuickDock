@@ -69,6 +69,7 @@ public sealed partial class MainWindow : Window
         _logger.LogInformation("MainWindow InitializeComponent finished.");
 
         _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        ViewModel.SetDispatcherQueue(DispatcherQueue);
 
         // Suppress QuickDock from Alt+Tab switcher and taskbar
         try
@@ -430,6 +431,9 @@ public sealed partial class MainWindow : Window
 
     private Visibility IsHomeVisible(string currentView) =>
         string.Equals(currentView, "Home", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsSystemVisible(string currentView) =>
+        string.Equals(currentView, "System", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
 
     private Visibility IsSettingsVisible(string currentView) =>
         string.Equals(currentView, "Settings", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;

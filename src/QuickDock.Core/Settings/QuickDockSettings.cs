@@ -59,10 +59,18 @@ public sealed class PrivacySettings
     public bool ClearDataOnExit { get; set; } = false;
 }
 
+public sealed class ClockSettings
+{
+    public bool Use24HourFormat { get; set; } = true;
+    public bool ShowSeconds { get; set; } = false;
+    public string SelectedTimeZoneId { get; set; } = string.Empty; // Empty = Local
+}
+
 public sealed class QuickDockSettings
 {
     public AppearanceSettings Appearance { get; set; } = new();
     public BehaviorSettings Behavior { get; set; } = new();
+    public ClockSettings Clock { get; set; } = new();
     public PerformanceSettings Performance { get; set; } = new();
     public PrivacySettings Privacy { get; set; } = new();
 

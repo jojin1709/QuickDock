@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using QuickDock.App.ViewModels;
 
 namespace QuickDock.App.Views;
@@ -37,9 +38,16 @@ public sealed partial class HomeView : UserControl
         InitializeComponent();
     }
 
+    private void OnTileTapped(object sender, TappedRoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.Tag is ModuleTileItem item)
+        {
+            ViewModel?.SelectModuleCommand.Execute(item);
+        }
+    }
+
     private Visibility HasSystemModules(HomeViewModel? vm) => vm?.FilteredSystemModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     private Visibility HasProductivityModules(HomeViewModel? vm) => vm?.FilteredProductivityModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     private Visibility HasUtilityModules(HomeViewModel? vm) => vm?.FilteredUtilityModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     private Visibility HasDeveloperModules(HomeViewModel? vm) => vm?.FilteredDeveloperModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 }
-

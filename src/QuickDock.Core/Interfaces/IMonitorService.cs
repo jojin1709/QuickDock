@@ -24,3 +24,4 @@ public interface IMonitorService
     MonitorInfo GetTargetMonitor(string? monitorTarget, bool followActive);
     event EventHandler? MonitorsChanged;
 }
+

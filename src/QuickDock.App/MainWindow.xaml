@@ -66,6 +66,8 @@
                 <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <controls:QuickDockStatusPill Text="{x:Bind ViewModel.Home.CpuMetricText, Mode=OneWay}"
                                                   DotBrush="{ThemeResource StatusAccentBrush}" />
+                    <controls:QuickDockStatusPill Text="{x:Bind ViewModel.Home.VolumeMetricText, Mode=OneWay}"
+                                                  DotBrush="{ThemeResource StatusInactiveBrush}" />
                 </StackPanel>
 
                 <!-- Expand Indicator (Chevron Down) -->
@@ -92,7 +94,7 @@
                 <Grid.RowDefinitions>
                     <!-- Expanded Header (Top edge bar) -->
                     <RowDefinition Height="Auto" />
-                    <!-- Main Content (Home or Settings) -->
+                    <!-- Main Content (Home, System, or Settings) -->
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
@@ -138,6 +140,11 @@
                                     ViewModel="{x:Bind ViewModel.Home, Mode=OneWay}"
                                     MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
                                     Visibility="{x:Bind IsHomeVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:SystemView x:Name="MainSystemView"
+                                      ViewModel="{x:Bind ViewModel.System, Mode=OneWay}"
+                                      MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                      Visibility="{x:Bind IsSystemVisible(ViewModel.CurrentView), Mode=OneWay}" />
 
                     <views:SettingsView x:Name="MainSettingsView"
                                         ViewModel="{x:Bind ViewModel.Settings, Mode=OneWay}"

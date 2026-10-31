@@ -7,3 +7,4 @@ public interface IFullscreenService : IDisposable
     void StartMonitoring();
     void StopMonitoring();
 }
+
