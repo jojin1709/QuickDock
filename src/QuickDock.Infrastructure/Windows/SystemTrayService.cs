@@ -11,9 +11,11 @@ public sealed class SystemTrayService : ISystemTrayService
 
     private const int CmdToggleDock = 101;
     private const int CmdSettings = 102;
-    private const int CmdPerformanceMode = 103;
-    private const int CmdRestart = 104;
-    private const int CmdExit = 105;
+    private const int CmdStartWithWindows = 103;
+    private const int CmdPerformanceMode = 104;
+    private const int CmdAbout = 105;
+    private const int CmdRestart = 106;
+    private const int CmdExit = 107;
 
     private readonly ILogger<SystemTrayService> _logger;
     private readonly NativeMethods.SUBCLASSPROC _subclassProc;
@@ -26,7 +28,10 @@ public sealed class SystemTrayService : ISystemTrayService
 
     private Action? _onToggleDock;
     private Action? _onOpenSettings;
+    private Action? _onToggleStartup;
+    private Func<bool>? _isStartupEnabled;
     private Action? _onTogglePerformanceMode;
+    private Action? _onAbout;
     private Action? _onRestart;
     private Action? _onExit;
 
@@ -40,7 +45,10 @@ public sealed class SystemTrayService : ISystemTrayService
         IntPtr hWnd,
         Action onToggleDock,
         Action onOpenSettings,
+        Action onToggleStartup,
+        Func<bool> isStartupEnabled,
         Action onTogglePerformanceMode,
+        Action onAbout,
         Action onRestart,
         Action onExit)
     {
@@ -50,7 +58,10 @@ public sealed class SystemTrayService : ISystemTrayService
         _hWnd = hWnd;
         _onToggleDock = onToggleDock;
         _onOpenSettings = onOpenSettings;
+        _onToggleStartup = onToggleStartup;
+        _isStartupEnabled = isStartupEnabled;
         _onTogglePerformanceMode = onTogglePerformanceMode;
+        _onAbout = onAbout;
         _onRestart = onRestart;
         _onExit = onExit;
 
@@ -163,8 +174,18 @@ public sealed class SystemTrayService : ISystemTrayService
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdToggleDock, toggleText);
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdSettings, "Settings");
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_SEPARATOR, 0, null);
+
+            // Start with Windows checkbox
+            NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdStartWithWindows, "Start with Windows");
+            bool isStartup = _isStartupEnabled?.Invoke() ?? false;
+            NativeMethods.CheckMenuItem(hMenu, CmdStartWithWindows, isStartup ? NativeMethods.MF_CHECKED : NativeMethods.MF_UNCHECKED);
+
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdPerformanceMode, "Performance Mode");
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_SEPARATOR, 0, null);
+
+            NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdAbout, "About QuickDock");
+            NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_SEPARATOR, 0, null);
+
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdRestart, "Restart QuickDock");
             NativeMethods.AppendMenuW(hMenu, NativeMethods.MF_STRING, CmdExit, "Exit QuickDock");
 
@@ -189,8 +210,14 @@ public sealed class SystemTrayService : ISystemTrayService
                 case CmdSettings:
                     _onOpenSettings?.Invoke();
                     break;
+                case CmdStartWithWindows:
+                    _onToggleStartup?.Invoke();
+                    break;
                 case CmdPerformanceMode:
                     _onTogglePerformanceMode?.Invoke();
+                    break;
+                case CmdAbout:
+                    _onAbout?.Invoke();
                     break;
                 case CmdRestart:
                     _onRestart?.Invoke();
@@ -232,4 +259,3 @@ public sealed class SystemTrayService : ISystemTrayService
         _logger.LogInformation("System tray service disposed.");
     }
 }
-

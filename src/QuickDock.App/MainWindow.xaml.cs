@@ -7,13 +7,20 @@ using QuickDock.App.ViewModels;
 using QuickDock.Core.Events;
 using QuickDock.Core.Interfaces;
 using QuickDock.Core.Settings;
+using QuickDock.Infrastructure.Windows;
 using Windows.System;
 
 namespace QuickDock.App;
 
 public sealed partial class MainWindow : Window
 {
+    private static readonly UIntPtr MainWindowSubclassId = new(1001);
+
     private readonly IWindowPositioningService _positioningService;
+    private readonly IMonitorService _monitorService;
+    private readonly IFullscreenService _fullscreenService;
+    private readonly IStartupService _startupService;
+    private readonly INotificationService _notificationService;
     private readonly IGlobalHotkeyService _hotkeyService;
     private readonly ISystemTrayService _systemTrayService;
     private readonly ISettingsManager _settingsManager;
@@ -21,15 +28,23 @@ public sealed partial class MainWindow : Window
     private readonly ILogger<MainWindow> _logger;
 
     private readonly IntPtr _hWnd;
+    private readonly uint _activateMsg;
+    private readonly NativeMethods.SUBCLASSPROC _windowSubclassProc;
+
     private readonly DispatcherTimer _hoverTimer;
     private readonly DispatcherTimer _tickTimer;
     private int _metricsCounter;
+    private IntPtr _previousForegroundHwnd = IntPtr.Zero;
 
     public MainViewModel ViewModel { get; }
 
     public MainWindow(
         MainViewModel viewModel,
         IWindowPositioningService positioningService,
+        IMonitorService monitorService,
+        IFullscreenService fullscreenService,
+        IStartupService startupService,
+        INotificationService notificationService,
         IGlobalHotkeyService hotkeyService,
         ISystemTrayService systemTrayService,
         ISettingsManager settingsManager,
@@ -41,6 +56,10 @@ public sealed partial class MainWindow : Window
 
         ViewModel = viewModel;
         _positioningService = positioningService;
+        _monitorService = monitorService;
+        _fullscreenService = fullscreenService;
+        _startupService = startupService;
+        _notificationService = notificationService;
         _hotkeyService = hotkeyService;
         _systemTrayService = systemTrayService;
         _settingsManager = settingsManager;
@@ -50,6 +69,16 @@ public sealed partial class MainWindow : Window
         _logger.LogInformation("MainWindow InitializeComponent finished.");
 
         _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+
+        // Suppress QuickDock from Alt+Tab switcher and taskbar
+        try
+        {
+            AppWindow.IsShownInSwitchers = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to set AppWindow.IsShownInSwitchers to false.");
+        }
 
         try
         {
@@ -63,7 +92,18 @@ public sealed partial class MainWindow : Window
         // Configure dock window layout and positioning
         _positioningService.ConfigureDockWindow(_hWnd);
 
-        // Hover expand timer (150ms delay)
+        // Register custom activation message for single-instance
+        _activateMsg = NativeMethods.RegisterWindowMessageW("QUICKDOCK_ACTIVATE_INSTANCE");
+        _windowSubclassProc = WindowSubclassProcedure;
+        NativeMethods.SetWindowSubclass(_hWnd, _windowSubclassProc, MainWindowSubclassId, UIntPtr.Zero);
+
+        // Register tray handle for notifications
+        if (_notificationService is NotificationService concreteNotificationService)
+        {
+            concreteNotificationService.RegisterTrayHandle(_hWnd);
+        }
+
+        // Hover expand timer (configurable delay)
         _hoverTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(_settingsManager.CurrentSettings.Behavior.HoverDelayMs)
@@ -83,8 +123,16 @@ public sealed partial class MainWindow : Window
         {
             DispatcherQueue.TryEnqueue(() =>
             {
-                ViewModel.ToggleExpand();
-                BringToFront();
+                if (ViewModel.IsExpanded)
+                {
+                    ViewModel.Collapse();
+                }
+                else
+                {
+                    CapturePreviousForeground();
+                    ViewModel.Expand();
+                    BringToFront();
+                }
             });
         });
 
@@ -93,24 +141,52 @@ public sealed partial class MainWindow : Window
             _hWnd,
             onToggleDock: () => DispatcherQueue.TryEnqueue(() =>
             {
-                ViewModel.ToggleExpand();
-                BringToFront();
+                if (ViewModel.IsExpanded)
+                {
+                    ViewModel.Collapse();
+                }
+                else
+                {
+                    CapturePreviousForeground();
+                    ViewModel.Expand();
+                    BringToFront();
+                }
             }),
             onOpenSettings: () => DispatcherQueue.TryEnqueue(() =>
             {
+                CapturePreviousForeground();
                 ViewModel.OpenSettings();
                 BringToFront();
             }),
+            onToggleStartup: () => DispatcherQueue.TryEnqueue(() =>
+            {
+                bool cur = _startupService.IsStartupEnabled();
+                _startupService.SetStartupEnabled(!cur);
+                _settingsManager.CurrentSettings.Behavior.StartWithWindows = !cur;
+                _ = _settingsManager.SaveAsync(_settingsManager.CurrentSettings);
+            }),
+            isStartupEnabled: () => _startupService.IsStartupEnabled(),
             onTogglePerformanceMode: () => DispatcherQueue.TryEnqueue(() =>
             {
                 _logger.LogInformation("Performance mode toggled from tray.");
             }),
-            onRestart: () => DispatcherQueue.TryEnqueue(RestartApplication),
-            onExit: () => DispatcherQueue.TryEnqueue(() =>
+            onAbout: () => DispatcherQueue.TryEnqueue(() =>
             {
-                Close();
-            })
+                CapturePreviousForeground();
+                ViewModel.OpenSettings();
+                BringToFront();
+            }),
+            onRestart: () => DispatcherQueue.TryEnqueue(RestartApplication),
+            onExit: () => DispatcherQueue.TryEnqueue(Close)
         );
+
+        // Fullscreen detection
+        if (_fullscreenService is FullscreenDetectionService concreteFullscreenService)
+        {
+            concreteFullscreenService.SetDockHandle(_hWnd);
+        }
+        _fullscreenService.FullscreenStateChanged += OnFullscreenStateChanged;
+        _fullscreenService.StartMonitoring();
 
         ViewModel.DockExpansionStateChanged += OnExpansionStateChanged;
 
@@ -121,15 +197,68 @@ public sealed partial class MainWindow : Window
         ApplyTheme(_settingsManager.CurrentSettings.Appearance.Theme);
         _eventBus.Subscribe<SettingsChangedEvent>((e, ct) =>
         {
-            DispatcherQueue.TryEnqueue(() => ApplyTheme(e.Settings.Appearance.Theme));
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                ApplyTheme(e.Settings.Appearance.Theme);
+                _positioningService.SetAlwaysOnTop(_hWnd, e.Settings.Behavior.AlwaysOnTop);
+                _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
+            });
             return Task.CompletedTask;
         });
+    }
+
+    private IntPtr WindowSubclassProcedure(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, UIntPtr uIdSubclass, UIntPtr dwRefData)
+    {
+        if (_activateMsg != 0 && uMsg == _activateMsg)
+        {
+            _logger.LogInformation("Activation message received from another QuickDock process.");
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                CapturePreviousForeground();
+                if (!ViewModel.IsExpanded)
+                {
+                    ViewModel.Expand();
+                }
+                BringToFront();
+            });
+            return IntPtr.Zero;
+        }
+
+        if (uMsg == NativeMethods.WM_DPICHANGED)
+        {
+            _logger.LogInformation("WM_DPICHANGED received, updating dock dimensions and positioning.");
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
+            });
+            return IntPtr.Zero;
+        }
+
+        return NativeMethods.DefSubclassProc(hWnd, uMsg, wParam, lParam);
+    }
+
+    private void CapturePreviousForeground()
+    {
+        IntPtr fg = NativeMethods.GetForegroundWindow();
+        if (fg != IntPtr.Zero && fg != _hWnd)
+        {
+            _previousForegroundHwnd = fg;
+        }
+    }
+
+    private void RestorePreviousForeground()
+    {
+        if (_previousForegroundHwnd != IntPtr.Zero)
+        {
+            NativeMethods.SetForegroundWindow(_previousForegroundHwnd);
+            _previousForegroundHwnd = IntPtr.Zero;
+        }
     }
 
     private void BringToFront()
     {
         Activate();
-        Infrastructure.Windows.NativeMethods.SetForegroundWindow(_hWnd);
+        NativeMethods.SetForegroundWindow(_hWnd);
     }
 
     private void OnTickTimer(object? sender, object e)
@@ -142,6 +271,45 @@ public sealed partial class MainWindow : Window
             _metricsCounter = 0;
             ViewModel.Home.RefreshMetrics();
         }
+    }
+
+    private void OnFullscreenStateChanged(object? sender, bool isFullscreen)
+    {
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            if (_settingsManager.CurrentSettings.Behavior.HideInFullscreen)
+            {
+                if (isFullscreen)
+                {
+                    _logger.LogInformation("Fullscreen application active. Hiding QuickDock.");
+                    if (ViewModel.IsExpanded)
+                    {
+                        ViewModel.Collapse();
+                    }
+                    try
+                    {
+                        AppWindow.Hide();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to hide AppWindow during fullscreen.");
+                    }
+                }
+                else
+                {
+                    _logger.LogInformation("Fullscreen application exited. Restoring QuickDock.");
+                    try
+                    {
+                        AppWindow.Show();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to restore AppWindow after fullscreen.");
+                    }
+                    _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
+                }
+            }
+        });
     }
 
     private void OnExpansionStateChanged(bool isExpanded)
@@ -160,13 +328,17 @@ public sealed partial class MainWindow : Window
             IdleDockBorder.Visibility = Visibility.Visible;
         }
 
-        // Resize & reposition window on primary screen
+        // Resize & reposition window on targeted monitor
         _positioningService.SetDockState(_hWnd, isExpanded);
         _systemTrayService.UpdateDockState(isExpanded);
 
         if (isExpanded)
         {
             BringToFront();
+        }
+        else
+        {
+            RestorePreviousForeground();
         }
     }
 
@@ -190,6 +362,7 @@ public sealed partial class MainWindow : Window
         _hoverTimer.Stop();
         if (!ViewModel.IsExpanded)
         {
+            CapturePreviousForeground();
             ViewModel.Expand();
         }
     }
@@ -197,6 +370,7 @@ public sealed partial class MainWindow : Window
     private void OnIdlePointerPressed(object sender, PointerRoutedEventArgs e)
     {
         _hoverTimer.Stop();
+        CapturePreviousForeground();
         ViewModel.Expand();
     }
 
@@ -264,7 +438,10 @@ public sealed partial class MainWindow : Window
     {
         _tickTimer.Stop();
         _hoverTimer.Stop();
+        _fullscreenService.StopMonitoring();
+        _fullscreenService.Dispose();
         _hotkeyService.Dispose();
         _systemTrayService.Dispose();
+        NativeMethods.RemoveWindowSubclass(_hWnd, _windowSubclassProc, MainWindowSubclassId);
     }
 }

@@ -6,9 +6,12 @@ public interface ISystemTrayService : IDisposable
         IntPtr hWnd,
         Action onToggleDock,
         Action onOpenSettings,
+        Action onToggleStartup,
+        Func<bool> isStartupEnabled,
         Action onTogglePerformanceMode,
+        Action onAbout,
         Action onRestart,
         Action onExit);
+
     void UpdateDockState(bool isExpanded);
 }
-

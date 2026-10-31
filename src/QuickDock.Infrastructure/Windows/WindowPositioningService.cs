@@ -1,30 +1,63 @@
 using Microsoft.Extensions.Logging;
 using QuickDock.Core.Interfaces;
+using QuickDock.Core.Settings;
 
 namespace QuickDock.Infrastructure.Windows;
 
 public sealed class WindowPositioningService : IWindowPositioningService
 {
+    private readonly IMonitorService _monitorService;
+    private readonly ISettingsManager _settingsManager;
     private readonly ILogger<WindowPositioningService> _logger;
 
-    // Idle dimensions (320-520px wide, 40-56px high)
-    public const int IdleWidth = 440;
-    public const int IdleHeight = 48;
+    // Base dimensions at 100% DPI (96 DPI)
+    public const int BaseIdleWidth = 440;
+    public const int BaseIdleHeight = 48;
 
-    // Expanded dimensions (700-1000px wide, 400-650px high)
-    public const int ExpandedWidth = 860;
-    public const int ExpandedHeight = 560;
+    public const int BaseExpandedWidth = 860;
+    public const int BaseExpandedHeight = 560;
 
-    public const int TopMargin = 12;
+    public const int BaseTopMargin = 12;
 
-    public WindowPositioningService(ILogger<WindowPositioningService> logger)
+    public WindowPositioningService(
+        IMonitorService monitorService,
+        ISettingsManager settingsManager,
+        ILogger<WindowPositioningService> logger)
     {
+        _monitorService = monitorService;
+        _settingsManager = settingsManager;
         _logger = logger;
     }
 
-    public (int Width, int Height) GetDockDimensions(bool isExpanded)
+    public (int Width, int Height) GetDockDimensions(bool isExpanded, double scaleFactor = 1.0)
     {
-        return isExpanded ? (ExpandedWidth, ExpandedHeight) : (IdleWidth, IdleHeight);
+        if (scaleFactor <= 0) scaleFactor = 1.0;
+
+        int baseW = isExpanded ? BaseExpandedWidth : BaseIdleWidth;
+        int baseH = isExpanded ? BaseExpandedHeight : BaseIdleHeight;
+
+        int w = (int)Math.Round(baseW * scaleFactor);
+        int h = (int)Math.Round(baseH * scaleFactor);
+
+        return (w, h);
+    }
+
+    public (int X, int Y, int Width, int Height) CalculatePlacement(
+        bool isExpanded,
+        int workX, int workY, int workWidth, int workHeight,
+        double scaleFactor,
+        int topMargin = BaseTopMargin)
+    {
+        if (scaleFactor <= 0) scaleFactor = 1.0;
+
+        var (width, height) = GetDockDimensions(isExpanded, scaleFactor);
+        int scaledTopMargin = (int)Math.Round(topMargin * scaleFactor);
+
+        // Center horizontally on the target monitor's work area
+        int x = workX + (workWidth - width) / 2;
+        int y = workY + scaledTopMargin;
+
+        return (x, y, width, height);
     }
 
     public void ConfigureDockWindow(IntPtr hWnd)
@@ -41,12 +74,20 @@ public sealed class WindowPositioningService : IWindowPositioningService
             style |= NativeMethods.WS_POPUP;
             NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_STYLE, new IntPtr(style));
 
+            bool alwaysOnTop = _settingsManager.CurrentSettings.Behavior.AlwaysOnTop;
             long exStyle = NativeMethods.GetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE).ToInt64();
-            exStyle |= NativeMethods.WS_EX_TOPMOST;
+            if (alwaysOnTop)
+            {
+                exStyle |= NativeMethods.WS_EX_TOPMOST;
+            }
+            else
+            {
+                exStyle &= ~NativeMethods.WS_EX_TOPMOST;
+            }
             NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE, new IntPtr(exStyle));
 
             SetDockState(hWnd, isExpanded: false);
-            _logger.LogInformation("Dock window successfully configured as borderless topmost dock.");
+            _logger.LogInformation("Dock window successfully configured (AlwaysOnTop={AlwaysOnTop}).", alwaysOnTop);
         }
         catch (Exception ex)
         {
@@ -54,22 +95,55 @@ public sealed class WindowPositioningService : IWindowPositioningService
         }
     }
 
-    public void SetDockState(IntPtr hWnd, bool isExpanded)
+    public void SetAlwaysOnTop(IntPtr hWnd, bool alwaysOnTop)
     {
         if (hWnd == IntPtr.Zero) return;
 
         try
         {
-            int screenWidth = NativeMethods.GetSystemMetrics(NativeMethods.SM_CXSCREEN);
-            if (screenWidth <= 0) screenWidth = 1920;
+            IntPtr insertAfter = alwaysOnTop ? NativeMethods.HWND_TOPMOST : NativeMethods.HWND_NOTOPMOST;
+            NativeMethods.SetWindowPos(
+                hWnd,
+                insertAfter,
+                0, 0, 0, 0,
+                NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOACTIVATE
+            );
+            _logger.LogInformation("Dock window TopMost updated to {AlwaysOnTop}", alwaysOnTop);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update always-on-top state.");
+        }
+    }
 
-            var (width, height) = GetDockDimensions(isExpanded);
-            int x = (screenWidth - width) / 2;
-            int y = TopMargin;
+    public void SetDockState(IntPtr hWnd, bool isExpanded)
+    {
+        Reposition(hWnd, isExpanded);
+    }
+
+    public void Reposition(IntPtr hWnd, bool isExpanded)
+    {
+        if (hWnd == IntPtr.Zero) return;
+
+        try
+        {
+            var behavior = _settingsManager.CurrentSettings.Behavior;
+            var targetMonitor = _monitorService.GetTargetMonitor(behavior.MonitorTarget, behavior.FollowActiveMonitor);
+
+            var (x, y, width, height) = CalculatePlacement(
+                isExpanded,
+                targetMonitor.WorkX,
+                targetMonitor.WorkY,
+                targetMonitor.WorkWidth,
+                targetMonitor.WorkHeight,
+                targetMonitor.ScaleFactor
+            );
+
+            IntPtr insertAfter = behavior.AlwaysOnTop ? NativeMethods.HWND_TOPMOST : NativeMethods.HWND_NOTOPMOST;
 
             NativeMethods.SetWindowPos(
                 hWnd,
-                NativeMethods.HWND_TOPMOST,
+                insertAfter,
                 x,
                 y,
                 width,
@@ -77,13 +151,13 @@ public sealed class WindowPositioningService : IWindowPositioningService
                 NativeMethods.SWP_SHOWWINDOW | NativeMethods.SWP_FRAMECHANGED
             );
 
-            _logger.LogDebug("Dock state set. Expanded: {IsExpanded}, Pos: ({X},{Y}), Size: {W}x{H}",
-                isExpanded, x, y, width, height);
+            _logger.LogDebug(
+                "Dock repositioned on {MonitorName}. Expanded: {Expanded}, Pos: ({X},{Y}), Size: {W}x{H}, Scale: {Scale}",
+                targetMonitor.DeviceName, isExpanded, x, y, width, height, targetMonitor.ScaleFactor);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to set dock window state.");
+            _logger.LogError(ex, "Failed to reposition dock window.");
         }
     }
 }
-

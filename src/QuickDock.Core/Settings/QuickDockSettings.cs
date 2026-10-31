@@ -37,7 +37,10 @@ public sealed class BehaviorSettings
     public bool AutoHide { get; set; } = true;
     public int HoverDelayMs { get; set; } = 150;
     public bool DetectFullscreen { get; set; } = true;
-    public string MonitorTarget { get; set; } = "Primary";
+    public bool HideInFullscreen { get; set; } = true;
+    public bool AlwaysOnTop { get; set; } = true;
+    public bool FollowActiveMonitor { get; set; } = true;
+    public string MonitorTarget { get; set; } = "Active";
     public bool StartWithWindows { get; set; } = false;
 }
 

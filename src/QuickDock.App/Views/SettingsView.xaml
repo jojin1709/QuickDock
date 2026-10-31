@@ -53,6 +53,72 @@
                       Padding="0,0,8,0">
             <StackPanel Spacing="16">
 
+                <!-- Display & Positioning Section -->
+                <controls:QuickDockSection Title="Display &amp; Monitors" />
+                <Border Background="{ThemeResource CardBackgroundBrush}"
+                        BorderBrush="{ThemeResource TileStrokeBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardCornerRadius}"
+                        Padding="16">
+                    <StackPanel Spacing="14">
+                        <!-- Target Display -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Target Display" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Choose which monitor QuickDock docks to or follow active window."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{x:Bind ViewModel.AvailableMonitors, Mode=OneWay}"
+                                      SelectedIndex="{x:Bind ViewModel.SelectedMonitorIndex, Mode=TwoWay}"
+                                      Width="180"
+                                      VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
+                        <!-- Always On Top -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Always on Top" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Keep the idle dock and expanded panel floating above other windows."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.AlwaysOnTop, Mode=TwoWay}"
+                                          OnContent="" OffContent=""
+                                          VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
+                        <!-- Hide in Fullscreen -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Hide in Fullscreen" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Automatically hide QuickDock when a fullscreen game or video is active."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.HideInFullscreen, Mode=TwoWay}"
+                                          OnContent="" OffContent=""
+                                          VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Appearance Section -->
                 <controls:QuickDockSection Title="Appearance" />
                 <Border Background="{ThemeResource CardBackgroundBrush}"
@@ -77,7 +143,7 @@
 
                         <ComboBox Grid.Row="0" Grid.Column="1"
                                   SelectedIndex="{x:Bind ViewModel.SelectedThemeIndex, Mode=TwoWay}"
-                                  Width="140" VerticalAlignment="Center">
+                                  Width="180" VerticalAlignment="Center">
                             <ComboBoxItem Content="Windows Default" />
                             <ComboBoxItem Content="Light" />
                             <ComboBoxItem Content="Dark" />
@@ -86,13 +152,32 @@
                 </Border>
 
                 <!-- Behavior Section -->
-                <controls:QuickDockSection Title="Behavior" />
+                <controls:QuickDockSection Title="Behavior &amp; System" />
                 <Border Background="{ThemeResource CardBackgroundBrush}"
                         BorderBrush="{ThemeResource TileStrokeBrush}"
                         BorderThickness="1"
                         CornerRadius="{StaticResource CardCornerRadius}"
                         Padding="16">
                     <StackPanel Spacing="14">
+                        <!-- Start with Windows -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Start with Windows" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Automatically launch QuickDock quietly on Windows logon."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
+                                          OnContent="" OffContent=""
+                                          VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
                         <!-- Global Hotkey -->
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -248,4 +333,3 @@
         </ScrollViewer>
     </Grid>
 </UserControl>
-

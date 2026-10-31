@@ -44,6 +44,10 @@ public partial class App : Application
                 services.AddSingleton<IAppLifecycleService, AppLifecycleService>();
 
                 // Windows Shell & Native Services
+                services.AddSingleton<IMonitorService, MonitorService>();
+                services.AddSingleton<IStartupService, StartupService>();
+                services.AddSingleton<IFullscreenService, FullscreenDetectionService>();
+                services.AddSingleton<INotificationService, NotificationService>();
                 services.AddSingleton<ISystemMetricsService, SystemMetricsService>();
                 services.AddSingleton<IWindowPositioningService, WindowPositioningService>();
                 services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
@@ -61,30 +65,18 @@ public partial class App : Application
                 {
                     _logger?.LogInformation("MainWindow factory lambda starting...");
                     var vm = sp.GetRequiredService<MainViewModel>();
-                    _logger?.LogInformation("Factory got MainViewModel");
                     var pos = sp.GetRequiredService<IWindowPositioningService>();
-                    _logger?.LogInformation("Factory got IWindowPositioningService");
+                    var mon = sp.GetRequiredService<IMonitorService>();
+                    var full = sp.GetRequiredService<IFullscreenService>();
+                    var start = sp.GetRequiredService<IStartupService>();
+                    var notif = sp.GetRequiredService<INotificationService>();
                     var hotkey = sp.GetRequiredService<IGlobalHotkeyService>();
-                    _logger?.LogInformation("Factory got IGlobalHotkeyService");
                     var tray = sp.GetRequiredService<ISystemTrayService>();
-                    _logger?.LogInformation("Factory got ISystemTrayService");
                     var settings = sp.GetRequiredService<ISettingsManager>();
-                    _logger?.LogInformation("Factory got ISettingsManager");
                     var bus = sp.GetRequiredService<IEventBus>();
-                    _logger?.LogInformation("Factory got IEventBus");
                     var logger = sp.GetRequiredService<ILogger<MainWindow>>();
-                    try
-                    {
-                        _logger?.LogInformation("Calling new MainWindow(...)");
-                        var win = new MainWindow(vm, pos, hotkey, tray, settings, bus, logger);
-                        _logger?.LogInformation("new MainWindow(...) returned successfully!");
-                        return win;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger?.LogError(ex, "Exception thrown inside new MainWindow(...)!");
-                        throw;
-                    }
+
+                    return new MainWindow(vm, pos, mon, full, start, notif, hotkey, tray, settings, bus, logger);
                 });
             })
             .Build();
