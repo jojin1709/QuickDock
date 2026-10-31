@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="QuickDock.App.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:QuickDock.App"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Padding="32" RowSpacing="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="6" HorizontalAlignment="Center">
+            <TextBlock Text="QuickDock Core" FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center" />
+            <TextBlock Text="Phase 1 Application Architecture Online" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Status Card -->
+        <Border Grid.Row="1" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+                CornerRadius="8" Padding="20" HorizontalAlignment="Stretch" VerticalAlignment="Top" MaxWidth="600">
+            <StackPanel Spacing="16">
+                <TextBlock Text="System Services Status" FontSize="16" FontWeight="SemiBold" />
+
+                <Grid RowSpacing="8" ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Dependency Injection:" FontWeight="Medium" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="DiStatusText" Text="Active" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="EventBus:" FontWeight="Medium" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="EventBusStatusText" Text="Active" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Settings Storage:" FontWeight="Medium" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="SettingsStatusText" Text="Loaded" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Registered Modules:" FontWeight="Medium" />
+                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="ModulesStatusText" Text="0 modules" />
+                </Grid>
+
+                <ListView x:Name="ModulesListView" Header="Modules List" SelectionMode="None" MaxHeight="160">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="4" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="SemiBold" />
+                                <TextBlock Grid.Column="1" Text="{Binding Description}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="2" Text="{Binding State}" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </StackPanel>
+        </Border>
+
+        <!-- Footer Info -->
+        <StackPanel Grid.Row="2" Spacing="4" HorizontalAlignment="Center">
+            <TextBlock x:Name="StoragePathText" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
+            <TextBlock Text="Ready for Phase 2: Dock Shell &amp; Window Integration" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,0" />
+        </StackPanel>
+    </Grid>
+</Page>

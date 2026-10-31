@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "QuickDock.App (Unpackaged)": {
+      "commandName": "Project"
+    },
+    "QuickDock.App (Package)": {
+      "commandName": "MsixPackage"
+    }
+  }
+}
