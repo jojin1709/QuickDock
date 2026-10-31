@@ -46,6 +46,8 @@ public sealed partial class HomeView : UserControl
         }
     }
 
+    public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
+
     private Visibility HasSystemModules(HomeViewModel? vm) => vm?.FilteredSystemModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     private Visibility HasProductivityModules(HomeViewModel? vm) => vm?.FilteredProductivityModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     private Visibility HasUtilityModules(HomeViewModel? vm) => vm?.FilteredUtilityModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;

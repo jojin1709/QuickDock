@@ -66,6 +66,71 @@ public sealed class ClockSettings
     public string SelectedTimeZoneId { get; set; } = string.Empty; // Empty = Local
 }
 
+public enum SensitiveDataHandling
+{
+    Ignore,
+    StoreNormally,
+    RequireConfirmation
+}
+
+public enum ClipboardRetention
+{
+    Hours1,
+    Hours6,
+    Days1,
+    Days7,
+    Days30
+}
+
+public sealed class ClipboardModuleSettings
+{
+    public bool Enabled { get; set; } = true;
+    public ClipboardRetention Retention { get; set; } = ClipboardRetention.Days7;
+    public int MaxItems { get; set; } = 50;
+    public bool IsPaused { get; set; } = false;
+    public SensitiveDataHandling SensitiveAction { get; set; } = SensitiveDataHandling.Ignore;
+}
+
+public sealed class TimerModuleSettings
+{
+    public int DefaultTimerMinutes { get; set; } = 15;
+    public bool PlaySoundOnComplete { get; set; } = true;
+    public int PomodoroWorkMinutes { get; set; } = 25;
+    public int PomodoroShortBreakMinutes { get; set; } = 5;
+    public int PomodoroLongBreakMinutes { get; set; } = 15;
+    public int PomodoroSessionsBeforeLongBreak { get; set; } = 4;
+    public bool PomodoroAutoStartBreaks { get; set; } = false;
+    public bool PomodoroAutoStartWork { get; set; } = false;
+}
+
+public sealed class NotesModuleSettings
+{
+    public int AutosaveDebounceMs { get; set; } = 600;
+}
+
+public sealed class CalendarModuleSettings
+{
+    public bool WeekStartsOnMonday { get; set; } = true;
+    public bool Use24HourFormat { get; set; } = true;
+}
+
+public sealed class WeatherModuleSettings
+{
+    public bool UseAutomaticLocation { get; set; } = true;
+    public string ManualLocationName { get; set; } = "Thrissur";
+    public double? ManualLatitude { get; set; } = 10.5276;
+    public double? ManualLongitude { get; set; } = 76.2144;
+    public int RefreshIntervalMinutes { get; set; } = 30;
+    public string Provider { get; set; } = "OpenMeteo";
+    public string ApiKey { get; set; } = string.Empty;
+}
+
+public sealed class ScreenTimeModuleSettings
+{
+    public bool TrackingEnabled { get; set; } = true;
+    public int SamplingIntervalSeconds { get; set; } = 2;
+}
+
 public sealed class QuickDockSettings
 {
     public AppearanceSettings Appearance { get; set; } = new();
@@ -73,6 +138,12 @@ public sealed class QuickDockSettings
     public ClockSettings Clock { get; set; } = new();
     public PerformanceSettings Performance { get; set; } = new();
     public PrivacySettings Privacy { get; set; } = new();
+    public ClipboardModuleSettings Clipboard { get; set; } = new();
+    public TimerModuleSettings Timer { get; set; } = new();
+    public NotesModuleSettings Notes { get; set; } = new();
+    public CalendarModuleSettings Calendar { get; set; } = new();
+    public WeatherModuleSettings Weather { get; set; } = new();
+    public ScreenTimeModuleSettings ScreenTime { get; set; } = new();
 
     /// <summary>
     /// Key: ModuleId, Value: whether it is enabled.
@@ -86,6 +157,11 @@ public sealed class QuickDockSettings
         ["quickdock.media"] = true,
         ["quickdock.clipboard"] = true,
         ["quickdock.notes"] = true,
+        ["quickdock.calendar"] = true,
+        ["quickdock.weather"] = true,
+        ["quickdock.links"] = true,
+        ["quickdock.temporarymessage"] = true,
+        ["quickdock.screentime"] = true,
         ["quickdock.dev"] = true,
         ["quickdock.quickdrop"] = true,
         ["quickdock.ai"] = true

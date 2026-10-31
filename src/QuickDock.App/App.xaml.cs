@@ -18,9 +18,16 @@ using QuickDock.Modules.Media;
 using QuickDock.Modules.Network;
 using QuickDock.Modules.System;
 using QuickDock.Modules.Volume;
+using QuickDock.Modules.Productivity;
 using QuickDock.Services.Audio;
+using QuickDock.Services.Clipboard;
 using QuickDock.Services.Media;
+using QuickDock.Services.Productivity;
+using QuickDock.Services.ScreenTime;
 using QuickDock.Services.System;
+using QuickDock.Services.Time;
+using QuickDock.Services.Weather;
+using System.Net.Http;
 
 namespace QuickDock.App;
 
@@ -66,17 +73,50 @@ public partial class App : Application
                 services.AddSingleton<ClockModule>();
                 services.AddSingleton<IQuickDockModule>(sp => sp.GetRequiredService<ClockModule>());
 
-                // Other Core Utility Modules
+                // Core Utility Modules
                 services.AddSingleton<IQuickDockModule, SystemModule>();
                 services.AddSingleton<IQuickDockModule, VolumeModule>();
                 services.AddSingleton<IQuickDockModule, MediaModule>();
                 services.AddSingleton<IQuickDockModule, BatteryModule>();
                 services.AddSingleton<IQuickDockModule, NetworkModule>();
 
+                // Phase 5 Productivity Services & Infrastructure
+                services.AddSingleton<HttpClient>();
+                services.AddSingleton<IDatabaseService, SqliteDatabaseService>();
+                services.AddSingleton<ISensitiveDataDetector, SensitiveDataDetector>();
+                services.AddSingleton<IClipboardService, WindowsClipboardService>();
+                services.AddSingleton<ITimerService, TimerService>();
+                services.AddSingleton<IStopwatchService, StopwatchService>();
+                services.AddSingleton<IPomodoroService, PomodoroService>();
+                services.AddSingleton<INotesService, NotesService>();
+                services.AddSingleton<ICalendarService, CalendarService>();
+                services.AddSingleton<IWeatherProvider, OpenMeteoWeatherProvider>();
+                services.AddSingleton<IWeatherService, WeatherService>();
+                services.AddSingleton<ISavedLinksService, SavedLinksService>();
+                services.AddSingleton<ITemporaryMessageService, TemporaryMessageService>();
+                services.AddSingleton<IScreenTimeService, ScreenTimeService>();
+
+                // Phase 5 Productivity Modules
+                services.AddSingleton<IQuickDockModule, ClipboardModule>();
+                services.AddSingleton<IQuickDockModule, TimerModule>();
+                services.AddSingleton<IQuickDockModule, NotesModule>();
+                services.AddSingleton<IQuickDockModule, CalendarModule>();
+                services.AddSingleton<IQuickDockModule, WeatherModule>();
+                services.AddSingleton<IQuickDockModule, LinksModule>();
+                services.AddSingleton<IQuickDockModule, TemporaryMessageModule>();
+                services.AddSingleton<IQuickDockModule, ScreenTimeModule>();
+
                 // ViewModels
                 services.AddSingleton<HomeViewModel>();
                 services.AddSingleton<SystemViewModel>();
                 services.AddSingleton<SettingsViewModel>();
+                services.AddSingleton<ClipboardViewModel>();
+                services.AddSingleton<TimerViewModel>();
+                services.AddSingleton<NotesViewModel>();
+                services.AddSingleton<CalendarViewModel>();
+                services.AddSingleton<WeatherViewModel>();
+                services.AddSingleton<SavedLinksViewModel>();
+                services.AddSingleton<ScreenTimeViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 services.AddTransient<MainWindow>(sp =>
@@ -113,6 +153,18 @@ public partial class App : Application
         {
             var lifecycle = Services.GetRequiredService<IAppLifecycleService>();
             await lifecycle.StartAsync();
+
+            var database = Services.GetRequiredService<IDatabaseService>();
+            await database.InitializeAsync();
+
+            var clipboard = Services.GetRequiredService<IClipboardService>();
+            await clipboard.StartListeningAsync();
+
+            var screenTime = Services.GetRequiredService<IScreenTimeService>();
+            if (Services.GetRequiredService<ISettingsManager>().CurrentSettings.ScreenTime.TrackingEnabled)
+            {
+                screenTime.StartTracking();
+            }
 
             _logger?.LogInformation("Resolving MainViewModel...");
             var vm = Services.GetRequiredService<MainViewModel>();

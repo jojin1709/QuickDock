@@ -438,6 +438,27 @@ public sealed partial class MainWindow : Window
     private Visibility IsSettingsVisible(string currentView) =>
         string.Equals(currentView, "Settings", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
 
+    private Visibility IsClipboardVisible(string currentView) =>
+        string.Equals(currentView, "Clipboard", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsTimerVisible(string currentView) =>
+        string.Equals(currentView, "Timer", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsNotesVisible(string currentView) =>
+        string.Equals(currentView, "Notes", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsCalendarVisible(string currentView) =>
+        string.Equals(currentView, "Calendar", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsWeatherVisible(string currentView) =>
+        string.Equals(currentView, "Weather", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsLinksVisible(string currentView) =>
+        string.Equals(currentView, "Links", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    private Visibility IsScreenTimeVisible(string currentView) =>
+        string.Equals(currentView, "ScreenTime", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();

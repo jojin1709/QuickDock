@@ -26,6 +26,10 @@ public sealed partial class HomeViewModel : ObservableObject
     private readonly IAudioService _audioService;
     private readonly IMediaService _mediaService;
     private readonly ClockModule _clockModule;
+    private readonly IDatabaseService _databaseService;
+    private readonly ITimerService _timerService;
+    private readonly IWeatherService _weatherService;
+    private readonly ITemporaryMessageService _tempMessageService;
     private readonly ILogger<HomeViewModel> _logger;
     private readonly List<ModuleTileItem> _allModules = [];
 
@@ -81,6 +85,27 @@ public sealed partial class HomeViewModel : ObservableObject
     [ObservableProperty]
     private string _searchQuery = string.Empty;
 
+    // Phase 5 Summaries
+    [ObservableProperty]
+    private string _clipboardSnippetText = "Clipboard ready";
+
+    [ObservableProperty]
+    private string _activeTimerText = "No active timer";
+
+    [ObservableProperty]
+    private string _weatherSnippetText = "Weather unavailable";
+
+    [ObservableProperty]
+    private string _screenTimeSnippetText = "Screen Time: 0m";
+
+    [ObservableProperty]
+    private string _temporaryMessageText = string.Empty;
+
+    [ObservableProperty]
+    private bool _hasTemporaryMessage;
+
+    private string _temporaryMessageId = string.Empty;
+
     public ObservableCollection<ModuleTileItem> FilteredProductivityModules { get; } = [];
     public ObservableCollection<ModuleTileItem> FilteredUtilityModules { get; } = [];
     public ObservableCollection<ModuleTileItem> FilteredDeveloperModules { get; } = [];
@@ -93,6 +118,10 @@ public sealed partial class HomeViewModel : ObservableObject
         IAudioService audioService,
         IMediaService mediaService,
         ClockModule clockModule,
+        IDatabaseService databaseService,
+        ITimerService timerService,
+        IWeatherService weatherService,
+        ITemporaryMessageService tempMessageService,
         ILogger<HomeViewModel> logger)
     {
         _eventBus = eventBus;
@@ -101,6 +130,10 @@ public sealed partial class HomeViewModel : ObservableObject
         _audioService = audioService;
         _mediaService = mediaService;
         _clockModule = clockModule;
+        _databaseService = databaseService;
+        _timerService = timerService;
+        _weatherService = weatherService;
+        _tempMessageService = tempMessageService;
         _logger = logger;
 
         InitializeModuleCatalog();
@@ -111,6 +144,84 @@ public sealed partial class HomeViewModel : ObservableObject
 
         _audioService.VolumeChanged += OnAudioVolumeChanged;
         _mediaService.MediaChanged += OnMediaChanged;
+        _timerService.TimerUpdated += (s, t) => RefreshTimerSummary();
+        _weatherService.WeatherUpdated += (s, w) => RefreshWeatherSummary(w);
+
+        _ = RefreshSummaryDataAsync();
+    }
+
+    public async Task RefreshSummaryDataAsync()
+    {
+        try
+        {
+            // Clipboard summary
+            var recentClips = await _databaseService.GetClipboardItemsAsync(limit: 1);
+            if (recentClips.Count > 0)
+            {
+                ClipboardSnippetText = recentClips[0].Preview;
+            }
+
+            // Weather summary
+            var weather = _weatherService.CurrentWeather;
+            RefreshWeatherSummary(weather);
+
+            // Screen time summary
+            var usage = await _databaseService.GetDailyUsageAsync(DateTime.Today);
+            var totalSec = usage.Sum(u => u.DurationSeconds);
+            var ts = TimeSpan.FromSeconds(totalSec);
+            ScreenTimeSnippetText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m today" : $"{ts.Minutes}m today";
+
+            // Temporary message banner
+            var tempMsg = await _tempMessageService.GetActiveMessageAsync();
+            if (tempMsg != null)
+            {
+                _temporaryMessageId = tempMsg.Id;
+                TemporaryMessageText = tempMsg.Content;
+                HasTemporaryMessage = true;
+            }
+            else
+            {
+                HasTemporaryMessage = false;
+            }
+
+            RefreshTimerSummary();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogTrace(ex, "Error refreshing home summary data.");
+        }
+    }
+
+    private void RefreshTimerSummary()
+    {
+        var active = _timerService.ActiveTimers.FirstOrDefault(t => t.State == Core.Models.TimerState.Running);
+        if (active != null)
+        {
+            ActiveTimerText = $"{active.Name}: {active.RemainingTime:mm\\:ss}";
+        }
+        else
+        {
+            ActiveTimerText = "No active timer";
+        }
+    }
+
+    private void RefreshWeatherSummary(Core.Models.WeatherData? weather)
+    {
+        if (weather != null)
+        {
+            WeatherSnippetText = $"{weather.LocationName}: {Math.Round(weather.TemperatureC)}°C, {weather.Condition}";
+        }
+    }
+
+    [RelayCommand]
+    private async Task DismissTemporaryMessageAsync()
+    {
+        if (!string.IsNullOrEmpty(_temporaryMessageId))
+        {
+            await _tempMessageService.DismissMessageAsync(_temporaryMessageId);
+            HasTemporaryMessage = false;
+            TemporaryMessageText = string.Empty;
+        }
     }
 
     public void UpdateTime(DateTime now)
@@ -293,10 +404,14 @@ public sealed partial class HomeViewModel : ObservableObject
         _allModules.Add(new ModuleTileItem("quickdock.battery", "Battery", "Power state & battery health", "\uE83F", "System", "Active"));
 
         // Productivity
+        _allModules.Add(new ModuleTileItem("quickdock.clipboard", "Clipboard", "Multi-format history & search", "\uF0E3", "Productivity", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.timer", "Timer", "Timers, stopwatch, pomodoro", "\uE916", "Productivity", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.notes", "Notes", "Quick scratchpad & notes", "\uE70B", "Productivity", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.calendar", "Calendar", "Upcoming events & schedule", "\uE787", "Productivity", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.weather", "Weather", "Current conditions & forecast", "\uE753", "Productivity", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.links", "Links", "Saved bookmarks & web shortcuts", "\uE71B", "Productivity", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.screentime", "Screen Time", "App usage & screen analytics", "\uEC58", "Productivity", "Active"));
         _allModules.Add(new ModuleTileItem("quickdock.clock", "Clock", "Local time & timezone", "\uE823", "Productivity", "Running"));
-        _allModules.Add(new ModuleTileItem("quickdock.clipboard", "Clipboard", "Multi-format ring & history", "\uF0E3", "Productivity", "Ready"));
-        _allModules.Add(new ModuleTileItem("quickdock.notes", "Notes", "Quick scratchpad & markdown", "\uE70B", "Productivity", "Ready"));
-        _allModules.Add(new ModuleTileItem("quickdock.timer", "Timer", "Pomodoro & countdowns", "\uE916", "Productivity", "Idle"));
 
         // Utilities
         _allModules.Add(new ModuleTileItem("quickdock.media", "Media", "System media transport session", "\uE8D6", "Utilities", "Active"));
@@ -310,14 +425,37 @@ public sealed partial class HomeViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void SelectModule(ModuleTileItem? item)
+    public void SelectModule(ModuleTileItem? item)
     {
         if (item == null) return;
         _logger.LogInformation("Selected module: {Id} ({Title})", item.Id, item.Title);
 
-        if (item.Id == "quickdock.system")
+        switch (item.Id)
         {
-            NavigationRequested?.Invoke("System");
+            case "quickdock.system":
+                NavigationRequested?.Invoke("System");
+                break;
+            case "quickdock.clipboard":
+                NavigationRequested?.Invoke("Clipboard");
+                break;
+            case "quickdock.timer":
+                NavigationRequested?.Invoke("Timer");
+                break;
+            case "quickdock.notes":
+                NavigationRequested?.Invoke("Notes");
+                break;
+            case "quickdock.calendar":
+                NavigationRequested?.Invoke("Calendar");
+                break;
+            case "quickdock.weather":
+                NavigationRequested?.Invoke("Weather");
+                break;
+            case "quickdock.links":
+                NavigationRequested?.Invoke("Links");
+                break;
+            case "quickdock.screentime":
+                NavigationRequested?.Invoke("ScreenTime");
+                break;
         }
     }
 }

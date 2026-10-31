@@ -32,6 +32,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private readonly ISettingsManager _settingsManager;
     private readonly IStartupService _startupService;
     private readonly IMonitorService _monitorService;
+    private readonly IDatabaseService _databaseService;
     private readonly IEventBus _eventBus;
     private readonly ILogger<SettingsViewModel> _logger;
 
@@ -61,8 +62,57 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _startWithWindows = false;
 
+    // Phase 5: Productivity Settings
     [ObservableProperty]
-    private string _appVersion = "1.0.0 (Phase 3 Integration)";
+    private bool _clipboardHistoryEnabled = true;
+
+    [ObservableProperty]
+    private int _clipboardRetentionIndex = 3; // 0=1h, 1=6h, 2=1d, 3=7d, 4=30d
+
+    [ObservableProperty]
+    private int _clipboardMaxItems = 50;
+
+    [ObservableProperty]
+    private int _sensitiveDataActionIndex = 0; // 0=Ignore, 1=StoreNormally, 2=RequireConfirmation
+
+    [ObservableProperty]
+    private int _defaultTimerMinutes = 15;
+
+    [ObservableProperty]
+    private bool _timerSoundEnabled = true;
+
+    [ObservableProperty]
+    private int _pomodoroWorkMinutes = 25;
+
+    [ObservableProperty]
+    private int _pomodoroShortBreakMinutes = 5;
+
+    [ObservableProperty]
+    private int _pomodoroLongBreakMinutes = 15;
+
+    [ObservableProperty]
+    private bool _calendarWeekStartsOnMonday = true;
+
+    [ObservableProperty]
+    private bool _calendar24HourFormat = true;
+
+    [ObservableProperty]
+    private bool _weatherAutoLocation = true;
+
+    [ObservableProperty]
+    private string _weatherManualCity = "Thrissur";
+
+    [ObservableProperty]
+    private int _weatherRefreshMinutes = 30;
+
+    [ObservableProperty]
+    private bool _screenTimeTrackingEnabled = true;
+
+    [ObservableProperty]
+    private string _settingsStatusMessage = string.Empty;
+
+    [ObservableProperty]
+    private string _appVersion = "1.0.0 (Phase 5 Productivity)";
 
     [ObservableProperty]
     private string _dotNetVersion = Environment.Version.ToString();
@@ -77,12 +127,14 @@ public sealed partial class SettingsViewModel : ObservableObject
         ISettingsManager settingsManager,
         IStartupService startupService,
         IMonitorService monitorService,
+        IDatabaseService databaseService,
         IEventBus eventBus,
         ILogger<SettingsViewModel> logger)
     {
         _settingsManager = settingsManager;
         _startupService = startupService;
         _monitorService = monitorService;
+        _databaseService = databaseService;
         _eventBus = eventBus;
         _logger = logger;
 
@@ -146,18 +198,46 @@ public sealed partial class SettingsViewModel : ObservableObject
                 SelectedMonitorIndex = matchIdx >= 0 ? matchIdx : 0;
             }
 
+            // Phase 5 Settings Load
+            ClipboardHistoryEnabled = settings.Clipboard.Enabled;
+            ClipboardRetentionIndex = (int)settings.Clipboard.Retention;
+            ClipboardMaxItems = settings.Clipboard.MaxItems;
+            SensitiveDataActionIndex = (int)settings.Clipboard.SensitiveAction;
+
+            DefaultTimerMinutes = settings.Timer.DefaultTimerMinutes;
+            TimerSoundEnabled = settings.Timer.PlaySoundOnComplete;
+            PomodoroWorkMinutes = settings.Timer.PomodoroWorkMinutes;
+            PomodoroShortBreakMinutes = settings.Timer.PomodoroShortBreakMinutes;
+            PomodoroLongBreakMinutes = settings.Timer.PomodoroLongBreakMinutes;
+
+            CalendarWeekStartsOnMonday = settings.Calendar.WeekStartsOnMonday;
+            Calendar24HourFormat = settings.Calendar.Use24HourFormat;
+
+            WeatherAutoLocation = settings.Weather.UseAutomaticLocation;
+            WeatherManualCity = settings.Weather.ManualLocationName ?? "Thrissur";
+            WeatherRefreshMinutes = settings.Weather.RefreshIntervalMinutes;
+
+            ScreenTimeTrackingEnabled = settings.ScreenTime.TrackingEnabled;
+
             ModuleToggles.Clear();
             var catalog = new (string Id, string Name, string Category)[]
             {
-                ("quickdock.clock", "Clock & Timer", "Productivity"),
+                ("quickdock.clock", "Clock & Time", "Productivity"),
                 ("quickdock.clipboard", "Clipboard Manager", "Productivity"),
+                ("quickdock.timer", "Timer & Stopwatch", "Productivity"),
                 ("quickdock.notes", "Quick Notes", "Productivity"),
+                ("quickdock.calendar", "Calendar Agenda", "Productivity"),
+                ("quickdock.weather", "Weather Forecast", "Productivity"),
+                ("quickdock.links", "Saved Links", "Productivity"),
+                ("quickdock.screentime", "Screen Time Analytics", "Productivity"),
                 ("quickdock.system", "System Controls", "System"),
                 ("quickdock.volume", "Volume Control", "System"),
-                ("quickdock.quickdrop", "QuickDrop Transfers", "Utilities"),
-                ("quickdock.weather", "Weather Forecast", "Utilities"),
+                ("quickdock.battery", "Battery & Power", "System"),
                 ("quickdock.network", "Network Monitor", "Utilities"),
+                ("quickdock.media", "Media Session", "Utilities"),
+                ("quickdock.quickdrop", "QuickDrop Transfers", "Utilities"),
                 ("quickdock.dev", "Developer Tools", "Developer"),
+                ("quickdock.security", "Security Toolkit", "Developer"),
                 ("quickdock.ai", "AI Services", "Developer")
             };
 
@@ -283,6 +363,48 @@ public sealed partial class SettingsViewModel : ObservableObject
         var settings = _settingsManager.CurrentSettings;
         await _settingsManager.SaveAsync(settings);
         await _eventBus.PublishAsync(new SettingsChangedEvent(settings));
+    }
+
+    [RelayCommand]
+    private async Task ClearAllStoredDataAsync()
+    {
+        await _databaseService.ClearAllDataAsync();
+        SettingsStatusMessage = "All stored local data has been cleared.";
+    }
+
+    [RelayCommand]
+    private async Task ClearScreenTimeDataAsync()
+    {
+        await _databaseService.ClearUsageHistoryAsync();
+        SettingsStatusMessage = "Screen time history cleared.";
+    }
+
+    [RelayCommand]
+    private async Task SaveProductivitySettingsAsync()
+    {
+        var settings = _settingsManager.CurrentSettings;
+        settings.Clipboard.Enabled = ClipboardHistoryEnabled;
+        settings.Clipboard.Retention = (ClipboardRetention)Math.Clamp(ClipboardRetentionIndex, 0, 4);
+        settings.Clipboard.MaxItems = Math.Clamp(ClipboardMaxItems, 5, 200);
+        settings.Clipboard.SensitiveAction = (SensitiveDataHandling)Math.Clamp(SensitiveDataActionIndex, 0, 2);
+
+        settings.Timer.DefaultTimerMinutes = DefaultTimerMinutes;
+        settings.Timer.PlaySoundOnComplete = TimerSoundEnabled;
+        settings.Timer.PomodoroWorkMinutes = PomodoroWorkMinutes;
+        settings.Timer.PomodoroShortBreakMinutes = PomodoroShortBreakMinutes;
+        settings.Timer.PomodoroLongBreakMinutes = PomodoroLongBreakMinutes;
+
+        settings.Calendar.WeekStartsOnMonday = CalendarWeekStartsOnMonday;
+        settings.Calendar.Use24HourFormat = Calendar24HourFormat;
+
+        settings.Weather.UseAutomaticLocation = WeatherAutoLocation;
+        settings.Weather.ManualLocationName = WeatherManualCity;
+        settings.Weather.RefreshIntervalMinutes = WeatherRefreshMinutes;
+
+        settings.ScreenTime.TrackingEnabled = ScreenTimeTrackingEnabled;
+
+        await SaveSettingsAndPublishAsync();
+        SettingsStatusMessage = "Settings saved successfully.";
     }
 
     [RelayCommand]

@@ -150,6 +150,41 @@
                                         ViewModel="{x:Bind ViewModel.Settings, Mode=OneWay}"
                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
                                         Visibility="{x:Bind IsSettingsVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:ClipboardView x:Name="MainClipboardView"
+                                         ViewModel="{x:Bind ViewModel.Clipboard, Mode=OneWay}"
+                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                         Visibility="{x:Bind IsClipboardVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:TimerView x:Name="MainTimerView"
+                                     ViewModel="{x:Bind ViewModel.Timer, Mode=OneWay}"
+                                     MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                     Visibility="{x:Bind IsTimerVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:NotesView x:Name="MainNotesView"
+                                     ViewModel="{x:Bind ViewModel.Notes, Mode=OneWay}"
+                                     MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                     Visibility="{x:Bind IsNotesVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:CalendarView x:Name="MainCalendarView"
+                                        ViewModel="{x:Bind ViewModel.Calendar, Mode=OneWay}"
+                                        MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                        Visibility="{x:Bind IsCalendarVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:WeatherView x:Name="MainWeatherView"
+                                       ViewModel="{x:Bind ViewModel.Weather, Mode=OneWay}"
+                                       MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                       Visibility="{x:Bind IsWeatherVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:SavedLinksView x:Name="MainLinksView"
+                                          ViewModel="{x:Bind ViewModel.Links, Mode=OneWay}"
+                                          MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                          Visibility="{x:Bind IsLinksVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:ScreenTimeView x:Name="MainScreenTimeView"
+                                          ViewModel="{x:Bind ViewModel.ScreenTime, Mode=OneWay}"
+                                          MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                          Visibility="{x:Bind IsScreenTimeVisible(ViewModel.CurrentView), Mode=OneWay}" />
                 </Grid>
             </Grid>
         </Border>

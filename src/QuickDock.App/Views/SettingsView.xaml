@@ -270,6 +270,103 @@
                     </ItemsRepeater>
                 </Border>
 
+                <!-- Productivity & Privacy Modules Section -->
+                <controls:QuickDockSection Title="Productivity &amp; Data Privacy" />
+                <Border Background="{ThemeResource CardBackgroundBrush}"
+                        BorderBrush="{ThemeResource TileStrokeBrush}"
+                        BorderThickness="1"
+                        CornerRadius="{StaticResource CardCornerRadius}"
+                        Padding="16">
+                    <StackPanel Spacing="14">
+                        <!-- Clipboard Privacy -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Clipboard History" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Capture and store local clipboard history."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.ClipboardHistoryEnabled, Mode=TwoWay}"
+                                          OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
+                        <!-- Screen Time Tracking -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Screen Time Tracking" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Record active foreground application duration locally."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.ScreenTimeTrackingEnabled, Mode=TwoWay}"
+                                          OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
+                        <!-- Timer Notification Sound -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Timer Audio Cues" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Play notification chime when timers complete."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.TimerSoundEnabled, Mode=TwoWay}"
+                                          OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
+                        <!-- Calendar Format -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                <TextBlock Text="Calendar Week Start" FontWeight="Medium" FontSize="13" />
+                                <TextBlock Text="Start week on Monday."
+                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsOn="{x:Bind ViewModel.CalendarWeekStartsOnMonday, Mode=TwoWay}"
+                                          OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
+
+                        <!-- Privacy Actions -->
+                        <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
+                            <Button Content="Save Productivity Settings"
+                                    Command="{x:Bind ViewModel.SaveProductivitySettingsCommand}"
+                                    Style="{ThemeResource AccentButtonStyle}"
+                                    CornerRadius="6" />
+                            <Button Content="Clear All Stored Data"
+                                    Command="{x:Bind ViewModel.ClearAllStoredDataCommand}"
+                                    CornerRadius="6" />
+                        </StackPanel>
+
+                        <TextBlock Text="{x:Bind ViewModel.SettingsStatusMessage, Mode=OneWay}"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                    </StackPanel>
+                </Border>
+
                 <!-- About QuickDock -->
                 <controls:QuickDockSection Title="About QuickDock" />
                 <Border Background="{ThemeResource CardBackgroundBrush}"

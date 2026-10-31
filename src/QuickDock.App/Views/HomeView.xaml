@@ -79,6 +79,65 @@
                       Padding="0,0,8,0">
             <StackPanel Spacing="14">
 
+                <!-- Temporary Message Banner -->
+                <Border Visibility="{x:Bind GetBoolVisibility(ViewModel.HasTemporaryMessage), Mode=OneWay}"
+                        Background="{ThemeResource CardBackgroundBrush}"
+                        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="12,8">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Grid.Column="0" Glyph="&#xE783;" FontSize="14" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.TemporaryMessageText, Mode=OneWay}" FontSize="12" FontWeight="Medium" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        <Button Grid.Column="2" Command="{x:Bind ViewModel.DismissTemporaryMessageCommand}" Background="Transparent" BorderBrush="Transparent" Padding="4">
+                            <FontIcon Glyph="&#xE711;" FontSize="11" />
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- Productivity Summaries Strip -->
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xF0E3;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.ClipboardSnippetText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE916;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.ActiveTimerText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE753;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.WeatherSnippetText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
+                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xEC58;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.ScreenTimeSnippetText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
                 <!-- Quick Controls: Volume & Media -->
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>

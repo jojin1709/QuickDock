@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="QuickDock.App.Views.SavedLinksView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:QuickDock.Core.Models"
+    xmlns:vm="using:QuickDock.App.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid RowSpacing="10">
+        <Grid.RowDefinitions>
+            <!-- Header bar with Back button -->
+            <RowDefinition Height="Auto" />
+            <!-- Add Link inputs -->
+            <RowDefinition Height="Auto" />
+            <!-- Search bar -->
+            <RowDefinition Height="Auto" />
+            <!-- Links list -->
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="4,0,4,2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Command="{x:Bind MainViewModel.OpenHomeCommand, Mode=OneWay}"
+                    Background="Transparent"
+                    BorderBrush="Transparent"
+                    Padding="8"
+                    CornerRadius="6"
+                    VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE72B;" FontSize="14" />
+                    <TextBlock Text="Back" FontSize="13" VerticalAlignment="Center" />
+                </StackPanel>
+            </Button>
+
+            <TextBlock Grid.Column="1"
+                       Text="Saved Links"
+                       FontSize="16"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"
+                       Margin="12,0,0,0" />
+        </Grid>
+
+        <!-- Add Link Row -->
+        <Grid Grid.Row="1" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBox Grid.Column="0"
+                     PlaceholderText="Title (optional)..."
+                     Text="{x:Bind ViewModel.NewTitle, Mode=TwoWay}"
+                     CornerRadius="6" />
+
+            <TextBox Grid.Column="1"
+                     PlaceholderText="https://..."
+                     Text="{x:Bind ViewModel.NewUrl, Mode=TwoWay}"
+                     CornerRadius="6" />
+
+            <Button Grid.Column="2"
+                    Content="Save"
+                    Command="{x:Bind ViewModel.AddLinkCommand}"
+                    Style="{ThemeResource AccentButtonStyle}"
+                    CornerRadius="6" />
+        </Grid>
+
+        <!-- Search Bar -->
+        <TextBox Grid.Row="2"
+                 PlaceholderText="Search saved links..."
+                 Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 CornerRadius="6" />
+
+        <!-- Links List -->
+        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{x:Bind ViewModel.Links, Mode=OneWay}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="models:SavedLinkItem">
+                        <Border Margin="0,0,0,6"
+                                Padding="12,10"
+                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="6">
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Spacing="2">
+                                    <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" FontSize="13" />
+                                    <TextBlock Text="{x:Bind Url}" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnOpenLinkClicked"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            Padding="6">
+                                        <FontIcon Glyph="&#xE8A7;" FontSize="13" />
+                                    </Button>
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnTogglePinClicked"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            Padding="6">
+                                        <FontIcon Glyph="&#xE718;" FontSize="13" />
+                                    </Button>
+                                    <Button Tag="{x:Bind}"
+                                            Click="OnDeleteLinkClicked"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            Padding="6">
+                                        <FontIcon Glyph="&#xE74D;" FontSize="13" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
+
