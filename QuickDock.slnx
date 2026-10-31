@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QuickDock.App/QuickDock.App.csproj" />
+    <Project Path="src/QuickDock.Core/QuickDock.Core.csproj" />
+    <Project Path="src/QuickDock.Infrastructure/QuickDock.Infrastructure.csproj" />
+    <Project Path="src/QuickDock.Modules/QuickDock.Modules.csproj" />
+    <Project Path="src/QuickDock.Services/QuickDock.Services.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QuickDock.Core.Tests/QuickDock.Core.Tests.csproj" />
+  </Folder>
+</Solution>
