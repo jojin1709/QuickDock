@@ -1192,3 +1192,4 @@ public sealed partial class DeveloperViewModel : ObservableObject
         Clipboard.SetContent(dataPackage);
     }
 }
+

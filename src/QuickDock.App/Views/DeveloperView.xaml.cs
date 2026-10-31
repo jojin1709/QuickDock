@@ -233,3 +233,4 @@ public sealed partial class DeveloperView : UserControl
 
     #endregion
 }
+

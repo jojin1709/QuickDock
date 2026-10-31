@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[Phase 7 Developer Toolkit Release](docs/PHASE_7_DEVELOPER_TOOLKIT.md):** Git integration, Docker manager, Terminal launcher, JSON/JWT offline tools, Regex tester, QR generator, HTTP REST client, and local port/process monitors are now live. See the [verification report](docs/PHASE_7_DEVELOPER_TOOLKIT.md#verification-results) (139 passing tests, 0 warnings).
+> **[Phase 8 Network & Security Toolkit Release](docs/PHASE_8_NETWORK_SECURITY.md):** Defensive network diagnostics, DNS resolver, active connection & port inspection, TLS inspector, HTTP security headers, Windows Firewall & Defender monitors, file integrity verification, and security posture reporting are now live. See the [verification report](docs/PHASE_8_NETWORK_SECURITY.md#14-test-verification-matrix) (166 passing tests, 0 warnings).
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-139%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-166%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 
@@ -32,7 +32,7 @@ dotnet run --project src/QuickDock.App
 
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
-<a href="docs/PHASE_7_DEVELOPER_TOOLKIT.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+<a href="docs/PHASE_8_NETWORK_SECURITY.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
 
 </div>
 
@@ -192,6 +192,19 @@ dotnet test --configuration Release
 - **HTTP / REST Client**: Execute GET, POST, PUT, PATCH, DELETE, and HEAD requests with custom headers, JSON body formatting, round-trip timing, and size metrics.
 - **Localhost & Process Monitor**: Inspect active TCP listening sockets via native Windows `GetExtendedTcpTable`, associate listening ports with PIDs and process names, and open `http://localhost:<PORT>` in your default browser.
 
+### 🛡️ Defensive Network & Security Toolkit
+- **Network Overview**: Real-time interface discovery, link speeds, IPv4/IPv6 addresses, gateway & DHCP detection, DNS servers, and live network traffic counters via .NET `NetworkInformation`.
+- **DNS Diagnostics**: Query A, AAAA, CNAME, MX, TXT, NS, PTR, SRV, and SOA records with round-trip latency metrics and direct Win32 `DnsQuery_W` (`dnsapi.dll`) resolution.
+- **Connectivity & Path Health**: ICMP ping with round-trip latency statistics (Min, Max, Avg, Packet Loss), MTU / packet fragmentation analysis, and TTL-stepped traceroute hop discovery.
+- **Socket & Port Inspector**: Native Win32 `iphlpapi.dll` extended TCP & UDP table queries (`GetExtendedTcpTable`, `GetExtendedUdpTable`) showing active connections, listening ports, remote endpoints, state, and owning process names/PIDs.
+- **Routing & Neighbor Cache**: Inspect the Windows IP forward routing table (`GetIpForwardTable`) and ARP / neighbor cache (`GetIpNetTable`) with MAC address resolution.
+- **TLS & Certificate Inspector**: Live TLS handshake negotiation, certificate chain validation, expiration countdown, SAN domains, and negotiated cipher suites.
+- **HTTP Security Headers**: Evaluates HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy with clear severity ratings (Pass, Warning, Missing).
+- **Public IP & WHOIS / RDAP**: Egress IP discovery with secure geolocation and autonomous system number (ASN) lookup.
+- **Windows Firewall & Defender**: Real-time profile state (Domain, Private, Public) and Windows Defender antimalware service status via native `sc.exe query WinDefend`.
+- **Local Security Posture & File Integrity**: Evaluates UAC, BitLocker, secure boot, guest accounts, and cryptographic hash verification with tamper detection.
+- **Defensive Security Reports**: Exportable Markdown / JSON security audits summarizing network and host posture.
+
 ---
 
 ## 🏗️ Architecture & Design Philosophy
@@ -294,6 +307,18 @@ flowchart TD
 | **Developer** | **HTTP / REST Client** | Active | Shared `HttpClient` REST runner with JSON response formatter |
 | **Developer** | **Localhost & Ports** | Active | Native Win32 `GetExtendedTcpTable` listening socket inspector |
 | **Developer** | **Process Monitor** | Active | Process memory & listening port mapping with safe termination |
+| **Network & Security** | **Network Overview** | Active | `NetworkInterface`, IP routing tables, link speed & interface telemetry |
+| **Network & Security** | **DNS Diagnostics** | Active | Win32 `DnsQuery_W` (`dnsapi.dll`) + .NET DNS records & query latency |
+| **Network & Security** | **Connectivity & Ping** | Active | High-precision ICMP ping, MTU path test, and stepped TTL traceroute |
+| **Network & Security** | **Socket & Port Inspector** | Active | Win32 `iphlpapi.dll` (`GetExtendedTcpTable` & `GetExtendedUdpTable`) |
+| **Network & Security** | **Routing & ARP Cache** | Active | Win32 `GetIpForwardTable` & `GetIpNetTable` with MAC resolution |
+| **Network & Security** | **TLS & Cert Inspector** | Active | Direct `SslStream` handshake, X.509 chain validation & cipher suites |
+| **Network & Security** | **HTTP Security Headers** | Active | Defensive assessment of HSTS, CSP, XFO, XXP, RP, and Permissions-Policy |
+| **Network & Security** | **Public IP & RDAP** | Active | User-consented egress IP lookup with secure geolocation and ASN |
+| **Network & Security** | **Firewall & Defender** | Active | Windows Firewall profiles & Windows Defender service (`sc.exe`) status |
+| **Network & Security** | **Security Posture** | Active | Local host hardening audit: UAC, BitLocker, Secure Boot, Guest accounts |
+| **Network & Security** | **File Integrity** | Active | Cryptographic baseline hashing & automated tamper detection |
+| **Network & Security** | **Security Audit Report** | Active | Structured Markdown and JSON audit export for compliance |
 
 ---
 
@@ -320,6 +345,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 | **[Phase 5 Guide](docs/PHASE_5_PRODUCTIVITY_MODULES.md)** | Productivity Modules | Clipboard manager, Timers, Notes, Calendar, Weather, Screen time |
 | **[Phase 6 Guide](docs/PHASE_6_FILE_TRANSFER.md)** | File & Transfer System | File Shelf, QuickDrop HTTP engine, QR pairing, Zip-Slip safe extractor |
 | **[Phase 7 Guide](docs/PHASE_7_DEVELOPER_TOOLKIT.md)** | Developer Toolkit | Git, Docker, Terminal, JSON/JWT, Regex, QR, HTTP client, Ports/Processes |
+| **[Phase 8 Guide](docs/PHASE_8_NETWORK_SECURITY.md)** | Network & Security Toolkit | Defensive diagnostics, DNS, sockets, TLS, headers, Firewall, Defender, integrity |
 
 ---
 

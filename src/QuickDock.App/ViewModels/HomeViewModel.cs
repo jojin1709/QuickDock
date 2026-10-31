@@ -429,6 +429,18 @@ public sealed partial class HomeViewModel : ObservableObject
         _allModules.Add(new ModuleTileItem("quickdock.http", "HTTP Client", "API tester, REST requests", "\uE774", "Developer", "Ready"));
         _allModules.Add(new ModuleTileItem("quickdock.localdev", "Localhost & Ports", "Listening ports & local servers", "\uEC27", "Developer", "Ready"));
         _allModules.Add(new ModuleTileItem("quickdock.processes", "Process Monitor", "Developer processes & PID inspector", "\uE9D9", "Developer", "Ready"));
+
+        // Network & Security Toolkit (Phase 8)
+        _allModules.Add(new ModuleTileItem("quickdock.netoverview", "Network Overview", "Local IP, Gateway, DNS, Public IP", "\uE968", "Utilities", "Active"));
+        _allModules.Add(new ModuleTileItem("quickdock.netadapters", "Network Adapters", "Interfaces, Speed, MAC, Status", "\uEC27", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.dnsping", "DNS & Connectivity", "DNS records query & Ping diagnostics", "\uE774", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.netconns", "Active Connections", "TCP/UDP tables & listening sockets", "\uE9D9", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.tls", "TLS Inspector", "Remote certificate inspection & cipher suites", "\uE72E", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.httpsec", "Security Headers", "Defensive HTTP headers assessment", "\uE8A1", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.firewall", "Firewall & Defender", "Microsoft Defender & Windows Firewall", "\uEA18", "Utilities", "Active"));
+        _allModules.Add(new ModuleTileItem("quickdock.posture", "Security Posture", "UAC, Secure Boot, Elevation, Open Ports", "\uE730", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.integrity", "File Integrity", "SHA-256/384/512 checksum verification", "\uE8D7", "Utilities", "Ready"));
+        _allModules.Add(new ModuleTileItem("quickdock.secreport", "Security Report", "Generate defensive diagnostics export", "\uE896", "Utilities", "Ready"));
     }
 
     [RelayCommand]
@@ -495,6 +507,36 @@ public sealed partial class HomeViewModel : ObservableObject
                 break;
             case "quickdock.processes":
                 NavigationRequested?.Invoke("Processes");
+                break;
+            case "quickdock.netoverview":
+                NavigationRequested?.Invoke("NetworkOverview");
+                break;
+            case "quickdock.netadapters":
+                NavigationRequested?.Invoke("Adapters");
+                break;
+            case "quickdock.dnsping":
+                NavigationRequested?.Invoke("DnsPing");
+                break;
+            case "quickdock.netconns":
+                NavigationRequested?.Invoke("Connections");
+                break;
+            case "quickdock.tls":
+                NavigationRequested?.Invoke("Tls");
+                break;
+            case "quickdock.httpsec":
+                NavigationRequested?.Invoke("Headers");
+                break;
+            case "quickdock.firewall":
+                NavigationRequested?.Invoke("Firewall");
+                break;
+            case "quickdock.posture":
+                NavigationRequested?.Invoke("Posture");
+                break;
+            case "quickdock.integrity":
+                NavigationRequested?.Invoke("Integrity");
+                break;
+            case "quickdock.secreport":
+                NavigationRequested?.Invoke("Report");
                 break;
         }
     }

@@ -21,10 +21,12 @@ using QuickDock.Modules.Volume;
 using QuickDock.Modules.Productivity;
 using QuickDock.Modules.Files;
 using QuickDock.Modules.Developer;
+using QuickDock.Modules.NetworkSecurity;
 using QuickDock.Services.Audio;
 using QuickDock.Services.Clipboard;
 using QuickDock.Services.Files;
 using QuickDock.Services.Developer;
+using QuickDock.Services.NetworkSecurity;
 using QuickDock.Services.Media;
 using QuickDock.Services.Productivity;
 using QuickDock.Services.QuickDrop;
@@ -151,6 +153,28 @@ public partial class App : Application
                 services.AddSingleton<IQuickDockModule, LocalDevModule>();
                 services.AddSingleton<IQuickDockModule, ProcessMonitorModule>();
 
+                // Phase 8 Network & Security Services
+                services.AddSingleton<INetworkOverviewService, NetworkOverviewService>();
+                services.AddSingleton<IDnsDiagnosticService, DnsDiagnosticService>();
+                services.AddSingleton<IConnectivityService, ConnectivityService>();
+                services.AddSingleton<INetworkConnectionService, NetworkConnectionService>();
+                services.AddSingleton<IRoutingNeighborService, RoutingNeighborService>();
+                services.AddSingleton<ITlsInspectionService, TlsInspectionService>();
+                services.AddSingleton<IHttpSecurityService, HttpSecurityService>();
+                services.AddSingleton<IIpDomainService, IpDomainService>();
+                services.AddSingleton<IFirewallStatusService, FirewallStatusService>();
+                services.AddSingleton<IWindowsSecurityService, WindowsSecurityService>();
+                services.AddSingleton<ILocalSecurityCheckService, LocalSecurityCheckService>();
+                services.AddSingleton<IFileIntegrityService, FileIntegrityService>();
+                services.AddSingleton<ISecurityReportService, SecurityReportService>();
+
+                // Phase 8 Network & Security Modules
+                services.AddSingleton<IQuickDockModule, NetworkDiagnosticsModule>();
+                services.AddSingleton<IQuickDockModule, SecurityDiagnosticsModule>();
+                services.AddSingleton<IQuickDockModule, TlsInspectorModule>();
+                services.AddSingleton<IQuickDockModule, HttpSecurityModule>();
+                services.AddSingleton<IQuickDockModule, FirewallStatusModule>();
+
                 // ViewModels
                 services.AddSingleton<HomeViewModel>();
                 services.AddSingleton<SystemViewModel>();
@@ -167,6 +191,7 @@ public partial class App : Application
                 services.AddSingleton<FileConverterViewModel>();
                 services.AddSingleton<TransferManagerViewModel>();
                 services.AddSingleton<DeveloperViewModel>();
+                services.AddSingleton<NetworkSecurityViewModel>();
                 services.AddSingleton<MainViewModel>();
 
                 services.AddTransient<MainWindow>(sp =>

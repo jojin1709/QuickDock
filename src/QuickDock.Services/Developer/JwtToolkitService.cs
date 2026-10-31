@@ -206,3 +206,4 @@ public sealed class JwtToolkitService : IJwtToolkitService
         return Convert.FromBase64String(padded);
     }
 }
+

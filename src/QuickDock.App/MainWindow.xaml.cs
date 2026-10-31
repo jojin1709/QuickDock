@@ -474,6 +474,9 @@ public sealed partial class MainWindow : Window
     private Visibility IsDeveloperVisible(string currentView) =>
         string.Equals(currentView, "Developer", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
 
+    private Visibility IsNetworkSecurityVisible(string currentView) =>
+        string.Equals(currentView, "NetworkSecurity", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();

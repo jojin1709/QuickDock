@@ -48,6 +48,7 @@ public class FileHashTests
 
             // Act
             var actualHash = await service.ComputeSha256Async(tempFile, progress);
+            await Task.Delay(100);
 
             // Assert
             Assert.Equal(expectedHash, actualHash);

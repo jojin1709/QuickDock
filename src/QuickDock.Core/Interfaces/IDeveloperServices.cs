@@ -112,3 +112,4 @@ public interface IDeveloperProcessService
     Task<IReadOnlyList<DeveloperProcessInfo>> GetDeveloperProcessesAsync(CancellationToken cancellationToken = default);
     bool TerminateProcess(int processId);
 }
+

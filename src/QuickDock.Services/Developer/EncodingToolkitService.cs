@@ -100,3 +100,4 @@ public sealed class EncodingToolkitService : IEncodingToolkitService
         _ => Encoding.UTF8
     };
 }
+

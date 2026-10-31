@@ -95,3 +95,4 @@ public sealed class DeveloperHashService : IDeveloperHashService
         _ => IncrementalHash.CreateHash(HashAlgorithmName.SHA256)
     };
 }
+

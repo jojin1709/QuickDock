@@ -143,3 +143,4 @@ public sealed class ProcessMonitorModule : ModuleBase
     protected override Task OnStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     protected override Task OnStopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
+

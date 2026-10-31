@@ -210,6 +210,11 @@
                                          ViewModel="{x:Bind ViewModel.Developer, Mode=OneWay}"
                                          MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
                                          Visibility="{x:Bind IsDeveloperVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                    <views:NetworkSecurityView x:Name="MainNetworkSecurityView"
+                                               ViewModel="{x:Bind ViewModel.NetworkSecurity, Mode=OneWay}"
+                                               MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                               Visibility="{x:Bind IsNetworkSecurityVisible(ViewModel.CurrentView), Mode=OneWay}" />
                 </Grid>
             </Grid>
         </Border>

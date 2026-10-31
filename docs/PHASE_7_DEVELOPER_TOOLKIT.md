@@ -153,3 +153,4 @@ Build: 0 errors, 0 warnings
 ## 5. Known Limitations
 - Docker features depend on the presence of Docker Desktop / Docker CLI on the host machine. When Docker is not installed or the engine is not running, the module safely indicates an unavailable state rather than simulating mock data.
 - Process inspection for protected Windows system processes (e.g. anti-malware, system kernel) will safely display "Access Denied" for executable paths as enforced by Windows security boundaries.
+

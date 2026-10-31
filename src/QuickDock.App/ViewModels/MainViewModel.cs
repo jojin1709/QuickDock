@@ -33,6 +33,7 @@ public sealed partial class MainViewModel : ObservableObject
     public FileConverterViewModel Converter { get; }
     public TransferManagerViewModel Transfers { get; }
     public DeveloperViewModel Developer { get; }
+    public NetworkSecurityViewModel NetworkSecurity { get; }
 
     public event Action<bool>? DockExpansionStateChanged;
 
@@ -52,6 +53,7 @@ public sealed partial class MainViewModel : ObservableObject
         FileConverterViewModel converter,
         TransferManagerViewModel transfers,
         DeveloperViewModel developer,
+        NetworkSecurityViewModel networkSecurity,
         IEventBus eventBus,
         ILogger<MainViewModel> logger)
     {
@@ -70,6 +72,7 @@ public sealed partial class MainViewModel : ObservableObject
         Converter = converter;
         Transfers = transfers;
         Developer = developer;
+        NetworkSecurity = networkSecurity;
         _eventBus = eventBus;
         _logger = logger;
 
@@ -154,6 +157,42 @@ public sealed partial class MainViewModel : ObservableObject
                 break;
             case "Processes":
                 OpenDeveloper("Processes");
+                break;
+            case "NetworkSecurity":
+            case "NetworkOverview":
+                OpenNetworkSecurity("Overview");
+                break;
+            case "Adapters":
+                OpenNetworkSecurity("Adapters");
+                break;
+            case "DnsPing":
+                OpenNetworkSecurity("DnsPing");
+                break;
+            case "Connections":
+                OpenNetworkSecurity("Connections");
+                break;
+            case "Tls":
+            case "TlsInspector":
+                OpenNetworkSecurity("Tls");
+                break;
+            case "Headers":
+            case "HttpSecurity":
+                OpenNetworkSecurity("Headers");
+                break;
+            case "Firewall":
+                OpenNetworkSecurity("Firewall");
+                break;
+            case "SecurityChecks":
+            case "Posture":
+                OpenNetworkSecurity("Posture");
+                break;
+            case "Integrity":
+            case "FileIntegrity":
+                OpenNetworkSecurity("Integrity");
+                break;
+            case "Report":
+            case "SecurityReport":
+                OpenNetworkSecurity("Report");
                 break;
             default:
                 OpenHome();
@@ -291,6 +330,14 @@ public sealed partial class MainViewModel : ObservableObject
         SwitchView("Developer");
         _ = Developer.InitializeSectionAsync(section);
         EnsureExpanded("OpenDeveloper");
+    }
+
+    [RelayCommand]
+    public void OpenNetworkSecurity(string section = "Overview")
+    {
+        SwitchView("NetworkSecurity");
+        _ = NetworkSecurity.InitializeSectionAsync(section);
+        EnsureExpanded("OpenNetworkSecurity");
     }
 
     [RelayCommand]

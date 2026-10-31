@@ -325,6 +325,7 @@ public class DeveloperTests
             string expected = Convert.ToHexStringLower(sha.ComputeHash(data));
 
             Assert.Equal(expected, res.HexHash);
+            await Task.Delay(100);
             Assert.True(lastProgress >= 0.99);
         }
         finally
