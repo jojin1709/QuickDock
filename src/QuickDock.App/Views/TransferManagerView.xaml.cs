@@ -46,3 +46,4 @@ public sealed partial class TransferManagerView : UserControl
         }
     }
 }
+

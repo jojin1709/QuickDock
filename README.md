@@ -1,0 +1,348 @@
+> [!NOTE]
+> **[Phase 6 File & Transfer Release](docs/PHASE_6_FILE_TRANSFER.md):** QuickDrop peer-to-peer Wi-Fi file sharing via QR code, local File Shelf staging, Zip-Slip protected archive extraction, and image transcoding are now live. See the [verification report](docs/PHASE_6_FILE_TRANSFER.md#verification-results) (109 passing tests, 0 warnings).
+
+<div align="center">
+
+<img src="src/QuickDock.App/Assets/icon-256x256.png" alt="QuickDock Logo" width="130" height="130" />
+
+# QuickDock
+
+[![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-109%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
+
+### QuickDock is a high-performance, native Windows 11 utility dock and productivity control layer.
+
+It docks subtly at the top center of your display, providing instant access to real-time hardware telemetry, productivity utilities, file staging, and zero-cloud peer-to-peer device transfers at the press of a hotkey. **Real Win32 telemetry. Zero Electron overhead.**
+
+**This repository contains QuickDock: the complete open-source native Windows utility, built from source.**
+
+<p><strong>Launch QuickDock</strong></p>
+
+```powershell
+dotnet run --project src/QuickDock.App
+```
+
+<sub>Press <code>Ctrl + Space</code> or mouse over the top-center edge to expand your dock.</sub>
+
+---
+
+<a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
+<a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
+<a href="docs/PHASE_6_FILE_TRANSFER.md"><img src="https://img.shields.io/badge/Docs-Architecture%20&%20Phases-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+
+</div>
+
+> [!TIP]
+> **Keyboard First:** Press <kbd>Ctrl</kbd> + <kbd>Space</kbd> anywhere in Windows to toggle QuickDock immediately without interrupting full-screen games, code editors, or active presentations.
+
+---
+
+## Table of Contents
+
+- [What is QuickDock?](#-what-is-quickdock)
+- [Quick Start](#-quick-start)
+- [Key Capabilities](#-key-capabilities)
+- [Architecture & Design Philosophy](#-architecture--design-philosophy)
+- [Module Ecosystem](#-module-ecosystem)
+- [Security, Privacy & Local-First Guarantees](#-security-privacy--local-first-guarantees)
+- [Documentation Matrix](#-documentation-matrix)
+- [Developer & Author](#-developer--author)
+- [Frequently Asked Questions](#-frequently-asked-questions)
+- [License](#-license)
+
+---
+
+## 💡 What is QuickDock?
+
+<details>
+<summary><strong>Why QuickDock Exists</strong></summary>
+
+Windows power users frequently switch between disjointed utilities: task managers, media controls, audio pickers, clipboard managers, scratchpads, pomodoro timers, file converters, and third-party cloud-based transfer tools. Most modern alternatives are built on Electron or Chromium web-views that consume hundreds of megabytes of RAM while idling.
+
+QuickDock consolidates these daily essentials into a single, cohesive, razor-thin native control layer that lives quietly at the top of your screen and surfaces only when you need it.
+</details>
+
+<details>
+<summary><strong>Native WinUI 3 vs Web Containers (Electron / Tauri)</strong></summary>
+
+QuickDock is engineered directly on **C# 13, .NET 10, WinUI 3, and Windows App SDK 2.6.4**:
+- **0 Chromium processes**: No embedded browsers, no V8 engine background spikes, and no multi-process IPC overhead for basic UI.
+- **Direct Win32 Interop**: Subscribes directly to native Windows messages (`WM_HOTKEY`, `WM_DISPLAYCHANGE`), native audio sessions (`WASAPI`), system media controls (`GSMTC`), and hardware performance counters.
+- **Ultra-low idle footprint**: Stays dormant at minimal memory usage until invoked.
+</details>
+
+<details>
+<summary><strong>The "Core Stays Alive. Modules Do Not." Rule</strong></summary>
+
+The architectural cornerstone of QuickDock is strict lifecycle isolation:
+```text
+CORE STAYS ALIVE. MODULES DO NOT.
+```
+- **Core services** (hotkey listeners, window positioning, system tray, event bus) remain lightweight and permanent.
+- **Feature modules** (CPU monitors, weather clients, QuickDrop HTTP sockets, media listeners) initialize and start **only when their view is visible or actively running an operation**.
+- When you collapse the dock, polling timers halt, sockets close, and memory allocations are released.
+</details>
+
+---
+
+## ⚡ Quick Start
+
+### Prerequisites
+
+| Requirement | Supported Version |
+| :--- | :--- |
+| **Operating System** | Windows 11 (22H2+) or Windows 10 (Build 19045+) |
+| **SDK** | [.NET 10 SDK (v10.0.402 or higher)](https://dotnet.microsoft.com/download/dotnet/10.0) |
+| **Windows App SDK** | 2.6.4 (Restored automatically via NuGet) |
+| **Terminal** | PowerShell 7+ or Windows Terminal |
+
+### 1. Clone & Build
+
+```powershell
+# Clone the repository
+git clone https://github.com/jojin1709/QuickDock.git
+cd QuickDock
+
+# Restore dependencies and build solution
+dotnet restore
+dotnet build --configuration Release
+```
+
+### 2. Run QuickDock
+
+```powershell
+# Launch the WinUI 3 desktop application
+dotnet run --project src/QuickDock.App
+```
+
+### 3. Run Test Suite
+
+```powershell
+# Execute all 109 unit and integration tests
+dotnet test --configuration Release
+```
+
+---
+
+## 🎯 Key Capabilities
+
+### 🖥️ Native Windows Shell & Positioning
+- **Top-Center Floating Dock**: Compact capsule anchored to the top of your display that expands into a rich command center.
+- **Multi-Monitor & DPI Aware**: Dynamically tracks monitor bounds, working areas, and per-monitor DPI scaling factors (`GetDpiForWindow`).
+- **Global Hotkey (`Ctrl + Space`)**: Registered via Win32 `RegisterHotKey` for instant invocation from any application.
+- **Fullscreen Suppression**: Detects foreground full-screen games, video players, and presentations using Win32 Shell hooks (`SHAppBarMessage` / `GetWindowRect`) and automatically suppresses hover popups.
+- **Single-Instance Mutex**: Prevents duplicate processes with named OS mutexes and redirects arguments to the active instance via named-pipe IPC.
+- **Native System Tray**: Low-profile tray icon with quick menus (Open, Settings, Exit) and native Windows toast alerts.
+
+### 📊 Real-Time Hardware & Media Telemetry (Zero Fake Data)
+- **CPU**: Real-time total processor utilization sampled directly via Windows Performance Counters.
+- **RAM**: Physical memory usage, free gigabytes, and load percentages via `GlobalMemoryStatusEx`.
+- **GPU**: Active hardware adapter detection and dedicated video memory usage via DirectX Graphics Infrastructure (DXGI).
+- **Storage & Battery**: Real-time disk capacity metrics and AC/battery charge percentages with power state notifications.
+- **Audio Control**: Native master volume control and instant mute toggle via Windows Core Audio (WASAPI).
+- **Media Controls**: Windows Global System Media Transport Controls (GSMTC) integration for Play, Pause, Next, Previous, and live track metadata.
+
+### ⏱️ Productivity Suite
+- **Clipboard Manager**:
+  - Event-driven clipboard listener (`Clipboard.ContentChanged`) capturing text, images, URLs, and file paths.
+  - **Sensitive Data Shield**: Built-in pattern detection masks API keys (OpenAI, AWS, GitHub), JWT tokens, and private keys.
+  - Search, item pinning, and configurable retention periods (Today, 7 Days, 30 Days, Forever).
+- **Time Tools**:
+  - **Multi-Timer**: Run concurrent countdown timers with presets (1m, 5m, 15m, 25m) and audio alarms.
+  - **Stopwatch**: High-precision monotonic stopwatch with lap time logging.
+  - **Pomodoro**: Structured 25m focus / 5m short break / 15m long break state machine with audible alerts.
+- **Notes & Scratchpad**: Instant markdown/text scratchpad with pinning, full-text search, and debounced local SQLite auto-saving.
+- **Calendar & Agenda**: Visual date picker with scheduled reminders, notes, and color-coded priority tags.
+- **Weather Module**: Lightweight weather data (via Open-Meteo) with WMO weather interpretations, temperature, humidity, and local disk fallback cache.
+- **Saved Links**: Category-organized web bookmarks with secure default browser launching.
+- **Temporary Dock Message**: Persistent banner widget on the main dock panel with customizable expiration (1h, 4h, 24h).
+- **Screen Time Analytics**: Low-frequency foreground application tracker aggregating daily and weekly application usage.
+
+### 📁 File Staging & QuickDrop (Peer-to-Peer Transfer)
+- **File Shelf**:
+  - Temporary staging area supporting native Windows Explorer Drag & Drop (both in and out).
+  - Metadata-only reference model that never creates unnecessary duplicate copies on disk.
+  - External file deletion detection with visual "Missing" badges and cleanup tools.
+- **QuickDrop (Direct Local Network Transfer)**:
+  - Transfer files between your PC and your phone, tablet, or another computer with zero cloud mediation.
+  - Generates a dynamic QR code on the desktop dock. Point your camera to open a responsive, local-only web application.
+  - Direct local HTTP streaming over Wi-Fi/LAN with automatic private IP discovery (`192.168.x.x`).
+  - Session tokens and server-generated GUID file mappings prevent path traversal and unauthorized downloads.
+- **File Conversion Utilities**:
+  - Image format transcoding between PNG, JPEG (with custom quality compression), BMP, and GIF.
+  - Archive compression to `.zip` and extraction with **Zip Slip path traversal prevention** (payloads with `../../` are rejected).
+  - Text encoding converter supporting UTF-8, UTF-16, and ASCII.
+- **Transfer Manager**: Real-time progress bars, transfer speed indicators (MB/s), and persistent SQLite transfer history with verified SHA-256 integrity checksums.
+
+---
+
+## 🏗️ Architecture & Design Philosophy
+
+QuickDock adheres to a strict modular design pattern where modules are decoupled through an in-memory event bus and reactive dependency injection.
+
+```mermaid
+flowchart TD
+    subgraph UI_Shell["QuickDock UI Layer (WinUI 3 / XAML)"]
+        Dock["Top-Center Dock (Idle / Compact)"]
+        ExpandedPanel["Expanded Command Panel"]
+        Tray["System Tray Icon & Menu"]
+        Views["Feature Views & Custom Controls"]
+    end
+
+    subgraph Native_Platform["Windows Native Integration (P/Invoke)"]
+        HotkeyHook["Win32 Hotkey Hook (Ctrl+Space)"]
+        MonitorService["Multi-Monitor & DPI Service"]
+        FullscreenDetector["Fullscreen Detection Service"]
+        AudioNative["WASAPI Core Audio"]
+        MediaNative["GSMTC Media Controls"]
+        HardwareNative["DXGI / PerformanceCounters / MemoryStatusEx"]
+    end
+
+    subgraph Core_Engine["QuickDock Core (Always Alive)"]
+        DI["Service Container (Dependency Injection)"]
+        EventBus["In-Memory Event Bus"]
+        ModuleManager["Dynamic Module Lifecycle Manager"]
+        SettingsService["Local JSON / Registry Settings"]
+        SingleInstance["Named Mutex & IPC Server"]
+    end
+
+    subgraph OnDemand_Modules["On-Demand Feature Modules (Awake When Active)"]
+        SysModule["System & Hardware Module"]
+        ProdModule["Productivity (Clipboard, Notes, Timers, Calendar)"]
+        FileModule["File Shelf & File Converters"]
+        QuickDropModule["QuickDrop Local HTTP Socket Server"]
+    end
+
+    subgraph Storage["100% Local Storage Engine"]
+        SQLite[("SQLite Local Database (WAL Mode)")]
+        LocalCache[("Local AppData Cache & Settings")]
+    end
+
+    HotkeyHook -->|Trigger| Dock
+    MonitorService -->|Position & DPI| Dock
+    FullscreenDetector -->|Suppress| Dock
+    
+    Dock <--> ExpandedPanel
+    ExpandedPanel --> Views
+    Tray --> Dock
+
+    Core_Engine --> Native_Platform
+    ModuleManager -->|Start / Stop Lifecycle| OnDemand_Modules
+
+    SysModule -.-> HardwareNative
+    SysModule -.-> AudioNative
+    SysModule -.-> MediaNative
+
+    ProdModule --> SQLite
+    FileModule --> SQLite
+    FileModule --> LocalCache
+    QuickDropModule -->|Direct Wi-Fi Streaming| Views
+```
+
+### Architectural Guarantees
+
+1. **Deterministic Lifecycle**: Every module implements `IQuickDockModule` exposing `InitializeAsync`, `StartAsync`, `StopAsync`, and `Dispose`.
+2. **Zero Polling in Background**: Sensors and hardware performance counters stop immediately when the dock is hidden or collapsed.
+3. **Local Database Isolation**: SQLite runs in Write-Ahead Logging (`WAL`) mode with parameterized queries, protecting all user notes, clipboard entries, and transfer logs locally at `%LOCALAPPDATA%\QuickDock\quickdock.db`.
+4. **Resilient Security Boundaries**: Network sockets (QuickDrop) are ephemeral, bound to local network interfaces only, and never expose external WAN ports.
+
+---
+
+## 🧩 Module Ecosystem
+
+| Category | Module | Status | Data Source / Technology |
+| :--- | :--- | :--- | :--- |
+| **System** | **Performance Metrics** | Active | Windows Performance Counters, `GlobalMemoryStatusEx`, DXGI |
+| **System** | **Audio & Volume** | Active | Windows Core Audio APIs (WASAPI) |
+| **System** | **Media Control** | Active | Global System Media Transport Controls (GSMTC) |
+| **System** | **Battery & Power** | Active | Win32 `GetSystemPowerStatus` & WMI |
+| **Productivity** | **Clipboard Manager** | Active | WinUI `Clipboard.ContentChanged` with sensitive token masking |
+| **Productivity** | **Timers & Stopwatch** | Active | Monotonic high-resolution `Stopwatch` & DispatcherTimers |
+| **Productivity** | **Pomodoro Tracker** | Active | 25/5/15 state machine with audible alert cues |
+| **Productivity** | **Notes & Scratchpad** | Active | Local SQLite storage with debounced auto-save |
+| **Productivity** | **Calendar & Agenda** | Active | XAML CalendarView with tag-filtered event storage |
+| **Productivity** | **Weather Forecast** | Active | Open-Meteo REST API with offline JSON disk cache |
+| **Productivity** | **Saved Bookmarks** | Active | SQLite bookmark library with default browser launcher |
+| **Productivity** | **Temporary Message** | Active | Ephemeral dock banner with 1h/4h/24h expiration |
+| **Productivity** | **Screen Time** | Active | Win32 `GetForegroundWindow` low-frequency sampler |
+| **File Transfer** | **File Shelf** | Active | WinUI Drag & Drop staging area (metadata reference) |
+| **File Transfer** | **QuickDrop** | Active | In-process lightweight HTTP server with QR pairing |
+| **File Transfer** | **File Converter** | Active | `System.Drawing` image transcoding & Zip-Slip safe compression |
+| **File Transfer** | **Transfer Manager**| Active | Streaming async pipeline with SHA-256 validation |
+
+---
+
+## 🛡️ Security, Privacy & Local-First Guarantees
+
+QuickDock is engineered under a strict **Zero-Telemetry, Local-First** commitment:
+
+- **100% Offline & Private**: Notes, clipboard history, calendar events, bookmarks, and files stay on your machine. No accounts, no analytics, no cloud sync, and no third-party tracking.
+- **Sensitive Data Masking**: Clipboard entries containing AWS keys, GitHub tokens, OpenAI keys, JWTs, and private keys are flagged and masked automatically in the UI.
+- **Zip Slip Exploit Prevention**: Archive extractions rigorously validate destination target paths, discarding files containing directory traversal sequences (`../`).
+- **Path Traversal Protection**: QuickDrop endpoints use server-generated GUID file mapping. Remote clients cannot access arbitrary disk directories.
+- **Local Network Boundary**: QuickDrop server binds strictly to private LAN adapters (`192.168.x.x`, `10.x.x.x`) and shuts down automatically when the transfer session completes.
+
+---
+
+## 📚 Documentation Matrix
+
+Detailed engineering specifications, design choices, and verification logs for each phase are preserved in the repository:
+
+| Document | Topic | Key Deliverables |
+| :--- | :--- | :--- |
+| **[Phase 3 Guide](docs/PHASE_3_WINDOWS_INTEGRATION.md)** | Windows Native Integration | Window positioning, DPI scaling, Mutex IPC, Fullscreen detection |
+| **[Phase 4 Guide](docs/PHASE_4_CORE_UTILITIES.md)** | Core Utility Modules | Real hardware sensors, WASAPI audio, GSMTC media sessions |
+| **[Phase 5 Guide](docs/PHASE_5_PRODUCTIVITY_MODULES.md)** | Productivity Modules | Clipboard manager, Timers, Notes, Calendar, Weather, Screen time |
+| **[Phase 6 Guide](docs/PHASE_6_FILE_TRANSFER.md)** | File & Transfer System | File Shelf, QuickDrop HTTP engine, QR pairing, Zip-Slip safe extractor |
+
+---
+
+## 👨‍💻 Developer & Author
+
+<div align="center">
+
+### **JOJIN JOHN**
+*Software Engineer & Security Researcher*
+
+[![GitHub](https://img.shields.io/badge/GitHub-jojin1709-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jojin1709)
+[![Repository](https://img.shields.io/badge/Repository-QuickDock-0078D4?style=for-the-badge&logo=git&logoColor=white)](https://github.com/jojin1709/QuickDock)
+
+</div>
+
+---
+
+## ❓ Frequently Asked Questions
+
+<details>
+<summary><strong>How is QuickDock different from standard Windows taskbar tools?</strong></summary>
+
+Standard taskbars are fixed and offer limited customizable utility spaces. QuickDock stays hidden until summoned, centers dynamically on your active monitor, provides instant access to clipboard history, file staging, media controls, and local phone transfers, and consumes virtually zero resources while idle.
+</details>
+
+<details>
+<summary><strong>How does QuickDrop transfer files to my phone without cloud servers?</strong></summary>
+
+QuickDock spins up a temporary HTTP server directly on your PC's private Wi-Fi network adapter. When you scan the QR code with your phone, your mobile browser connects directly to your PC over your home or office Wi-Fi. Files are streamed byte-for-byte directly between devices.
+</details>
+
+<details>
+<summary><strong>Does QuickDock support multiple monitors with different scaling?</strong></summary>
+
+Yes. QuickDock queries Windows monitor topology and per-monitor DPI scaling dynamically (`GetDpiForWindow`). When moved or summoned, it positions itself precisely at the top-center work area of the active monitor.
+</details>
+
+<details>
+<summary><strong>Will QuickDock pop up while playing full-screen games?</strong></summary>
+
+No. The built-in fullscreen detection service monitors the active foreground window state via Win32 Shell APIs (`SHAppBarMessage`) and suppresses hover animations and notifications while you are in a full-screen game or presentation.
+</details>
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).

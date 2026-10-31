@@ -48,6 +48,10 @@ public sealed class QuickDropHttpServer : IDisposable
         var ip = IPAddress.Parse(session.LocalAddress);
         _listener = new TcpListener(ip, session.Port);
         _listener.Start();
+        if (session.Port == 0 && _listener.LocalEndpoint is IPEndPoint ep)
+        {
+            session.Port = ep.Port;
+        }
         session.IsActive = true;
 
         _listenerTask = Task.Run(() => AcceptConnectionsAsync(_listener, _cts.Token));

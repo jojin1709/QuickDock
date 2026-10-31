@@ -86,3 +86,4 @@ public sealed class TransferManagerModule : ModuleBase
     protected override Task OnStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
     protected override Task OnStopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
+

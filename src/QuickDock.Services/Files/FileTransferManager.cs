@@ -101,3 +101,4 @@ public sealed class FileTransferManager : IFileTransferManager
         await _databaseService.ClearTransferHistoryAsync(cancellationToken).ConfigureAwait(false);
     }
 }
+

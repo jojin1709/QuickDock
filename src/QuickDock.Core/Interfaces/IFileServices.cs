@@ -63,3 +63,4 @@ public interface IQuickDropService
     bool RemoveSharedFile(string fileId);
     byte[] GenerateQrCodePng(string content, int pixelsPerModule = 6);
 }
+

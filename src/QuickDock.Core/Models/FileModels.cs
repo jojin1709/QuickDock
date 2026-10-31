@@ -145,3 +145,4 @@ public sealed class ConversionTask
     public double Progress { get; set; }
     public string? ErrorMessage { get; set; }
 }
+

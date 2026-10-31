@@ -128,3 +128,4 @@ public sealed partial class FileShelfView : UserControl
         }
     }
 }
+

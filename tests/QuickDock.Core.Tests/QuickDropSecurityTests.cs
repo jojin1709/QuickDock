@@ -31,18 +31,18 @@ public class QuickDropSecurityTests : IDisposable
 
     private QuickDropSession StartTestServer(int timeoutSeconds = 600)
     {
-        _port = new Random().Next(49000, 55000);
         var session = new QuickDropSession
         {
             Token = Guid.NewGuid().ToString("N").ToUpperInvariant(),
             LocalAddress = "127.0.0.1",
-            Port = _port,
+            Port = 0,
             CreatedAt = DateTimeOffset.UtcNow,
             ExpiresAt = DateTimeOffset.UtcNow.AddSeconds(timeoutSeconds),
             IsActive = true
         };
 
         _server.Start(session);
+        _port = session.Port;
         return session;
     }
 

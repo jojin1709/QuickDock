@@ -238,3 +238,4 @@ public sealed partial class FileShelfViewModel : ObservableObject
         RequestNavigate?.Invoke("converter");
     }
 }
+

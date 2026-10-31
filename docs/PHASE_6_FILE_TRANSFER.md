@@ -165,3 +165,4 @@ Build succeeded.
 ## 5. Known Limitations
 - QuickDrop utilizes HTTP on the local Wi-Fi network rather than HTTPS with custom CA certificates to ensure friction-free pairing across mobile browsers without SSL certificate warning prompts. The temporary cryptographic token restricts pairing access exclusively to devices with the QR code.
 - File preview for text documents safely truncates display at 256 KB to ensure predictable WinUI 3 memory consumption.
+

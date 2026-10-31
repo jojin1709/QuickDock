@@ -70,3 +70,4 @@ public sealed partial class QuickDropView : UserControl
         }
     }
 }
+

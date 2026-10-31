@@ -112,3 +112,4 @@ public sealed partial class TransferManagerViewModel : ObservableObject, IDispos
         _transferManager.TransferCompleted -= OnTransferCompleted;
     }
 }
+

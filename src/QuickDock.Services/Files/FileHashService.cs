@@ -57,3 +57,4 @@ public sealed class FileHashService : IFileHashService
         return Convert.ToHexStringLower(hashBytes);
     }
 }
+
