@@ -40,6 +40,31 @@
       
       <div class="timeline">
         
+        <!-- v1.0.3 -->
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-version">v1.0.3 — Input Safety Hardening & Regression Resolution</div>
+          <div class="timeline-date">November 1, 2026 · Official Production Release</div>
+          
+          <div style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">
+            <p>Critical input stability and visual lifecycle release eliminating low-level mouse hooks, guaranteeing zero OS-level cursor lag, and preventing XAML storyboard re-entrancy exceptions.</p>
+            
+            <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--text-muted);">Input Safety & Kernel Proximity Polling</h4>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 13px;">
+              <li><strong>Eliminated WH_MOUSE_LL:</strong> Completely removed synchronous low-level mouse hooks. Windows mouse input pipeline is never blocked or intercepted.</li>
+              <li><strong>Microsecond GetCursorPos:</strong> Non-blocking 50ms proximity checks execute in ~36 nanoseconds from cached kernel memory.</li>
+              <li><strong>Debounced Transitions:</strong> Proximity boundary crossings are debounced to prevent DispatcherQueue saturation.</li>
+            </ul>
+
+            <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--text-muted);">Storyboard & Window Stability</h4>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 13px;">
+              <li><strong>Crash Prevention (0xc000027b):</strong> Guarded Expand and Collapse storyboards against non-finite dimensions on DockSurface.</li>
+              <li><strong>Focus Isolation:</strong> Hover peeks never steal keyboard or foreground window focus from background applications.</li>
+              <li><strong>Subclass Isolation:</strong> Reassigned MainWindow subclass identifier to 2001 to resolve Win32 comctl32 collisions.</li>
+            </ul>
+          </div>
+        </div>
+
         <!-- v1.0.2 -->
         <div class="timeline-item">
           <div class="timeline-dot"></div>

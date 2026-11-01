@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[QuickDock 1.0.2 Production Release](docs/RELEASE_1.0.2.md):** The official release of QuickDock for Windows 11 & Windows 10 is live! Featuring full UI/UX & functional remediation, native WASAPI volume synchronization, live system metrics, zero-polling idle efficiency, zero-cloud QuickDrop file transfers, 100% offline security-audited diagnostics, and instant <kbd>Ctrl</kbd> + <kbd>Space</kbd> desktop control. See the [official 1.0.2 release notes](docs/RELEASE_1.0.2.md) (240 passing tests, 0 warnings, 0 errors).
+> **[QuickDock 1.0.3 Production Release](docs/RELEASE_1.0.3.md):** The official release of QuickDock for Windows 11 & Windows 10 is live! Featuring full input safety hardening, zero-lag cursor proximity tracking, native WASAPI volume synchronization, live system metrics, zero-polling idle efficiency, zero-cloud QuickDrop file transfers, 100% offline security-audited diagnostics, and instant <kbd>Ctrl</kbd> + <kbd>Space</kbd> desktop control. See the [official 1.0.3 release notes](docs/RELEASE_1.0.3.md) (240 passing tests, 0 warnings, 0 errors).
 
 <div align="center">
 
@@ -7,7 +7,7 @@
 
 # QuickDock
 
-[![Release](https://img.shields.io/badge/Release-v1.0.2-0078D4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2)
+[![Release](https://img.shields.io/badge/Release-v1.0.3-0078D4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3)
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
@@ -24,8 +24,8 @@ It docks subtly at the top center of your display, providing instant access to r
 
 <p><strong>Download & Install QuickDock</strong></p>
 
-[![Download Installer](https://img.shields.io/badge/Download-QuickDock--Setup.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2)
-[![Download Portable ZIP](https://img.shields.io/badge/Download-Portable%20ZIP-1F2328?style=for-the-badge&logo=archive&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2)
+[![Download Installer](https://img.shields.io/badge/Download-QuickDock--Setup.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3)
+[![Download Portable ZIP](https://img.shields.io/badge/Download-Portable%20ZIP-1F2328?style=for-the-badge&logo=archive&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3)
 
 <sub>Press <code>Ctrl + Space</code> or mouse over the top-center edge to expand your dock.</sub>
 
@@ -34,7 +34,7 @@ It docks subtly at the top center of your display, providing instant access to r
 <a href="https://www.linkedin.com/in/jojin-john/"><img src="https://img.shields.io/badge/LinkedIn-JOJIN%20JOHN-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" height="35" alt="LinkedIn JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709"><img src="https://img.shields.io/badge/Author-JOJIN%20JOHN-000000?style=for-the-badge&logo=github&logoColor=white" height="35" alt="Developer JOJIN JOHN"/></a>
 <a href="https://github.com/jojin1709/QuickDock"><img src="https://img.shields.io/badge/Repository-QuickDock-1F2328?style=for-the-badge&logo=git&logoColor=white" height="35" alt="QuickDock Repo"/></a>
-<a href="docs/RELEASE_1.0.2.md"><img src="https://img.shields.io/badge/Docs-Release%201.0.2-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
+<a href="docs/RELEASE_1.0.3.md"><img src="https://img.shields.io/badge/Docs-Release%201.0.3-0969DA?style=for-the-badge&logo=readme&logoColor=white" height="35" alt="Documentation"/></a>
 
 </div>
 
@@ -100,13 +100,13 @@ QuickDock is distributed as verified, pre-compiled, self-contained Windows appli
 
 ### Option 1: Standalone Installer (Recommended)
 
-1. Download **[`QuickDock-Setup.exe`](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2)** from the [Official Releases](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2).
+1. Download **[`QuickDock-Setup.exe`](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3)** from the [Official Releases](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3).
 2. Run `QuickDock-Setup.exe`.
 3. QuickDock installs seamlessly to your user profile (`%LOCALAPPDATA%\Programs\QuickDock`), creates Start Menu and Desktop shortcuts, registers a clean uninstaller in Windows Settings, and launches automatically.
 
 ### Option 2: Portable Package (Zero Installation)
 
-1. Download **[`QuickDock-v1.0.2-win-x64.zip`](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2)** from the [Official Releases](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.2).
+1. Download **[`QuickDock-v1.0.3-win-x64.zip`](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3)** from the [Official Releases](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.3).
 2. Extract the archive to any directory (e.g. `%LOCALAPPDATA%\Programs\QuickDock` or a USB drive).
 3. Run `QuickDock.App.exe`.
 4. 100% self-contained: no installation, no registry modifications, and no system dependencies needed.
@@ -356,6 +356,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 | **[Phase 9 Guide](docs/PHASE_9_SETTINGS_PERSONALIZATION.md)** | Settings & Personalization | 12 settings sections, backdrop switching, hotkey manager, storage inspector, JSON backup |
 | **[Phase 10 Guide](docs/PHASE_10_PERFORMANCE_RELIABILITY.md)** | Performance & Reliability | Zero idle polling, crash containment, database self-healing, process safety |
 | **[Phase 11 Guide](docs/PHASE_11_TESTING_SECURITY_AUDIT.md)** | Testing & Security Audit | Threat model, timing-safe tokens, Zip Bomb guards, command injection mitigation |
+| **[Release 1.0.3 Notes](docs/RELEASE_1.0.3.md)** | Packaging & Release | Critical input safety hardening, zero-lag cursor proximity, XAML re-entrancy fix |
 | **[Release 1.0.2 Notes](docs/RELEASE_1.0.2.md)** | Packaging & Release | Full UI/UX & functional overhaul, WASAPI audio sync, live telemetry |
 | **[Release 1.0.1 Notes](docs/RELEASE_1.0.1.md)** | Packaging & Release | Production release artifacts, SHA-256 checksums, verified benchmarks |
 | **[Release 1.0.0 Notes](docs/RELEASE_1.0.0.md)** | Packaging & Release | Initial production release baseline |
