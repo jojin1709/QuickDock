@@ -50,8 +50,7 @@ public sealed class NotchWindowManager : IDisposable
 
     private readonly Dictionary<string, DockWindowState> _dockStates = new(StringComparer.OrdinalIgnoreCase);
     private bool _initialized;
-    private IntPtr _mouseHookHandle = IntPtr.Zero;
-    private NativeMethods.LowLevelMouseProc? _mouseProc;
+    private DispatcherTimer? _proximityTimer;
 
     public NotchWindowManager(
         IServiceProvider serviceProvider,
@@ -81,113 +80,73 @@ public sealed class NotchWindowManager : IDisposable
         SynchronizeWindows();
         _monitorService.MonitorsChanged += OnMonitorsChanged;
 
-        InstallMouseHook();
+        StartProximityMonitoring();
     }
 
-    private void InstallMouseHook()
+    private void StartProximityMonitoring()
     {
-        if (_mouseHookHandle != IntPtr.Zero) return;
-
-        try
+        _proximityTimer = new DispatcherTimer
         {
-            _mouseProc = HookCallback;
-            IntPtr hMod = NativeMethods.GetModuleHandle(null);
-            _mouseHookHandle = NativeMethods.SetWindowsHookEx(
-                NativeMethods.WH_MOUSE_LL,
-                _mouseProc,
-                hMod,
-                0);
-
-            if (_mouseHookHandle != IntPtr.Zero)
-            {
-                _logger.LogInformation("Low-level mouse hook successfully installed for top-notch hover detection.");
-            }
-            else
-            {
-                _logger.LogWarning("Failed to install low-level mouse hook. System error: {Error}", Marshal.GetLastWin32Error());
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error installing mouse hook.");
-        }
+            Interval = TimeSpan.FromMilliseconds(50)
+        };
+        _proximityTimer.Tick += OnProximityTimerTick;
+        _proximityTimer.Start();
+        _logger.LogInformation("NotchWindowManager: Non-blocking 50ms cursor proximity monitoring started.");
     }
 
-    private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+    private void OnProximityTimerTick(object? sender, object e)
     {
-        if (nCode >= 0 && wParam == (IntPtr)NativeMethods.WM_MOUSEMOVE)
-        {
-            try
-            {
-                var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);
-                int px = hookStruct.pt.X;
-                int py = hookStruct.pt.Y;
+        if (!NativeMethods.GetCursorPos(out var pt)) return;
 
-                ProcessCursorPosition(px, py);
-            }
-            catch
-            {
-                // Hook callback must never throw
-            }
-        }
+        int px = pt.X;
+        int py = pt.Y;
 
-        return NativeMethods.CallNextHookEx(_mouseHookHandle, nCode, wParam, lParam);
-    }
-
-    private void ProcessCursorPosition(int px, int py)
-    {
         foreach (var state in _dockStates.Values)
         {
             var mon = state.Monitor;
             bool onThisMonitor = px >= mon.BoundsX && px < (mon.BoundsX + mon.BoundsWidth) &&
                                  py >= mon.BoundsY && py < (mon.BoundsY + mon.BoundsHeight);
 
-            bool inHitZone = px >= state.TopHitZone.Left && px <= state.TopHitZone.Right &&
-                             py >= state.TopHitZone.Top && py <= state.TopHitZone.Bottom;
-
-            bool inIdle = px >= state.IdleBounds.X && px < state.IdleBounds.X + state.IdleBounds.Width &&
-                          py >= state.IdleBounds.Y && py < state.IdleBounds.Y + state.IdleBounds.Height;
-
-            bool inExpanded = px >= state.ExpandedBounds.X && px < state.ExpandedBounds.X + state.ExpandedBounds.Width &&
-                              py >= state.ExpandedBounds.Y && py < state.ExpandedBounds.Y + state.ExpandedBounds.Height;
-
             if (state.Window.IsExpanded)
             {
-                bool inZone = onThisMonitor && (inExpanded || inHitZone || inIdle);
-                if (inZone)
+                int margin = (int)Math.Round(30 * mon.ScaleFactor);
+                bool insideExpanded = onThisMonitor &&
+                                      px >= (state.ExpandedBounds.X - margin) &&
+                                      px <= (state.ExpandedBounds.X + state.ExpandedBounds.Width + margin) &&
+                                      py >= state.ExpandedBounds.Y &&
+                                      py <= (state.ExpandedBounds.Y + state.ExpandedBounds.Height + margin);
+
+                if (!insideExpanded)
                 {
-                    if (state.State == DockInteractionState.Closing)
+                    if (_settingsManager.CurrentSettings.Behavior.AutoHide && state.State == DockInteractionState.Open)
                     {
-                        state.State = DockInteractionState.Open;
-                        _dispatcherQueue.TryEnqueue(() => state.CloseTimer?.Stop());
+                        state.State = DockInteractionState.Closing;
+                        state.CloseTimer?.Stop();
+                        state.CloseTimer?.Start();
                     }
                 }
                 else
                 {
-                    if (state.State == DockInteractionState.Open)
+                    if (state.State == DockInteractionState.Closing)
                     {
-                        state.State = DockInteractionState.Closing;
-                        _dispatcherQueue.TryEnqueue(() =>
-                        {
-                            state.CloseTimer?.Stop();
-                            state.CloseTimer?.Start();
-                        });
+                        state.State = DockInteractionState.Open;
+                        state.CloseTimer?.Stop();
                     }
                 }
             }
             else
             {
-                bool inZone = onThisMonitor && (inHitZone || inIdle);
-                if (inZone)
+                bool inHitZone = onThisMonitor &&
+                                 px >= state.TopHitZone.Left && px <= state.TopHitZone.Right &&
+                                 py >= state.TopHitZone.Top && py <= state.TopHitZone.Bottom;
+
+                if (inHitZone)
                 {
                     if (state.State == DockInteractionState.Closed)
                     {
                         state.State = DockInteractionState.Opening;
-                        _dispatcherQueue.TryEnqueue(() =>
-                        {
-                            state.OpenTimer?.Stop();
-                            state.OpenTimer?.Start();
-                        });
+                        state.OpenTimer?.Stop();
+                        state.OpenTimer?.Start();
                     }
                 }
                 else
@@ -195,7 +154,7 @@ public sealed class NotchWindowManager : IDisposable
                     if (state.State == DockInteractionState.Opening)
                     {
                         state.State = DockInteractionState.Closed;
-                        _dispatcherQueue.TryEnqueue(() => state.OpenTimer?.Stop());
+                        state.OpenTimer?.Stop();
                     }
                 }
             }
@@ -416,11 +375,8 @@ public sealed class NotchWindowManager : IDisposable
 
     public void Dispose()
     {
-        if (_mouseHookHandle != IntPtr.Zero)
-        {
-            NativeMethods.UnhookWindowsHookEx(_mouseHookHandle);
-            _mouseHookHandle = IntPtr.Zero;
-        }
+        _proximityTimer?.Stop();
+        _proximityTimer = null;
 
         foreach (var state in _dockStates.Values)
         {

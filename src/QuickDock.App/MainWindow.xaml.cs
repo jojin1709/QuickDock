@@ -20,7 +20,7 @@ namespace QuickDock.App;
 
 public sealed partial class MainWindow : Window
 {
-    private static readonly UIntPtr MainWindowSubclassId = new(1001);
+    private static readonly UIntPtr MainWindowSubclassId = new(2001);
 
     private readonly IServiceProvider _serviceProvider;
     private readonly IWindowPositioningService _positioningService;
@@ -134,11 +134,17 @@ public sealed partial class MainWindow : Window
         {
             AppWindow.Closing += (sender, args) =>
             {
+                _logger.LogInformation("AppWindow.Closing fired! ExplicitExit={Exit}", _isExplicitExit);
                 if (!_isExplicitExit)
                 {
                     args.Cancel = true;
                     Collapse();
                 }
+            };
+
+            AppWindow.Destroying += (sender, args) =>
+            {
+                _logger.LogInformation("AppWindow.Destroying fired on HWND {hWnd}!", _hWnd);
             };
 
             if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
@@ -414,14 +420,17 @@ public sealed partial class MainWindow : Window
         IdleContentGrid.Visibility = Visibility.Visible;
         ExpandedContentGrid.Visibility = Visibility.Visible;
 
+        double currentW = DockSurface.ActualWidth > 0 ? DockSurface.ActualWidth : (double.IsNaN(DockSurface.Width) ? 290 : DockSurface.Width);
+        double currentH = DockSurface.ActualHeight > 0 ? DockSurface.ActualHeight : (double.IsNaN(DockSurface.Height) ? 34 : DockSurface.Height);
+
         if (_expandStoryboard?.Children[0] is DoubleAnimation wAnim)
         {
-            wAnim.From = DockSurface.Width;
+            wAnim.From = currentW;
             wAnim.To = 820;
         }
         if (_expandStoryboard?.Children[1] is DoubleAnimation hAnim)
         {
-            hAnim.From = DockSurface.Height;
+            hAnim.From = currentH;
             hAnim.To = 540;
         }
 
@@ -437,7 +446,6 @@ public sealed partial class MainWindow : Window
 
         _metricsCounter = 0;
         _ = Task.Run(() => ViewModel.Home.RefreshMetrics());
-        BringToFront();
     }
 
     public void Collapse()
@@ -451,14 +459,17 @@ public sealed partial class MainWindow : Window
         IdleContentGrid.Visibility = Visibility.Visible;
         ExpandedContentGrid.Visibility = Visibility.Visible;
 
+        double currentW = DockSurface.ActualWidth > 0 ? DockSurface.ActualWidth : (double.IsNaN(DockSurface.Width) ? 820 : DockSurface.Width);
+        double currentH = DockSurface.ActualHeight > 0 ? DockSurface.ActualHeight : (double.IsNaN(DockSurface.Height) ? 540 : DockSurface.Height);
+
         if (_collapseStoryboard?.Children[0] is DoubleAnimation wAnim)
         {
-            wAnim.From = DockSurface.Width;
+            wAnim.From = currentW;
             wAnim.To = 290;
         }
         if (_collapseStoryboard?.Children[1] is DoubleAnimation hAnim)
         {
-            hAnim.From = DockSurface.Height;
+            hAnim.From = currentH;
             hAnim.To = 34;
         }
 
@@ -517,7 +528,7 @@ public sealed partial class MainWindow : Window
             return IntPtr.Zero;
         }
 
-        if (uMsg == NativeMethods.WM_DISPLAYCHANGE || uMsg == NativeMethods.WM_SETTINGCHANGE)
+        if (uMsg == NativeMethods.WM_DISPLAYCHANGE)
         {
             _logger.LogInformation("Display topology changed (uMsg=0x{Msg:X}). Reconciling monitors...", uMsg);
             DispatcherQueue.TryEnqueue(() =>
@@ -599,6 +610,7 @@ public sealed partial class MainWindow : Window
     private void OnIdlePointerPressed(object sender, PointerRoutedEventArgs e)
     {
         CapturePreviousForeground();
+        BringToFront();
         Expand();
     }
 
@@ -785,6 +797,7 @@ public sealed partial class MainWindow : Window
 
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
+        _logger.LogInformation("MainWindow.Closed event fired on HWND {hWnd}.", _hWnd);
         _tickTimer.Stop();
         _expandStoryboard?.Stop();
         _collapseStoryboard?.Stop();
