@@ -218,6 +218,36 @@ public sealed class MonitorService : IMonitorService
         return isPrimary ? $"{baseName} (Primary)" : baseName;
     }
 
+    private IReadOnlyList<MonitorInfo> _lastKnownMonitors = [];
+
+    public bool CheckForMonitorChanges()
+    {
+        var current = GetAllMonitors();
+        if (_lastKnownMonitors.Count != current.Count)
+        {
+            _lastKnownMonitors = current;
+            NotifyMonitorsChanged();
+            return true;
+        }
+
+        for (int i = 0; i < current.Count; i++)
+        {
+            var m1 = current[i];
+            var m2 = _lastKnownMonitors[i];
+            if (m1.DeviceId != m2.DeviceId ||
+                m1.WorkX != m2.WorkX || m1.WorkY != m2.WorkY ||
+                m1.WorkWidth != m2.WorkWidth || m1.WorkHeight != m2.WorkHeight ||
+                m1.Dpi != m2.Dpi || m1.IsPrimary != m2.IsPrimary)
+            {
+                _lastKnownMonitors = current;
+                NotifyMonitorsChanged();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public void NotifyMonitorsChanged()
     {
         MonitorsChanged?.Invoke(this, EventArgs.Empty);

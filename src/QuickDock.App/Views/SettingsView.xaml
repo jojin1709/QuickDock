@@ -10,1215 +10,721 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid RowSpacing="8">
-        <Grid.RowDefinitions>
-            <!-- Header bar with Back button and Status -->
-            <RowDefinition Height="Auto" />
-            <!-- Main 2-column Settings body -->
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
+    <Grid Background="#0A0A0C">
+        <Grid.ColumnDefinitions>
+            <!-- Left Sidebar (width ~230) -->
+            <ColumnDefinition Width="230" />
+            <!-- Divider -->
+            <ColumnDefinition Width="1" />
+            <!-- Right Content Area -->
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- Header -->
-        <Grid Grid.Row="0" Margin="4,0,4,2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <!-- ==================== LEFT SIDEBAR ==================== -->
+        <Grid Grid.Column="0" Margin="14,16,14,16" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <!-- Brand Header -->
+                <RowDefinition Height="Auto" />
+                <!-- Search Box -->
+                <RowDefinition Height="Auto" />
+                <!-- Navigation Items -->
+                <RowDefinition Height="*" />
+                <!-- Footer Info -->
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <Button Grid.Column="0"
-                    Command="{x:Bind MainViewModel.OpenHomeCommand, Mode=OneWay}"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Padding="8,6"
-                    CornerRadius="6"
-                    VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                    <TextBlock Text="Back" FontSize="13" VerticalAlignment="Center" />
+            <!-- Brand Header: QuickDock Logo + App Name -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="10" Margin="4,4,4,8">
+                <controls:QuickDockIcon Width="26" Height="26" VerticalAlignment="Center" />
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="QuickDock" FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
                 </StackPanel>
-            </Button>
+            </StackPanel>
 
-            <TextBlock Grid.Column="1"
-                       Text="Settings &amp; Personalization"
-                       FontSize="15"
-                       FontWeight="SemiBold"
-                       VerticalAlignment="Center"
-                       Margin="10,0,0,0" />
-
-            <TextBlock Grid.Column="2"
-                       Text="{x:Bind ViewModel.SettingsStatusMessage, Mode=OneWay}"
-                       FontSize="11"
-                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                       VerticalAlignment="Center"
-                       Margin="0,0,8,0"
-                       Visibility="{x:Bind HasStatusMessage(ViewModel.SettingsStatusMessage), Mode=OneWay}" />
-        </Grid>
-
-        <!-- Main Body: Sidebar (Left) + Content Panel (Right) -->
-        <Grid Grid.Row="1" ColumnSpacing="12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="210" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <!-- LEFT SIDEBAR -->
-            <Grid Grid.Column="0" RowSpacing="6">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- Search Input -->
-                <TextBox Grid.Row="0"
-                         PlaceholderText="Search settings..."
+            <!-- Search Box with Ctrl K -->
+            <Grid Grid.Row="1">
+                <TextBox PlaceholderText="Search"
                          Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         CornerRadius="{StaticResource SearchBoxCornerRadius}"
-                         FontSize="12"
-                         Padding="10,6" />
-
-                <!-- Navigation List / Search Results List -->
-                <Border Grid.Row="1"
-                        Background="{ThemeResource CardBackgroundBrush}"
-                        BorderBrush="{ThemeResource TileStrokeBrush}"
-                        BorderThickness="1"
-                        CornerRadius="{StaticResource CardCornerRadius}"
-                        Padding="4">
-                    <Grid>
-                        <!-- Search Results View (when SearchQuery has matches) -->
-                        <ListView ItemsSource="{x:Bind ViewModel.SearchResults, Mode=OneWay}"
-                                  Visibility="{x:Bind HasSearchResults(ViewModel.SearchResults.Count), Mode=OneWay}"
-                                  SelectionMode="None">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:SettingSearchItem">
-                                    <Button Command="{Binding ElementName=RootSettingsView, Path=ViewModel.SelectSearchResultCommand}"
-                                            CommandParameter="{x:Bind}"
-                                            HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Left"
-                                            Background="Transparent"
-                                            BorderBrush="Transparent"
-                                            Padding="6,4">
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="{x:Bind Title}" FontSize="12" FontWeight="SemiBold" />
-                                            <TextBlock Text="{x:Bind SectionName}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        </StackPanel>
-                                    </Button>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-
-                        <!-- Standard 12-Section Navigation (when SearchResults empty) -->
-                        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                      Visibility="{x:Bind NoSearchResults(ViewModel.SearchResults.Count), Mode=OneWay}">
-                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.NavItems, Mode=OneWay}">
-                                <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="vm:SettingsNavItem">
-                                        <Button Command="{Binding ElementName=RootSettingsView, Path=ViewModel.SelectSectionCommand}"
-                                                CommandParameter="{x:Bind Key}"
-                                                HorizontalAlignment="Stretch"
-                                                HorizontalContentAlignment="Left"
-                                                Background="Transparent"
-                                                BorderBrush="Transparent"
-                                                Padding="8,6"
-                                                Margin="0,1"
-                                                CornerRadius="6">
-                                            <Grid ColumnSpacing="8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="20" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-                                                <FontIcon Grid.Column="0" Glyph="{x:Bind IconGlyph}" FontSize="12"
-                                                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                                <TextBlock Grid.Column="1" Text="{x:Bind Title}" FontSize="12" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </Button>
-                                    </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
-                        </ScrollViewer>
-                    </Grid>
+                         Background="#141417"
+                         BorderBrush="#222226"
+                         BorderThickness="1"
+                         CornerRadius="8"
+                         Padding="10,6,40,6"
+                         FontSize="12" />
+                <Border HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Background="#222226" CornerRadius="4" Padding="5,2" Margin="0,0,8,0">
+                    <TextBlock Text="Ctrl K" FontSize="10" Foreground="#8E8E93" />
                 </Border>
-
-                <!-- Sidebar Footer: Reset & Backup Actions -->
-                <StackPanel Grid.Row="2" Spacing="4">
-                    <Button Content="Reset This Section"
-                            Command="{x:Bind ViewModel.ResetCurrentSectionCommand}"
-                            HorizontalAlignment="Stretch"
-                            FontSize="11"
-                            Padding="6,4"
-                            CornerRadius="6" />
-                    <Button Content="Reset All Settings"
-                            Command="{x:Bind ViewModel.ResetAllSettingsCommand}"
-                            HorizontalAlignment="Stretch"
-                            FontSize="11"
-                            Padding="6,4"
-                            CornerRadius="6" />
-                </StackPanel>
             </Grid>
 
-            <!-- RIGHT CONTENT PANE -->
-            <Border Grid.Column="1"
-                    Background="{ThemeResource CardBackgroundBrush}"
-                    BorderBrush="{ThemeResource TileStrokeBrush}"
-                    BorderThickness="1"
-                    CornerRadius="{StaticResource CardCornerRadius}"
-                    Padding="14">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                    <StackPanel Spacing="16">
-
-                        <!-- 1. GENERAL SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'General'), Mode=OneWay}">
-                            <TextBlock Text="General Settings" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Configure QuickDock launch, minimize, and background system behavior."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Start with Windows -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
+            <!-- Navigation Items -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <ItemsRepeater ItemsSource="{x:Bind ViewModel.NavItems, Mode=OneWay}">
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate x:DataType="vm:SettingsNavItem">
+                            <Button Command="{Binding ElementName=RootSettingsView, Path=ViewModel.SelectSectionCommand}"
+                                    CommandParameter="{x:Bind Key}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Padding="10,8"
+                                    Margin="0,2"
+                                    CornerRadius="8">
+                                <Grid ColumnSpacing="10">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Start with Windows" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Launch QuickDock automatically upon signing into Windows."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Start Minimized -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Start Minimized" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Launch in compact idle capsule mode without expanding."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.StartMinimized, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Launch Behavior -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Launch Behavior" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Initial display presentation when QuickDock boots."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.LaunchBehaviorIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Show Dock" />
-                                        <ComboBoxItem Content="Start Minimized" />
-                                        <ComboBoxItem Content="Start Hidden" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Close Behavior -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Close Behavior" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Action performed when the application close request is triggered."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.CloseBehaviorIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Minimize to Tray" />
-                                        <ComboBoxItem Content="Exit Application" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 2. APPEARANCE SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Appearance'), Mode=OneWay}">
-                            <TextBlock Text="Appearance &amp; Styling" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Personalize theme, accent coloration, window materials, and animation levels."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Application Theme -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Application Theme" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Choose between Windows Default, Light mode, or Dark mode."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.SelectedThemeIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="System Default" />
-                                        <ComboBoxItem Content="Light" />
-                                        <ComboBoxItem Content="Dark" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Accent Color -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Accent Palette" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Restrained primary accent color across buttons and status indicators."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.SelectedAccentIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Blue (#0078D4)" />
-                                        <ComboBoxItem Content="Purple (#8764B8)" />
-                                        <ComboBoxItem Content="Green (#107C41)" />
-                                        <ComboBoxItem Content="Orange (#CA5010)" />
-                                        <ComboBoxItem Content="Red (#D13438)" />
-                                        <ComboBoxItem Content="Custom Hex" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Custom Accent Hex (Visible only if Custom chosen) -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10"
-                                    Visibility="{x:Bind IsCustomAccentVisible(ViewModel.SelectedAccentIndex), Mode=OneWay}">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Custom Accent Hex Code" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Enter custom 6-digit hex color format (e.g. #0078D4)."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <TextBox Grid.Column="1" Text="{x:Bind ViewModel.AccentCustomHex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                             Width="150" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Backdrop Material -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Window Backdrop Material" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Mica provides subtle tinting, Acrylic provides frosted blur, Solid is opaque."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.BackdropIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Mica (Default)" />
-                                        <ComboBoxItem Content="Acrylic" />
-                                        <ComboBoxItem Content="Solid" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Transparency -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Transparency Effect" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Controlled transparency for idle dock and expanded panel."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.TransparencyIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Off (Opaque)" />
-                                        <ComboBoxItem Content="Subtle (Recommended)" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Animation Level -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Transitions &amp; Motion" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="System default transitions, reduced motion, or instant cut."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.AnimationIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="System Default" />
-                                        <ComboBoxItem Content="Reduced Motion" />
-                                        <ComboBoxItem Content="Off" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 3. DOCK CONFIGURATION SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Dock'), Mode=OneWay}">
-                            <TextBlock Text="Dock Positioning &amp; Behavior" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Configure position, dimensions, hover delays, auto-collapse, and multi-monitor rules."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Dock Position -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Dock Position" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Anchor QuickDock to the top or bottom of the work area."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.DockPositionIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Top (Default)" />
-                                        <ComboBoxItem Content="Bottom" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Dock Size -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Capsule Sizing" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Compact (85%), Normal (100%), or Large (115%)."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.DockSizeIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Compact" />
-                                        <ComboBoxItem Content="Normal (Default)" />
-                                        <ComboBoxItem Content="Large" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Hover Expansion Enabled -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Hover Expansion" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Automatically expand idle dock when pointer hovers over the capsule."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.HoverExpansionEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Hover Delay -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Hover Expansion Delay" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="{x:Bind FormatHoverDelay(ViewModel.HoverDelayMs), Mode=OneWay}"
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <Slider Grid.Column="1" Minimum="50" Maximum="1000" StepFrequency="50"
-                                            Value="{x:Bind ViewModel.HoverDelayMs, Mode=TwoWay}" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Always on Top -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Always on Top" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Keep the idle dock and expanded panel floating above other windows."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.AlwaysOnTop, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Auto-Hide Mode -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Auto-Hide Policy" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Collapse when focus is lost or playing fullscreen media."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.AutoHideModeIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Never" />
-                                        <ComboBoxItem Content="Fullscreen Only" />
-                                        <ComboBoxItem Content="Always (Default)" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Target Monitor -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Target Display" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Choose which monitor QuickDock docks to or follow active window."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1"
-                                              ItemsSource="{x:Bind ViewModel.AvailableMonitors, Mode=OneWay}"
-                                              SelectedIndex="{x:Bind ViewModel.SelectedMonitorIndex, Mode=TwoWay}"
-                                              Width="180" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 4. MODULES SECTION -->
-                        <StackPanel Spacing="14" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Modules'), Mode=OneWay}">
-                            <TextBlock Text="Module Ecosystem" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Enable or disable QuickDock modules on demand. Core services remain active; disabled modules consume zero memory."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Productivity Group -->
-                            <controls:QuickDockSection Title="Productivity Modules" />
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="10">
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.ProductivityModules, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ModuleSettingItem">
-                                            <Grid Margin="0,4" ColumnSpacing="10">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="Medium" FontSize="12" />
-                                                    <TextBlock Text="{x:Bind Description}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                </StackPanel>
-                                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
-                                                              OnContent="" OffContent="" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </Border>
-
-                            <!-- Files Group -->
-                            <controls:QuickDockSection Title="Files &amp; Transfer Modules" />
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="10">
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilesModules, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ModuleSettingItem">
-                                            <Grid Margin="0,4" ColumnSpacing="10">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="Medium" FontSize="12" />
-                                                    <TextBlock Text="{x:Bind Description}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                </StackPanel>
-                                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
-                                                              OnContent="" OffContent="" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </Border>
-
-                            <!-- Developer Group -->
-                            <controls:QuickDockSection Title="Developer Modules" />
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="10">
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.DeveloperModules, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ModuleSettingItem">
-                                            <Grid Margin="0,4" ColumnSpacing="10">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="Medium" FontSize="12" />
-                                                    <TextBlock Text="{x:Bind Description}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                </StackPanel>
-                                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
-                                                              OnContent="" OffContent="" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </Border>
-
-                            <!-- Network & Security Group -->
-                            <controls:QuickDockSection Title="Network &amp; Security Diagnostics" />
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="10">
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.NetworkSecurityModules, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ModuleSettingItem">
-                                            <Grid Margin="0,4" ColumnSpacing="10">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="Medium" FontSize="12" />
-                                                    <TextBlock Text="{x:Bind Description}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                </StackPanel>
-                                                <ToggleSwitch Grid.Column="1" IsOn="{x:Bind IsEnabled, Mode=TwoWay}"
-                                                              OnContent="" OffContent="" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 5. SHORTCUTS SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Shortcuts'), Mode=OneWay}">
-                            <TextBlock Text="Keyboard Shortcuts" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="System-wide and local keyboard bindings. Conflicts and duplicate shortcuts are automatically rejected."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- List of registered shortcuts -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="10">
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.ShortcutsList, Mode=OneWay}">
-                                    <ItemsRepeater.ItemTemplate>
-                                        <DataTemplate x:DataType="vm:ShortcutDisplayItem">
-                                            <Grid Margin="0,4" ColumnSpacing="8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind Name}" FontWeight="Medium" FontSize="12" />
-                                                    <TextBlock Text="{x:Bind Description}" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                </StackPanel>
-                                                <Border Grid.Column="1" Background="{ThemeResource CardBackgroundBrush}"
-                                                        BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1"
-                                                        CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
-                                                    <TextBlock Text="{x:Bind CurrentKeyGesture, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" />
-                                                </Border>
-                                                <Button Grid.Column="2" Content="Edit" FontSize="11" Padding="8,4" CornerRadius="4"
-                                                        Command="{Binding ElementName=RootSettingsView, Path=ViewModel.SelectShortcutForEditCommand}"
-                                                        CommandParameter="{x:Bind}" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsRepeater.ItemTemplate>
-                                </ItemsRepeater>
-                            </Border>
-
-                            <!-- Shortcut Edit Box (appears when editing) -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12"
-                                    Visibility="{x:Bind HasEditingShortcut(ViewModel.SelectedShortcutForEdit), Mode=OneWay}">
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="Edit Shortcut Combination" FontWeight="SemiBold" FontSize="12" />
-                                    <Grid ColumnSpacing="8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox Grid.Column="0" Text="{x:Bind ViewModel.EditingKeyGesture, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                 PlaceholderText="e.g. Ctrl+Shift+T" />
-                                        <Button Grid.Column="1" Content="Save Shortcut" Command="{x:Bind ViewModel.SaveEditedShortcutCommand}"
-                                                Style="{ThemeResource AccentButtonStyle}" CornerRadius="4" />
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-
-                            <TextBlock Text="{x:Bind ViewModel.ShortcutStatusMessage, Mode=OneWay}"
-                                       FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                       Visibility="{x:Bind HasStatusMessage(ViewModel.ShortcutStatusMessage), Mode=OneWay}" />
-
-                            <Button Content="Reset All Shortcuts to Defaults" Command="{x:Bind ViewModel.ResetAllShortcutsCommand}"
-                                    HorizontalAlignment="Left" FontSize="11" Padding="8,4" CornerRadius="4" />
-                        </StackPanel>
-
-                        <!-- 6. NOTIFICATIONS SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Notifications'), Mode=OneWay}">
-                            <TextBlock Text="System Notifications" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Control Windows desktop notifications and toast alerts across different QuickDock categories."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Master Enable -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Enable Notifications" FontWeight="SemiBold" FontSize="12" />
-                                        <TextBlock Text="Master switch for all system tray and desktop toast notifications."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.NotificationsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Timer Notifications -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Timer Notifications" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Alerts when countdown timers reach zero."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.TimerNotificationsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Pomodoro Notifications -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Pomodoro Interval Notifications" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Alerts when transitioning between Focus, Short Break, and Long Break."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.PomodoroNotificationsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- QuickDrop & Transfer Notifications -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="QuickDrop &amp; File Transfer Notifications" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Alerts when incoming transfers complete or device pairs."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.QuickDropNotificationsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Security Notifications -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Security Notifications" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Notifications for completed defensive audits and file integrity checks."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.SecurityNotificationsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 7. PRIVACY SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Privacy'), Mode=OneWay}">
-                            <TextBlock Text="Privacy &amp; Local Execution" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="QuickDock operates 100% locally by default. Explicitly control external request permissions."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Weather Requests -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Weather Requests (Open-Meteo)" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Allow fetching weather forecast telemetry over HTTPS."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.AllowWeatherRequests, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Public IP Lookup -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Public IP &amp; RDAP Lookup" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Allow egress IP query when explicitly requested by user."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.AllowPublicIpLookup, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- HTTP & TLS Inspection -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="HTTP &amp; TLS Security Probes" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Permit TLS certificate negotiation and HTTP header inspection on user targets."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.AllowHttpInspection, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Analytics (Disabled by Design) -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Telemetry &amp; Usage Analytics" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Not currently implemented. QuickDock has zero tracking, zero telemetry."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="False" IsEnabled="False"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Clipboard Sensitive Data Shield -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Clipboard Sensitive Data Shield" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Detect and mask API keys, JWTs, and private tokens in clipboard history."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.ClipboardSensitiveDataDetection, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 8. STORAGE SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Storage'), Mode=OneWay}">
-                            <TextBlock Text="Storage Management" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Inspect local disk space consumption in %LOCALAPPDATA%\QuickDock and clean temporary caches."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Sizes Grid -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12">
-                                <Grid RowSpacing="6" ColumnSpacing="12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="20" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-
-                                    <StackPanel Grid.Row="0" Grid.Column="0">
-                                        <TextBlock Text="Cache" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewModel.StorageCacheSize, Mode=OneWay}" FontWeight="SemiBold" FontSize="13" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="0" Grid.Column="1">
-                                        <TextBlock Text="Logs" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewModel.StorageLogsSize, Mode=OneWay}" FontWeight="SemiBold" FontSize="13" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="0" Grid.Column="2">
-                                        <TextBlock Text="Database" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewModel.StorageDatabaseSize, Mode=OneWay}" FontWeight="SemiBold" FontSize="13" />
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Row="1" Grid.Column="0">
-                                        <TextBlock Text="Temporary Files" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewModel.StorageTempSize, Mode=OneWay}" FontWeight="SemiBold" FontSize="13" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="1" Grid.Column="1">
-                                        <TextBlock Text="Data" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewModel.StorageDataSize, Mode=OneWay}" FontWeight="SemiBold" FontSize="13" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Row="1" Grid.Column="2">
-                                        <TextBlock Text="Total Footprint" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Text="{x:Bind ViewModel.StorageTotalSize, Mode=OneWay}" FontWeight="Bold" FontSize="13"
-                                                   Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                    </StackPanel>
+                                    <FontIcon Grid.Column="0" Glyph="{x:Bind IconGlyph}" FontSize="14" Foreground="#FFFFFF" />
+                                    <TextBlock Grid.Column="1" Text="{x:Bind Title}" FontSize="13" FontWeight="Medium" Foreground="#FFFFFF" VerticalAlignment="Center" />
                                 </Grid>
-                            </Border>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </ScrollViewer>
 
-                            <!-- Action Buttons -->
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Button Content="Clear Cache" Command="{x:Bind ViewModel.ClearCacheCommand}" FontSize="11" CornerRadius="4" />
-                                <Button Content="Clear Logs" Command="{x:Bind ViewModel.ClearLogsCommand}" FontSize="11" CornerRadius="4" />
-                                <Button Content="Clear Temp Files" Command="{x:Bind ViewModel.ClearTemporaryDataCommand}" FontSize="11" CornerRadius="4" />
-                                <Button Content="Clear Data" Command="{x:Bind ViewModel.ClearProductivityDataCommand}" FontSize="11" CornerRadius="4" />
-                                <Button Content="Open Folder" Command="{x:Bind ViewModel.OpenDataFolderCommand}" FontSize="11" CornerRadius="4" />
-                            </StackPanel>
-
-                            <TextBlock Text="{x:Bind ViewModel.StorageStatusMessage, Mode=OneWay}"
-                                       FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                       Visibility="{x:Bind HasStatusMessage(ViewModel.StorageStatusMessage), Mode=OneWay}" />
-                        </StackPanel>
-
-                        <!-- 9. NETWORK PREFERENCES SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Network'), Mode=OneWay}">
-                            <TextBlock Text="Network Preferences" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Network diagnostics run strictly on demand with zero background polling. Adjust request timeout thresholds."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Request Timeout -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="General Request Timeout" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="{x:Bind FormatSeconds(ViewModel.NetworkRequestTimeoutSeconds), Mode=OneWay}"
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <Slider Grid.Column="1" Minimum="5" Maximum="120" StepFrequency="5"
-                                            Value="{x:Bind ViewModel.NetworkRequestTimeoutSeconds, Mode=TwoWay}" />
-                                </Grid>
-                            </Border>
-
-                            <!-- DNS Timeout -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="DNS Query Timeout" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="{x:Bind FormatSeconds(ViewModel.NetworkDnsTimeoutSeconds), Mode=OneWay}"
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <Slider Grid.Column="1" Minimum="1" Maximum="30" StepFrequency="1"
-                                            Value="{x:Bind ViewModel.NetworkDnsTimeoutSeconds, Mode=TwoWay}" />
-                                </Grid>
-                            </Border>
-
-                            <!-- HTTP & TLS Timeout -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="HTTP / TLS Inspection Timeout" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="{x:Bind FormatSeconds(ViewModel.NetworkHttpTimeoutSeconds), Mode=OneWay}"
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <Slider Grid.Column="1" Minimum="2" Maximum="60" StepFrequency="2"
-                                            Value="{x:Bind ViewModel.NetworkHttpTimeoutSeconds, Mode=TwoWay}" />
-                                </Grid>
-                            </Border>
-
-                            <!-- External IP Lookup -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Public IP Lookup Module" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Enable egress IP resolution and RDAP Autonomous System lookups."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.ExternalIpLookupEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 10. DEVELOPER PREFERENCES SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Developer'), Mode=OneWay}">
-                            <TextBlock Text="Developer Preferences" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Configure logging verbosity, developer diagnostic switches, and process monitor refresh rate."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Log Level -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Logging Verbosity" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Level written to %LOCALAPPDATA%\QuickDock\Logs."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.LogLevelIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="Information" />
-                                        <ComboBoxItem Content="Debug" />
-                                        <ComboBoxItem Content="Warning" />
-                                        <ComboBoxItem Content="Error" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Developer Diagnostics -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Developer Diagnostics" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Enable verbose diagnostic telemetry and timing benchmarks in UI."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.DeveloperDiagnosticsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Process Monitor Refresh Rate -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="150" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Process Monitor Refresh Rate" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="{x:Bind FormatSeconds(ViewModel.ProcessRefreshRateSeconds), Mode=OneWay}"
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <Slider Grid.Column="1" Minimum="2" Maximum="30" StepFrequency="1"
-                                            Value="{x:Bind ViewModel.ProcessRefreshRateSeconds, Mode=TwoWay}" />
-                                </Grid>
-                            </Border>
-
-                            <!-- Git Destructive Confirmation -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Confirm Destructive Git Actions" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Prompt for confirmation before running branch delete or hard resets."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.ConfirmDestructiveGitActions, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 11. ACCESSIBILITY SECTION -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Accessibility'), Mode=OneWay}">
-                            <TextBlock Text="Accessibility" FontSize="15" FontWeight="SemiBold" />
-                            <TextBlock Text="Adjust text scaling, motion cues, and assistive tooltips."
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-
-                            <!-- Reduced Motion -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Reduced Motion" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Honor Windows motion reduction preferences or force static rendering."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.ReducedMotionIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="System Default" />
-                                        <ComboBoxItem Content="On (Reduced)" />
-                                        <ComboBoxItem Content="Off" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Text Scaling -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Text Scale Multiplier" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Enlarge UI typography for readability without breaking layout."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ComboBox Grid.Column="1" SelectedIndex="{x:Bind ViewModel.TextScaleIndex, Mode=TwoWay}" Width="150">
-                                        <ComboBoxItem Content="100% (Default)" />
-                                        <ComboBoxItem Content="110%" />
-                                        <ComboBoxItem Content="125%" />
-                                        <ComboBoxItem Content="150%" />
-                                    </ComboBox>
-                                </Grid>
-                            </Border>
-
-                            <!-- Show Tooltips -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12,10">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="Helpful Hover Tooltips" FontWeight="Medium" FontSize="12" />
-                                        <TextBlock Text="Display descriptive keyboard shortcut and metric tooltips on hover."
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    </StackPanel>
-                                    <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.ShowTooltipsEnabled, Mode=TwoWay}"
-                                                  OnContent="" OffContent="" VerticalAlignment="Center" />
-                                </Grid>
-                            </Border>
-                        </StackPanel>
-
-                        <!-- 12. ABOUT SECTION & IMPORT / EXPORT -->
-                        <StackPanel Spacing="12" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'About'), Mode=OneWay}">
-                            <TextBlock Text="About QuickDock" FontSize="15" FontWeight="SemiBold" />
-
-                            <!-- Header card -->
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="14">
-                                <StackPanel Spacing="10">
-                                    <Grid ColumnSpacing="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <controls:QuickDockIcon Grid.Column="0" Width="40" Height="40"
-                                                                GlyphBrush="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                                                VerticalAlignment="Center" />
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <TextBlock Text="QuickDock" FontSize="16" FontWeight="SemiBold" />
-                                            <TextBlock Text="Lightweight native Windows utility dock &amp; control layer"
-                                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <Rectangle Height="1" Fill="{ThemeResource SubtleDividerBrush}" />
-
-                                    <Grid RowSpacing="6">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="100" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Version:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}" FontSize="11" FontWeight="Medium" />
-
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Developer:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{x:Bind ViewModel.DeveloperName, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" />
-
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="License:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{x:Bind ViewModel.LicenseText, Mode=OneWay}" FontSize="11" FontWeight="Medium" />
-
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Contact:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <HyperlinkButton Grid.Row="3" Grid.Column="1" Content="JOJIN JOHN (LinkedIn)" NavigateUri="{x:Bind ViewModel.LinkedInUrl, Mode=OneWay}" Padding="0" FontSize="11" />
-
-                                        <TextBlock Grid.Row="4" Grid.Column="0" Text=".NET Core:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{x:Bind ViewModel.DotNetVersion, Mode=OneWay}" FontSize="11" FontWeight="Medium" />
-                                    </Grid>
-
-                                    <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
-                                        <Button Content="Check for Updates" Command="{x:Bind ViewModel.CheckForUpdatesCommand}"
-                                                Style="{ThemeResource AccentButtonStyle}" FontSize="11" CornerRadius="4" />
-                                    </StackPanel>
-
-                                    <TextBlock Text="{x:Bind ViewModel.AboutUpdateMessage, Mode=OneWay}"
-                                               FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                               Visibility="{x:Bind HasStatusMessage(ViewModel.AboutUpdateMessage), Mode=OneWay}" />
-                                </StackPanel>
-                            </Border>
-
-                            <!-- Backup, Import & Export Card -->
-                            <TextBlock Text="Configuration Backup &amp; Transfer" FontSize="13" FontWeight="SemiBold" Margin="0,6,0,0" />
-                            <Border Background="{ThemeResource PillBackgroundBrush}" CornerRadius="6" Padding="12">
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="Export current configuration to validated JSON or import a previously exported configuration."
-                                               FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                    <TextBox Text="{x:Bind ViewModel.ImportExportJsonText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                             PlaceholderText="Paste JSON configuration payload here to import, or click Export Settings..."
-                                             AcceptsReturn="True" Height="80" FontSize="10" FontFamily="Consolas" />
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Button Content="Export Settings" Command="{x:Bind ViewModel.ExportSettingsCommand}" FontSize="11" CornerRadius="4" />
-                                        <Button Content="Import Settings" Command="{x:Bind ViewModel.ImportSettingsCommand}" FontSize="11" CornerRadius="4" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-
-                    </StackPanel>
-                </ScrollViewer>
-            </Border>
+            <!-- Footer: Help, Feedback, v1.0.0 -->
+            <StackPanel Grid.Row="3" Spacing="4" Margin="4,8,4,0">
+                <TextBlock Text="Help · Feedback · v1.0.0" FontSize="11" Foreground="#71717A" />
+            </StackPanel>
         </Grid>
+
+        <!-- Divider Line -->
+        <Border Grid.Column="1" Background="#1C1C1F" />
+
+        <!-- ==================== RIGHT CONTENT PANE ==================== -->
+        <ScrollViewer Grid.Column="2" Padding="28,24,28,24" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="24">
+
+                <!-- ==================== SECTION 1: GENERAL ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'General'), Mode=OneWay}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="General" FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Startup, shortcut, time and units" FontSize="12" Foreground="#8E8E93" />
+                    </StackPanel>
+
+                    <!-- Start QuickDock when Windows starts -->
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4" Margin="0,0,16,0">
+                            <TextBlock Text="Start QuickDock when Windows starts" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Starts silently each time you sign in. To have it back seconds after a restart, turn on 'Restart apps' in Windows Settings > Accounts > Sign-in options."
+                                       FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                        </StackPanel>
+                        <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}"
+                                      OnContent="" OffContent="" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Open the notch -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Open the notch" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Opens or closes the notch from anywhere" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <Border Background="#1C1C1F" BorderBrush="#27272A" BorderThickness="1" CornerRadius="6" Padding="12,6">
+                                <TextBlock Text="{x:Bind ViewModel.GlobalHotkeyText, Mode=OneWay}" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            </Border>
+                            <Button Content="Change" Background="#222226" Foreground="#FFFFFF" CornerRadius="6" Padding="12,6" FontSize="12" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Time format -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Time format" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Used by the notch, Home and Clock" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Content="System" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="12,5" FontSize="11" />
+                                <Button Content="12-hour" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="12,5" FontSize="11" />
+                                <Button Content="24-hour" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="12,5" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Temperature -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Temperature" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Weather, Home and the notch" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Content="°C" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="16,5" FontSize="11" />
+                                <Button Content="°F" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="16,5" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Wind speed -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Wind speed" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Used by Weather and Home" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Content="km/h" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="14,5" FontSize="11" />
+                                <Button Content="mph" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="14,5" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+
+                    <!-- Language -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Language" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="More languages are on the way" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="English" FontSize="13" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                    </Grid>
+                </StackPanel>
+
+                <!-- ==================== SECTION 2: NOTCH ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Notch'), Mode=OneWay}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Notch" FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Shape, behavior and live preview" FontSize="12" Foreground="#8E8E93" />
+                    </StackPanel>
+
+                    <!-- Live Preview Box -->
+                    <Border Background="#121214" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Height="150" Padding="12">
+                        <Grid>
+                            <!-- Mini screen top notch preview -->
+                            <Border HorizontalAlignment="Center" VerticalAlignment="Top"
+                                    Background="#000000" CornerRadius="0,0,10,10" Padding="12,4" Margin="0,-2,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="16">
+                                    <TextBlock Text="14:17" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                                    <StackPanel Orientation="Horizontal" Spacing="3" VerticalAlignment="Center">
+                                        <Border Width="14" Height="7" CornerRadius="2" BorderThickness="1" BorderBrush="#88FFFFFF">
+                                            <Border Width="10" Height="4" Background="#22C55E" HorizontalAlignment="Left" />
+                                        </Border>
+                                        <TextBlock Text="80" FontSize="9" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Top Right Toggle: Resting / Hover -->
+                            <Border HorizontalAlignment="Right" VerticalAlignment="Top"
+                                    Background="#1C1C1F" BorderBrush="#27272A" BorderThickness="1" CornerRadius="6" Padding="2">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="Resting" Background="#27272A" Foreground="#FFFFFF" CornerRadius="4" Padding="10,4" FontSize="10" />
+                                    <Button Content="Hover" Background="Transparent" Foreground="#8E8E93" CornerRadius="4" Padding="10,4" FontSize="10" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Bottom Left: Preview Badge -->
+                            <Border HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                                    Background="#1C1C1F" CornerRadius="4" Padding="6,2">
+                                <TextBlock Text="Preview" FontSize="9" Foreground="#8E8E93" />
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- VISIBILITY Section -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="VISIBILITY" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+                        <Grid ColumnSpacing="12" RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Card 1: Always (Selected) -->
+                            <Border Grid.Row="0" Grid.Column="0" Background="#141417" BorderBrush="#FFFFFF" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Always" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Always on screen. Fullscreen rules below still apply." FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 2: Smart -->
+                            <Border Grid.Row="0" Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Smart" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Full on the desktop; tucked away over maximized apps." FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 3: Minimal -->
+                            <Border Grid.Row="1" Grid.Column="0" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Minimal" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Just a small arrow at the top. Hover to peek, open on hover or click." FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 4: Hidden -->
+                            <Border Grid.Row="1" Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Hidden" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Nothing on screen. Open it from the tray icon (or set a shortcut in General)." FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- STYLE Section -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="STYLE" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Style 1: Line -->
+                            <Border Grid.Column="0" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Line" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="A slim bar along the top edge" FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Style 2: Notch (Selected) -->
+                            <Border Grid.Column="1" Background="#141417" BorderBrush="#FFFFFF" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Notch" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Grows out of the screen edge" FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Style 3: Island -->
+                            <Border Grid.Column="2" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Island" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="A pill floating just below the edge" FontSize="11" Foreground="#8E8E93" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Notch shape -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Notch shape" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Fine-tune the Notch style's silhouette" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" SelectedIndex="0" Width="140" Background="#141417" CornerRadius="6">
+                            <ComboBoxItem Content="Compact" />
+                            <ComboBoxItem Content="Classic" />
+                            <ComboBoxItem Content="Wide" />
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Size Slider -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Size" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Scales the resting notch" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <TextBlock Text="90%" FontSize="12" Foreground="#8E8E93" VerticalAlignment="Center" />
+                            <Slider Value="90" Minimum="70" Maximum="130" Width="140" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Resting layout -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Spacing="4">
+                            <TextBlock Text="Resting layout" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                            <TextBlock Text="Time and battery in corners or center" FontSize="11" Foreground="#8E8E93" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                <Button Content="Corners" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="14,5" FontSize="11" />
+                                <Button Content="Center" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="14,5" FontSize="11" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
+                <!-- ==================== SECTION 3: APPEARANCE ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Appearance'), Mode=OneWay}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Appearance" FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Theme, surface and notch effects" FontSize="12" Foreground="#8E8E93" />
+                    </StackPanel>
+
+                    <!-- THEME Section -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="THEME" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+                        <Grid ColumnSpacing="12" RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Theme 1: Pure Black (Selected) -->
+                            <Border Grid.Row="0" Grid.Column="0" Background="#141417" BorderBrush="#FFFFFF" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Pure Black" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Monochrome on true black" FontSize="11" Foreground="#8E8E93" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Theme 2: Ember Dark -->
+                            <Border Grid.Row="0" Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Ember Dark" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Black with an orange accent" FontSize="11" Foreground="#8E8E93" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Theme 3: Vivid -->
+                            <Border Grid.Row="1" Grid.Column="0" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Vivid" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Black with a blue accent" FontSize="11" Foreground="#8E8E93" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Theme 4: Silver -->
+                            <Border Grid.Row="1" Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Silver" FontSize="13" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="Light panel; the notch stays black" FontSize="11" Foreground="#8E8E93" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- SURFACE Section -->
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="SURFACE" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+
+                        <!-- Outline -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Outline" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="A hairline around the notch" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.OutlineEnabled, Mode=TwoWay}"
+                                          OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Outline width -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="Outline width" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                            <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="1 px" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="12,5" FontSize="11" />
+                                    <Button Content="2 px" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="12,5" FontSize="11" />
+                                    <Button Content="3 px" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="12,5" FontSize="11" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Shadow -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Shadow" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Depth under the open notch" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="None" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                    <Button Content="Subtle" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                    <Button Content="Medium" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                    <Button Content="Deep" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Soft edge -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Soft edge" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Softens the notch edge; unavailable in reduced-effects mode" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <Border Grid.Column="1" Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="2">
+                                    <Button Content="None" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                    <Button Content="Low" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                    <Button Content="Medium" Background="#27272A" Foreground="#FFFFFF" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                    <Button Content="High" Background="Transparent" Foreground="#8E8E93" CornerRadius="6" Padding="10,5" FontSize="11" />
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- ==================== SECTION 4: MODULES ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Modules'), Mode=OneWay}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Modules" FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Choose what lives in your notch. Drag to reorder." FontSize="12" Foreground="#8E8E93" />
+                    </StackPanel>
+
+                    <!-- ESSENTIALS -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="ESSENTIALS" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+
+                        <!-- Home -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" Glyph="&#xE80F;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Home" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Now playing, your next event and quick stats" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="2" IsOn="True" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- System -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" Glyph="&#xE950;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="System" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="CPU, memory, disk and battery" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="2" IsOn="True" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Timers -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" Glyph="&#xE916;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Timers" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Pomodoro, countdown, stopwatch and water" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="2" IsOn="True" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Weather -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" Glyph="&#xE753;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Weather" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Now, hourly and five-day forecast" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="2" IsOn="True" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- PRODUCTIVITY -->
+                    <StackPanel Spacing="10" Margin="0,10,0,0">
+                        <TextBlock Text="PRODUCTIVITY" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+
+                        <!-- Clipboard -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" Glyph="&#xF0E3;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Clipboard" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Everything you copied, searchable" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="2" IsOn="True" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Notes -->
+                        <Grid Margin="0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Grid.Column="0" Glyph="&#xE70F;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,12,0" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="Notes" FontSize="13" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Quick notes that stay with the notch" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="2" IsOn="True" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+
+                    <Button Content="Reset order" Background="#222226" Foreground="#FFFFFF" CornerRadius="6" Padding="14,6" FontSize="12" Margin="0,6,0,0" />
+                </StackPanel>
+
+                <!-- ==================== SECTION 5: LIVE ACTIVITIES ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Live Activities'), Mode=OneWay}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Live Activities" FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Which events may expand the notch" FontSize="12" Foreground="#8E8E93" />
+                    </StackPanel>
+
+                    <!-- MUSIC -->
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="MUSIC" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Now playing" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Music from your player" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.NowPlayingEnabled, Mode=TwoWay}" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Show browser media in notch" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Includes videos and audio reported by your browser" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.BrowserMediaEnabled, Mode=TwoWay}" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- CHARGING & VOLUME -->
+                    <StackPanel Spacing="12" Margin="0,8,0,0">
+                        <TextBlock Text="SYSTEM FEEDBACK" FontSize="11" FontWeight="SemiBold" Foreground="#71717A" CharacterSpacing="50" />
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Battery charging" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Plugged in, unplugged and fully charged" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.BatteryChargingActivity, Mode=TwoWay}" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Volume change feedback" FontSize="14" FontWeight="SemiBold" Foreground="#FFFFFF" />
+                                <TextBlock Text="Brief notch peek when adjusting system volume" FontSize="11" Foreground="#8E8E93" />
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1" IsOn="{x:Bind ViewModel.VolumeActivity, Mode=TwoWay}" OnContent="" OffContent="" VerticalAlignment="Center" />
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- ==================== SECTION 6: PRIVACY ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'Privacy'), Mode=OneWay}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Privacy" FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Permissions and local data management" FontSize="12" Foreground="#8E8E93" />
+                    </StackPanel>
+
+                    <Border Background="#141417" BorderBrush="#222226" BorderThickness="1" CornerRadius="12" Padding="16">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="100% Offline &amp; Local" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" />
+                            <TextBlock Text="QuickDock does not collect telemetry, send analytics, or transmit personal data. All clipboard history, notes, and metrics remain strictly on your local PC."
+                                       FontSize="12" Foreground="#8E8E93" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+
+                    <StackPanel Spacing="8">
+                        <Button Content="Clear Clipboard History" Command="{x:Bind ViewModel.ClearClipboardDataCommand}"
+                                Background="#1C1C1F" Foreground="#FFFFFF" CornerRadius="6" Padding="14,8" FontSize="12" />
+                        <Button Content="Clear Screen Time Logs" Command="{x:Bind ViewModel.ClearHistoryDataCommand}"
+                                Background="#1C1C1F" Foreground="#FFFFFF" CornerRadius="6" Padding="14,8" FontSize="12" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- ==================== SECTION 7: ABOUT ==================== -->
+                <StackPanel Spacing="20" Visibility="{x:Bind IsSectionVisible(ViewModel.SelectedSection, 'About'), Mode=OneWay}">
+                    <StackPanel Spacing="12" HorizontalAlignment="Center" Margin="0,20,0,0">
+                        <controls:QuickDockIcon Width="48" Height="48" HorizontalAlignment="Center" />
+                        <TextBlock Text="QuickDock" FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
+                        <TextBlock Text="The notch, reimagined for Windows." FontSize="13" Foreground="#8E8E93" HorizontalAlignment="Center" />
+                        <TextBlock Text="Version 1.0.0 (x64 Release)" FontSize="12" Foreground="#71717A" HorizontalAlignment="Center" />
+                        <TextBlock Text="100% Free · Fully Local · No Cloud · No Telemetry" FontSize="11" Foreground="#22C55E" HorizontalAlignment="Center" Margin="0,4,0,0" />
+                        <TextBlock Text="Copyright © 2026 JOJIN JOHN. All rights reserved." FontSize="11" Foreground="#52525B" HorizontalAlignment="Center" Margin="0,16,0,0" />
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

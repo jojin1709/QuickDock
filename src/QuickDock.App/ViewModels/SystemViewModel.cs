@@ -63,6 +63,39 @@ public sealed partial class SystemViewModel : ObservableObject
     [ObservableProperty]
     private string _uptimeText = "—";
 
+    [ObservableProperty]
+    private string _batteryPercentText = "80%";
+
+    [ObservableProperty]
+    private string _batteryStateText = "Plugged in";
+
+    [ObservableProperty]
+    private string _batteryHealthText = "Health 92%";
+
+    [ObservableProperty]
+    private double _batteryPercentValue = 80;
+
+    [ObservableProperty]
+    private string _networkSsidText = "D-Link";
+
+    [ObservableProperty]
+    private string _networkSpeedText = "Wi-Fi 4 · 162 Mbps";
+
+    [ObservableProperty]
+    private string _networkDownSpeedText = "5 KB/s";
+
+    [ObservableProperty]
+    private string _networkUpSpeedText = "128 KB/s";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(VolumePercentText))]
+    private int _volumePercent = 32;
+
+    public string VolumePercentText => $"{VolumePercent}%";
+
+    [ObservableProperty]
+    private string _volumeDeviceName = "Realtek(R) Audio";
+
     public SystemViewModel(ISystemMetricsService metricsService, ILogger<SystemViewModel> logger)
     {
         _metricsService = metricsService;

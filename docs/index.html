@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickDock — Native Windows 11 Notch & Dynamic Dock Utility</title>
+  <meta name="description" content="A lightweight, keyboard-first, native Windows 11 dynamic island and notch utility. 100% free, offline, zero telemetry, local-first.">
+  <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="./" class="brand">
+        <img src="./assets/images/logo.png" alt="QuickDock Logo">
+        <span>QuickDock</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="./features/">Features</a></li>
+        <li><a href="./notch/">Notch</a></li>
+        <li><a href="./clipboard/">Clipboard</a></li>
+        <li><a href="./docs/">Docs</a></li>
+        <li><a href="./changelog/">Changelog</a></li>
+        <li><a href="./download/" class="btn-primary">Download Free</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-tagline">
+        <span class="status-dot"></span> QuickDock 1.0.0 — Native Windows 11 Utility
+      </div>
+      <h1 class="hero-title">
+        The top of your screen,<br>finally useful.
+      </h1>
+      <p class="hero-subtitle">
+        A compact, dynamic-island style notch living at the top of your desktop. Expands instantly on hover or hotkey. Zero telemetry, completely free.
+      </p>
+      <div class="hero-actions">
+        <a href="./download/" class="btn-primary">Download QuickDock (v1.0.0)</a>
+        <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" class="btn-secondary">GitHub Repository</a>
+      </div>
+
+      <!-- Interactive Showcase Frame -->
+      <div class="showcase-wrapper">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">
+            Interactive Preview
+          </div>
+          <div class="notch-tabs">
+            <button class="tab-btn active" id="tabResting">Resting Notch</button>
+            <button class="tab-btn" id="tabHover">Hover Expanded</button>
+          </div>
+        </div>
+
+        <div class="interactive-screen" id="interactiveNotch">
+          <!-- Top Notch Capsule -->
+          <div class="interactive-notch-bar">
+            <div class="interactive-notch-body">
+              <span class="notch-time">14:17</span>
+              <div class="notch-battery">
+                <div class="battery-pill-graphic">
+                  <div class="battery-level"></div>
+                </div>
+                <span>80</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resting State Placeholder in Mock Screen -->
+          <div id="notchRestingContent" style="padding: 100px 20px; text-align: center; color: #52525B;">
+            <p style="font-size: 13px; font-weight: 500;">Hover over the notch above or click the tabs to expand</p>
+            <p style="font-size: 11px; margin-top: 6px; color: #3F3F46;">Resting notch consumes < 0.5% CPU and 45 MB RAM</p>
+          </div>
+
+          <!-- Expanded Panel View Mock (Hidden in resting state) -->
+          <div id="notchExpandedContent" class="dock-expanded-view" style="display: none;">
+            <div class="dock-header-bar">
+              <div class="dock-title-group">
+                <img src="./assets/images/logo.png" alt="QuickDock" style="width: 20px; height: 20px; border-radius: 4px;">
+                <span class="dock-title">Home</span>
+                <div class="dock-separator"></div>
+                <span class="dock-subtitle">Sunday, November 1</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: #A1A1AA;">
+                <div class="notch-battery">
+                  <div class="battery-pill-graphic"><div class="battery-level"></div></div>
+                  <span>80%</span>
+                </div>
+                <span>⚙</span>
+                <span>✕</span>
+              </div>
+            </div>
+
+            <div class="grid-cards">
+              <!-- Screen Time Card -->
+              <div class="card-dark">
+                <div class="card-header-label">Screen Time</div>
+                <div class="big-stat">&lt;1m</div>
+                <div class="stat-caption">5 apps active today</div>
+                <div style="display: flex; gap: 4px; align-items: flex-end; height: 32px; margin-top: 14px;">
+                  <div style="width: 12px; height: 4px; background: #27272A; border-radius: 2px;"></div>
+                  <div style="width: 12px; height: 6px; background: #27272A; border-radius: 2px;"></div>
+                  <div style="width: 12px; height: 4px; background: #27272A; border-radius: 2px;"></div>
+                  <div style="width: 12px; height: 8px; background: #27272A; border-radius: 2px;"></div>
+                  <div style="width: 12px; height: 28px; background: #FFFFFF; border-radius: 2px;"></div>
+                </div>
+              </div>
+
+              <!-- System Status Card -->
+              <div class="card-dark">
+                <div class="card-header-label">System</div>
+                <div class="rings-row">
+                  <div class="ring-item">
+                    <div class="ring-visual" style="border-top-color: #FFFFFF; border-right-color: #27272A;">21%</div>
+                    <div class="ring-label">CPU</div>
+                  </div>
+                  <div class="ring-item">
+                    <div class="ring-visual" style="border-top-color: #FFFFFF; border-right-color: #FFFFFF;">75%</div>
+                    <div class="ring-label">RAM</div>
+                  </div>
+                  <div class="ring-item">
+                    <div class="ring-visual" style="border-top-color: #FFFFFF; border-right-color: #FFFFFF; border-bottom-color: #FFFFFF;">96%</div>
+                    <div class="ring-label">DISK</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Weather Card -->
+              <div class="card-dark">
+                <div class="card-header-label">Weather</div>
+                <div class="big-stat">32°</div>
+                <div class="stat-caption">Light Drizzle · Thrissur</div>
+                <div style="font-size: 10px; color: #71717A; margin-top: 4px;">H 32° L 24°</div>
+              </div>
+
+              <!-- Focus Card -->
+              <div class="card-dark">
+                <div class="card-header-label">Focus</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div class="big-stat">25:00</div>
+                    <div class="stat-caption">Ready</div>
+                  </div>
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: #27272A; display: flex; align-items: center; justify-content: center; color: #FFFFFF;">▶</div>
+                </div>
+              </div>
+
+              <!-- Clipboard Card -->
+              <div class="card-dark">
+                <div class="card-header-label">Clipboard</div>
+                <div style="font-size: 12px; font-weight: 600; color: #FFFFFF; margin-bottom: 2px;">Latest snippets</div>
+                <div class="stat-caption">Quickly paste from history</div>
+              </div>
+
+              <!-- Notes Card -->
+              <div class="card-dark">
+                <div class="card-header-label">Notes</div>
+                <div style="background: #1C1C1F; border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #71717A; display: flex; justify-content: space-between; align-items: center;">
+                  <span>Write a note...</span>
+                  <span style="color: #FFFFFF; font-weight: bold;">+</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Dock Navigation -->
+            <div style="text-align: center;">
+              <div class="floating-dock-nav">
+                <span class="nav-icon-pill active">⌂</span>
+                <span class="nav-icon-pill">⚙</span>
+                <span class="nav-icon-pill">📋</span>
+                <span class="nav-icon-pill">📝</span>
+                <span class="nav-icon-pill">⏱</span>
+                <span class="nav-icon-pill">📁</span>
+                <span class="nav-icon-pill">📡</span>
+                <span class="nav-icon-pill">📊</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Editorial Section 1: The Core Philosophy -->
+  <section class="section" style="background: #FFFFFF; border-top: 1px solid var(--border-light);">
+    <div class="container">
+      <div class="feature-split">
+        <div class="split-content">
+          <div class="section-tag">Zero Distraction</div>
+          <h2 class="section-title">Lives quietly at the edge until you need it.</h2>
+          <p class="section-desc">
+            Traditional desktop widgets clutter your wallpaper and hog system memory. QuickDock rests discreetly at the top-center bezel of every display. Approach with your cursor or hit <kbd style="background:#F4F4F5; border:1px solid #D4D4D8; border-radius:4px; padding:2px 6px; font-size:12px;">Ctrl + Space</kbd> to expand smoothly.
+          </p>
+        </div>
+        <div class="split-visual" style="background: #0A0A0C; border-color: #1F1F24;">
+          <div style="color: #FFFFFF; text-align: left; padding: 10px;">
+            <div style="font-size: 11px; font-weight: 700; color: #71717A; text-transform: uppercase; margin-bottom: 8px;">Multi-Monitor Ready</div>
+            <p style="font-size: 13px; color: #A1A1AA; line-height: 1.6;">
+              Whether you use a single laptop screen or a dual 4K multi-monitor workstation, QuickDock spawns an independent notch per display. The notch stays locked at top-center across all DPI scaling factors.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-split reverse">
+        <div class="split-content">
+          <div class="section-tag">Complete Privacy</div>
+          <h2 class="section-title">Your data never leaves your computer.</h2>
+          <p class="section-desc">
+            QuickDock contains zero analytics, zero AI wrappers, zero telemetry pings, and no cloud sign-ins. Clipboard history and settings are stored locally in an encrypted SQLite database on your device.
+          </p>
+        </div>
+        <div class="split-visual" style="background: #0A0A0C; border-color: #1F1F24;">
+          <div style="color: #FFFFFF; text-align: left; padding: 10px;">
+            <div style="font-size: 11px; font-weight: 700; color: #71717A; text-transform: uppercase; margin-bottom: 8px;">100% Offline Architecture</div>
+            <p style="font-size: 13px; color: #A1A1AA; line-height: 1.6;">
+              No license keys, no trial counters, no subscriptions, no paywalls. Built in C# and WinUI 3 with native Win32 interop for maximum speed and sub-millisecond response times.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Grid Section -->
+  <section class="features-grid-section">
+    <div class="container">
+      <div style="text-align: center; max-width: 600px; margin: 0 auto;">
+        <div class="section-tag">Built For Productivity</div>
+        <h2 class="section-title">Everything you need in one keystroke.</h2>
+        <p class="section-desc" style="margin: 0 auto;">Engineered from the ground up for speed, reliability, and minimal resource utilization.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-box">
+          <div class="feature-box-number">01</div>
+          <h3 class="feature-box-title">System Metrics</h3>
+          <p class="feature-box-desc">Real-time CPU, RAM, and disk utilization with sparklines, per-process inspector, and battery telemetry.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-box-number">02</div>
+          <h3 class="feature-box-title">Clipboard History</h3>
+          <p class="feature-box-desc">Searchable clipboard archive with automatic sensitive-data masking for passwords, tokens, and credit cards.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-box-number">03</div>
+          <h3 class="feature-box-title">Screen Time</h3>
+          <p class="feature-box-desc">Track active application time, daily productivity quotas, and 7-day usage trends without third-party tracking.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-box-number">04</div>
+          <h3 class="feature-box-title">Quick Notes & Shelf</h3>
+          <p class="feature-box-desc">Instant scratchpad and temporary file parking zone. Drag and drop files directly onto the notch from any window.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-box-number">05</div>
+          <h3 class="feature-box-title">Developer Toolkit</h3>
+          <p class="feature-box-desc">JSON formatter/validator, Base64 encoder, UUID generator, timestamp converter, and port scanner built into the dock.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-box-number">06</div>
+          <h3 class="feature-box-title">Network & LAN Drop</h3>
+          <p class="feature-box-desc">Zero-configuration local device transfer. Share links and files seamlessly across your home Wi-Fi with no cloud relay.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Banner -->
+  <section class="section">
+    <div class="container">
+      <div class="download-card">
+        <h2>Get QuickDock for Windows 11</h2>
+        <p>Completely free, open source, and offline. Installs in seconds with no admin privileges required.</p>
+        <a href="./download/" class="btn-primary" style="background:#FFFFFF; color:#000000 !important; font-size:15px; padding:12px 28px;">
+          Download QuickDock Setup (.exe)
+        </a>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="faq-list">
+        <h2 style="font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 24px;">Frequently Asked Questions</h2>
+        
+        <div class="faq-item">
+          <div class="faq-question">Is QuickDock really free?</div>
+          <div class="faq-answer">Yes, 100% free and open source. There are no license keys, no trial periods, no paid tiers, and no advertisements.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">What are the system requirements?</div>
+          <div class="faq-answer">QuickDock requires Windows 11 (or Windows 10 version 19041+) and runs on 64-bit x64 systems. .NET 10 runtime is included in the self-contained package.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Does QuickDock support multiple monitors?</div>
+          <div class="faq-answer">Yes. QuickDock automatically detects all connected monitors and positions an independent notch on each display. Cursor position determines which notch expands when invoking global hotkeys.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Does QuickDock collect telemetry or crash reports?</div>
+          <div class="faq-answer">No. QuickDock does not connect to any telemetry server or external API. All data stays strictly on your local disk.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="./" class="brand">
+            <img src="./assets/images/logo.png" alt="QuickDock">
+            <span>QuickDock</span>
+          </a>
+          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="./features/">Features</a></li>
+            <li><a href="./notch/">Notch Interaction</a></li>
+            <li><a href="./clipboard/">Clipboard Manager</a></li>
+            <li><a href="./download/">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="./docs/">Documentation</a></li>
+            <li><a href="./changelog/">Changelog</a></li>
+            <li><a href="./privacy/">Privacy Policy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Author</h4>
+          <ul>
+            <li><span>JOJIN JOHN</span></li>
+            <li><span>Master Build v1.0.0</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
+        <span>Made for Windows 11</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/main.js"></script>
+</body>
+</html>

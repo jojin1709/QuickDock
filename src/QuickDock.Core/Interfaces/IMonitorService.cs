@@ -23,6 +23,7 @@ public interface IMonitorService
     MonitorInfo GetActiveMonitor();
     MonitorInfo GetTargetMonitor(string? monitorTarget, bool followActive);
     void SetDockHandle(IntPtr hWnd) { }
+    bool CheckForMonitorChanges() => false;
     event EventHandler? MonitorsChanged;
 }
 

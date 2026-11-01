@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clipboard Manager — QuickDock</title>
+  <meta name="description" content="Searchable, local-first clipboard history with sensitive-data masking and encrypted SQLite storage.">
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="../" class="brand">
+        <img src="../assets/images/logo.png" alt="QuickDock Logo">
+        <span>QuickDock</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../features/">Features</a></li>
+        <li><a href="../notch/">Notch</a></li>
+        <li><a href="../clipboard/" class="active">Clipboard</a></li>
+        <li><a href="../docs/">Docs</a></li>
+        <li><a href="../changelog/">Changelog</a></li>
+        <li><a href="../download/" class="btn-primary">Download Free</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title">Instant Clipboard History</h1>
+      <p class="page-subtitle">Search, pin, and paste anything you copied. Protected by automatic secret detection and encrypted local storage.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="feature-split">
+        <div class="split-content">
+          <div class="section-tag">Privacy & Security First</div>
+          <h2 class="section-title">Zero Leaks. Built-in Data Sanitization.</h2>
+          <p class="section-desc">
+            QuickDock inspects copied text on the fly using pattern recognition to detect sensitive tokens, API keys, private passwords, and credit card numbers.
+          </p>
+          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
+            <li>Auto-masking keeps passwords shielded on screen.</li>
+            <li>Configurable ignore rules for password managers (1Password, Bitwarden, KeePass).</li>
+            <li>Stored in a local, encrypted SQLite database with optional auto-purge after 24h, 7 days, or 30 days.</li>
+          </ul>
+        </div>
+        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
+          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Clipboard History Preview</div>
+          
+          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:12px; font-weight:600;">git commit -m "feat(notch): multi-monitor"</div>
+              <div style="font-size:10px; color:#71717A;">Copied 2m ago · Shell</div>
+            </div>
+            <span style="font-size:11px; color:#A1A1AA; cursor:pointer;">Copy</span>
+          </div>
+
+          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:12px; font-weight:600; font-family:monospace; color:#E4E4E7;">••••••••••••••••••••••••••••••••</div>
+              <div style="font-size:10px; color:#EAB308;">Detected Secret: API Key (Masked)</div>
+            </div>
+            <span style="font-size:11px; color:#A1A1AA; cursor:pointer;">Reveal</span>
+          </div>
+
+          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:12px; font-weight:600;">https://github.com/jojin1709/QuickDock</div>
+              <div style="font-size:10px; color:#71717A;">Copied 14m ago · Link</div>
+            </div>
+            <span style="font-size:11px; color:#A1A1AA; cursor:pointer;">Copy</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="brand">
+            <img src="../assets/images/logo.png" alt="QuickDock">
+            <span>QuickDock</span>
+          </a>
+          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../features/">Features</a></li>
+            <li><a href="../notch/">Notch Interaction</a></li>
+            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../download/">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../docs/">Documentation</a></li>
+            <li><a href="../changelog/">Changelog</a></li>
+            <li><a href="../privacy/">Privacy Policy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Author</h4>
+          <ul>
+            <li><span>JOJIN JOHN</span></li>
+            <li><span>Master Build v1.0.0</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
+        <span>Made for Windows 11</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

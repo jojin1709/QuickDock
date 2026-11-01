@@ -118,7 +118,7 @@
                     <StackPanel Grid.Column="0" HorizontalAlignment="Center" Spacing="4">
                         <Grid Width="46" Height="46">
                             <Ellipse Width="46" Height="46" Stroke="#27272A" StrokeThickness="3.5" />
-                            <Ellipse Width="46" Height="46" Stroke="#3B82F6" StrokeThickness="3.5" StrokeDashArray="3 1" />
+                            <Ellipse Width="46" Height="46" Stroke="#FFFFFF" StrokeThickness="3.5" StrokeDashArray="3 1" />
                             <TextBlock Text="{x:Bind ViewModel.CpuPercentText, Mode=OneWay}"
                                        FontSize="10"
                                        FontWeight="Bold"
@@ -137,7 +137,7 @@
                     <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="4">
                         <Grid Width="46" Height="46">
                             <Ellipse Width="46" Height="46" Stroke="#27272A" StrokeThickness="3.5" />
-                            <Ellipse Width="46" Height="46" Stroke="#10B981" StrokeThickness="3.5" StrokeDashArray="3.5 1" />
+                            <Ellipse Width="46" Height="46" Stroke="#FFFFFF" StrokeThickness="3.5" StrokeDashArray="3.5 1" />
                             <TextBlock Text="{x:Bind ViewModel.RamPercentText, Mode=OneWay}"
                                        FontSize="10"
                                        FontWeight="Bold"
@@ -156,7 +156,7 @@
                     <StackPanel Grid.Column="2" HorizontalAlignment="Center" Spacing="4">
                         <Grid Width="46" Height="46">
                             <Ellipse Width="46" Height="46" Stroke="#27272A" StrokeThickness="3.5" />
-                            <Ellipse Width="46" Height="46" Stroke="#8B5CF6" StrokeThickness="3.5" StrokeDashArray="1 2" />
+                            <Ellipse Width="46" Height="46" Stroke="#FFFFFF" StrokeThickness="3.5" StrokeDashArray="1 2" />
                             <TextBlock Text="{x:Bind ViewModel.DiskPercentText, Mode=OneWay}"
                                        FontSize="10"
                                        FontWeight="Bold"
@@ -223,7 +223,7 @@
                         <FontIcon Grid.Column="1"
                                   Glyph="&#xE753;"
                                   FontSize="30"
-                                  Foreground="#FBBF24"
+                                  Foreground="#FFFFFF"
                                   VerticalAlignment="Center"
                                   Margin="0,0,4,0" />
                     </Grid>

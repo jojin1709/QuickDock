@@ -3,6 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using QuickDock.App.Services;
 using QuickDock.App.ViewModels;
 using QuickDock.Core.Events;
 using QuickDock.Core.Interfaces;
@@ -42,11 +43,23 @@ namespace QuickDock.App;
 public partial class App : Application
 {
     private Window? _window;
+    private static SettingsWindow? _settingsWindow;
     private ILogger<App>? _logger;
 
     public static Window? MainWindowInstance => (Current as App)?._window;
     public static IHost Host { get; private set; } = null!;
     public static IServiceProvider Services => Host.Services;
+
+    public static void OpenSettingsWindow()
+    {
+        if (_settingsWindow == null)
+        {
+            var vm = Services.GetRequiredService<SettingsViewModel>();
+            _settingsWindow = new SettingsWindow(vm);
+            _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+        }
+        _settingsWindow.Activate();
+    }
 
     public App()
     {
@@ -197,6 +210,7 @@ public partial class App : Application
                 services.AddSingleton<DeveloperViewModel>();
                 services.AddSingleton<NetworkSecurityViewModel>();
                 services.AddSingleton<MainViewModel>();
+                services.AddSingleton<NotchWindowManager>();
                 services.AddTransient<MainWindow>();
             })
             .Build();
@@ -221,24 +235,31 @@ public partial class App : Application
         _logger?.LogInformation("Entered OnLaunched on UI thread.");
         try
         {
-            // 1. Immediately instantiate and activate MainWindow synchronously on the UI thread
-            _window = Services.GetRequiredService<MainWindow>();
+            // 1. Initialize multi-monitor NotchWindowManager across all connected displays
+            var notchManager = Services.GetRequiredService<NotchWindowManager>();
+            notchManager.Initialize();
+
+            _window = notchManager.ActiveWindows.FirstOrDefault(w => w.IsPrimaryInstance) 
+                      ?? notchManager.ActiveWindows.FirstOrDefault() 
+                      ?? Services.GetRequiredService<MainWindow>();
 
             var lifecycle = Services.GetRequiredService<IAppLifecycleService>();
-            _window.Closed += async (s, e) =>
+            if (_window != null)
             {
-                try
+                _window.Closed += async (s, e) =>
                 {
-                    await lifecycle.StopAsync();
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "Error stopping lifecycle on window close.");
-                }
-            };
+                    try
+                    {
+                        await lifecycle.StopAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Error stopping lifecycle on window close.");
+                    }
+                };
+            }
 
-            _window.Activate();
-            _logger?.LogInformation("QuickDock MainWindow activated successfully on UI thread.");
+            _logger?.LogInformation("QuickDock NotchWindowManager initialized across displays.");
 
             // 2. Start core background services asynchronously without blocking the UI thread
             _ = Task.Run(async () =>

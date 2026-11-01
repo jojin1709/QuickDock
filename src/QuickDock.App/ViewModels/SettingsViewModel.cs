@@ -126,6 +126,81 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private int _closeBehaviorIndex; // 0=MinimizeToTray, 1=ExitApplication
 
+    [ObservableProperty]
+    private string _globalHotkeyText = "Ctrl + Space";
+
+    [ObservableProperty]
+    private int _timeFormatIndex = 0; // 0=System, 1=12-hour, 2=24-hour
+
+    [ObservableProperty]
+    private int _temperatureUnitIndex = 0; // 0=°C, 1=°F
+
+    [ObservableProperty]
+    private int _windSpeedUnitIndex = 0; // 0=km/h, 1=mph
+
+    // Notch (Shape, Behavior, Live Preview)
+    [ObservableProperty]
+    private int _visibilityMode = 0; // 0=Always, 1=Smart, 2=Minimal, 3=Hidden
+
+    [ObservableProperty]
+    private int _styleMode = 1; // 0=Line, 1=Notch, 2=Island
+
+    [ObservableProperty]
+    private int _notchShapeIndex = 0; // 0=Compact, 1=Classic, 2=Wide
+
+    [ObservableProperty]
+    private double _notchScale = 90;
+
+    [ObservableProperty]
+    private int _restingLayoutIndex = 0; // 0=Corners, 1=Center
+
+    [ObservableProperty]
+    private bool _previewIsHover = false;
+
+    // Appearance (Theme, Surface, Notch Effects)
+    [ObservableProperty]
+    private int _themeMode = 0; // 0=PureBlack, 1=EmberDark, 2=Vivid, 3=Silver
+
+    [ObservableProperty]
+    private bool _outlineEnabled = false;
+
+    [ObservableProperty]
+    private int _outlineWidthIndex = 0; // 0=1px, 1=2px, 2=3px
+
+    [ObservableProperty]
+    private bool _tintFromWallpaper = false;
+
+    [ObservableProperty]
+    private int _shadowLevelIndex = 2; // 0=None, 1=Subtle, 2=Medium, 3=Deep
+
+    [ObservableProperty]
+    private int _softEdgeLevelIndex = 2; // 0=None, 1=Low, 2=Medium, 3=High
+
+    // Live Activities
+    [ObservableProperty]
+    private bool _nowPlayingEnabled = true;
+
+    [ObservableProperty]
+    private bool _browserMediaEnabled = false;
+
+    [ObservableProperty]
+    private string _musicColor = "Auto";
+
+    [ObservableProperty]
+    private bool _batteryChargingActivity = true;
+
+    [ObservableProperty]
+    private bool _volumeActivity = true;
+
+    [ObservableProperty]
+    private bool _clipboardActivity = true;
+
+    [ObservableProperty]
+    private bool _hideCopiedText = false;
+
+    [ObservableProperty]
+    private bool _runningTimersActivity = true;
+
     // Appearance
     [ObservableProperty]
     private int _selectedThemeIndex; // 0=System, 1=Light, 2=Dark
@@ -360,16 +435,11 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         NavItems.Clear();
         NavItems.Add(new SettingsNavItem("General", "General", "\uE713"));
+        NavItems.Add(new SettingsNavItem("Notch", "Notch", "\uE743"));
         NavItems.Add(new SettingsNavItem("Appearance", "Appearance", "\uE790"));
-        NavItems.Add(new SettingsNavItem("Dock", "Dock", "\uE8B7"));
         NavItems.Add(new SettingsNavItem("Modules", "Modules", "\uE74C"));
-        NavItems.Add(new SettingsNavItem("Shortcuts", "Shortcuts", "\uE765"));
-        NavItems.Add(new SettingsNavItem("Notifications", "Notifications", "\uEA8F"));
+        NavItems.Add(new SettingsNavItem("Live Activities", "Live Activities", "\uEA8F"));
         NavItems.Add(new SettingsNavItem("Privacy", "Privacy", "\uE72E"));
-        NavItems.Add(new SettingsNavItem("Storage", "Storage", "\uEDA2"));
-        NavItems.Add(new SettingsNavItem("Network", "Network", "\uE839"));
-        NavItems.Add(new SettingsNavItem("Developer", "Developer", "\uE7BE"));
-        NavItems.Add(new SettingsNavItem("Accessibility", "Accessibility", "\uE776"));
         NavItems.Add(new SettingsNavItem("About", "About", "\uE946"));
     }
 
@@ -1168,6 +1238,20 @@ public sealed partial class SettingsViewModel : ObservableObject
         await _storageManager.ClearProductivityDataAsync();
         await RefreshStorageStatsAsync();
         StorageStatusMessage = "Productivity records (Notes, Calendar, Screen Time) cleared.";
+    }
+
+    [RelayCommand]
+    public async Task ClearClipboardDataAsync()
+    {
+        await _storageManager.ClearCacheAsync();
+        SettingsStatusMessage = "Clipboard history cleared.";
+    }
+
+    [RelayCommand]
+    public async Task ClearHistoryDataAsync()
+    {
+        await _storageManager.ClearProductivityDataAsync();
+        SettingsStatusMessage = "Screen time history cleared.";
     }
 
     [RelayCommand]

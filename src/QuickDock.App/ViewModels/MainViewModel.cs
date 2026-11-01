@@ -273,6 +273,11 @@ public sealed partial class MainViewModel : ObservableObject
     {
         SwitchView("Settings");
         EnsureExpanded("OpenSettings");
+        try
+        {
+            App.OpenSettingsWindow();
+        }
+        catch { }
     }
 
     [RelayCommand]

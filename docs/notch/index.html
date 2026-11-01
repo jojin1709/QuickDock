@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Notch & Dock Interaction — QuickDock</title>
+  <meta name="description" content="Learn how QuickDock's hardware-accelerated top-center notch interaction, hover detection, multi-monitor synchronization, and auto-collapse work.">
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="../" class="brand">
+        <img src="../assets/images/logo.png" alt="QuickDock Logo">
+        <span>QuickDock</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../features/">Features</a></li>
+        <li><a href="../notch/" class="active">Notch</a></li>
+        <li><a href="../clipboard/">Clipboard</a></li>
+        <li><a href="../docs/">Docs</a></li>
+        <li><a href="../changelog/">Changelog</a></li>
+        <li><a href="../download/" class="btn-primary">Download Free</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title">Native Windows 11 Dynamic Island</h1>
+      <p class="page-subtitle">Sub-millisecond hover detection, graceful collapse timers, and multi-monitor window management engineered in C# and Win32.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- How it Works -->
+      <div class="feature-split">
+        <div class="split-content">
+          <div class="section-tag">Precision Mechanics</div>
+          <h2 class="section-title">The State Machine Cycle</h2>
+          <p class="section-desc">
+            QuickDock operates using a deterministic finite state machine (FSM) that eliminates UI flickers and accidental closures.
+          </p>
+          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
+            <li><strong>Resting:</strong> 160×28px minimal capsule displaying clock and battery percentage.</li>
+            <li><strong>Hover Trigger:</strong> 150ms debounce window prevents unintended expansions when passing cursor across the bezel.</li>
+            <li><strong>Expanded:</strong> 640×440px dashboard displaying metrics, clipboard, timers, and modules.</li>
+            <li><strong>Auto-Collapse:</strong> 200ms grace period keeps dock open when briefly traversing edges or switching focus.</li>
+          </ul>
+        </div>
+        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF; text-align:center;">
+          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:16px;">Interaction Lifecycle</div>
+          <div style="display:inline-flex; flex-direction:column; gap:12px; font-family:monospace; font-size:12px; text-align:left;">
+            <div style="background:#141417; border:1px solid #27272A; padding:8px 14px; border-radius:6px;">[RESTING] ── Pointer Approaches ──&gt;</div>
+            <div style="background:#141417; border:1px solid #27272A; padding:8px 14px; border-radius:6px;">[EXPANDING] ── 150ms Debounce Verified ──&gt;</div>
+            <div style="background:#141417; border:1px solid #3F3F46; padding:8px 14px; border-radius:6px; color:#FFFFFF; font-weight:bold;">[EXPANDED] ── Active Interaction ──&gt;</div>
+            <div style="background:#141417; border:1px solid #27272A; padding:8px 14px; border-radius:6px;">[COLLAPSING] ── 200ms Grace Period ──&gt;</div>
+            <div style="background:#141417; border:1px solid #27272A; padding:8px 14px; border-radius:6px;">[RESTING] ── Idle State (45 MB RAM)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Monitor Architecture -->
+      <div class="feature-split reverse">
+        <div class="split-content">
+          <div class="section-tag">Multi-Monitor Architecture</div>
+          <h2 class="section-title">Seamless Dual & Triple Display Support</h2>
+          <p class="section-desc">
+            QuickDock's <code>NotchWindowManager</code> queries Win32 display topology upon launch and monitors dynamic display changes via <code>WM_DISPLAYCHANGE</code>.
+          </p>
+          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
+            <li>Independent notch instances instantiated on every physical display.</li>
+            <li>Per-monitor DPI awareness ensures pixel-crisp rendering on 100%, 125%, 150%, and 200% scaling factors.</li>
+            <li>Hotkeys automatically route to whichever display your cursor currently occupies.</li>
+          </ul>
+        </div>
+        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
+          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Active Displays Detected</div>
+          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:12px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold;">
+              <span>Display 1 (Primary)</span>
+              <span style="color:#22C55E;">1536 × 864 @ 125%</span>
+            </div>
+            <div style="font-size:11px; color:#71717A; margin-top:2px;">Notch Window #1 Active · Top Center</div>
+          </div>
+          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:bold;">
+              <span>Display 2 (Secondary)</span>
+              <span style="color:#22C55E;">1920 × 1080 @ 100%</span>
+            </div>
+            <div style="font-size:11px; color:#71717A; margin-top:2px;">Notch Window #2 Active · Top Center</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="brand">
+            <img src="../assets/images/logo.png" alt="QuickDock">
+            <span>QuickDock</span>
+          </a>
+          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../features/">Features</a></li>
+            <li><a href="../notch/">Notch Interaction</a></li>
+            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../download/">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../docs/">Documentation</a></li>
+            <li><a href="../changelog/">Changelog</a></li>
+            <li><a href="../privacy/">Privacy Policy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Author</h4>
+          <ul>
+            <li><span>JOJIN JOHN</span></li>
+            <li><span>Master Build v1.0.0</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
+        <span>Made for Windows 11</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

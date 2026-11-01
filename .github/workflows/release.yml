@@ -78,8 +78,11 @@ jobs:
           Copy-Item -Path "./dist/$zipName" -Destination ./src/QuickDock.Setup/payload.zip -Force
           dotnet publish src/QuickDock.Setup/QuickDock.Setup.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./dist/installer
           Copy-Item -Path ./dist/installer/QuickDock-Setup.exe -Destination ./dist/QuickDock-Setup.exe -Force
+          $namedExe = "QuickDock-$tag-win-x64.exe"
+          Copy-Item -Path ./dist/installer/QuickDock-Setup.exe -Destination "./dist/$namedExe" -Force
           $setupHash = (Get-FileHash -Path ./dist/QuickDock-Setup.exe -Algorithm SHA256).Hash
           "$setupHash *QuickDock-Setup.exe" | Out-File -FilePath ./dist/SHA256SUMS.txt -Encoding utf8 -Append
+          "$setupHash *$namedExe" | Out-File -FilePath ./dist/SHA256SUMS.txt -Encoding utf8 -Append
           Write-Host "QuickDock-Setup.exe SHA-256: $setupHash"
 
       - name: Upload Build Artifacts to GitHub Actions
@@ -94,7 +97,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            ./dist/QuickDock-Setup.exe
+            ./dist/*.exe
             ./dist/*.zip
             ./dist/SHA256SUMS.txt
           generate_release_notes: true

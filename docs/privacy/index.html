@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — QuickDock</title>
+  <meta name="description" content="QuickDock is 100% offline and local-first. We collect zero telemetry, zero analytics, and zero personal data.">
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="../" class="brand">
+        <img src="../assets/images/logo.png" alt="QuickDock Logo">
+        <span>QuickDock</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../features/">Features</a></li>
+        <li><a href="../notch/">Notch</a></li>
+        <li><a href="../clipboard/">Clipboard</a></li>
+        <li><a href="../docs/">Docs</a></li>
+        <li><a href="../changelog/">Changelog</a></li>
+        <li><a href="../download/" class="btn-primary">Download Free</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title">Privacy Policy</h1>
+      <p class="page-subtitle">Effective Date: November 1, 2026. Zero telemetry, zero analytics, local-first by design.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container" style="max-width: 800px;">
+      
+      <div class="callout" style="border-left-color: #22C55E;">
+        <div class="callout-title" style="color: #22C55E;">Short Version</div>
+        <p>QuickDock does not track you, does not phone home, does not sell data, does not use analytics SDKs, and has no backend servers. Everything stays on your computer.</p>
+      </div>
+
+      <h2 style="font-size: 22px; font-weight: 800; margin: 30px 0 12px;">1. Information We Collect</h2>
+      <p style="font-size: 15px; color: #333333; line-height: 1.7; margin-bottom: 20px;">
+        QuickDock collects <strong>no personal data</strong>. There are no user accounts, no login screens, no cloud sync, and no tracking identifiers.
+      </p>
+
+      <h2 style="font-size: 22px; font-weight: 800; margin: 30px 0 12px;">2. Local Data Storage</h2>
+      <p style="font-size: 15px; color: #333333; line-height: 1.7; margin-bottom: 20px;">
+        All application data (including your clipboard history, quick notes, pinned items, and screen time metrics) is stored exclusively in a local SQLite database residing inside your user folder:
+      </p>
+      <div class="code-block">
+        <pre><code>%LocalAppData%\QuickDock\quickdock.db</code></pre>
+      </div>
+      <p style="font-size: 15px; color: #333333; line-height: 1.7; margin-bottom: 20px;">
+        This file is never uploaded or transmitted to any third-party server.
+      </p>
+
+      <h2 style="font-size: 22px; font-weight: 800; margin: 30px 0 12px;">3. Network Communications</h2>
+      <p style="font-size: 15px; color: #333333; line-height: 1.7; margin-bottom: 20px;">
+        QuickDock makes network requests only in the following explicit scenarios:
+      </p>
+      <ul style="margin: 0 0 20px 24px; font-size: 15px; color: #333333; line-height: 1.7;">
+        <li><strong>Weather Forecast:</strong> If enabled, calls public weather APIs strictly to fetch weather conditions for your designated location. No personal or device identifier is transmitted.</li>
+        <li><strong>LAN QuickDrop:</strong> Local network file transfers occur peer-to-peer over your private Wi-Fi network using standard TCP sockets. No files ever touch the public internet.</li>
+      </ul>
+
+      <h2 style="font-size: 22px; font-weight: 800; margin: 30px 0 12px;">4. Open Source Verification</h2>
+      <p style="font-size: 15px; color: #333333; line-height: 1.7; margin-bottom: 20px;">
+        QuickDock is fully open source under the MIT License. Anyone can audit the complete codebase, network handlers, and database queries at <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" style="text-decoration: underline;">https://github.com/jojin1709/QuickDock</a>.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="brand">
+            <img src="../assets/images/logo.png" alt="QuickDock">
+            <span>QuickDock</span>
+          </a>
+          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../features/">Features</a></li>
+            <li><a href="../notch/">Notch Interaction</a></li>
+            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../download/">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../docs/">Documentation</a></li>
+            <li><a href="../changelog/">Changelog</a></li>
+            <li><a href="../privacy/">Privacy Policy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Author</h4>
+          <ul>
+            <li><span>JOJIN JOHN</span></li>
+            <li><span>Master Build v1.0.0</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
+        <span>Made for Windows 11</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

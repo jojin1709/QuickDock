@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features — QuickDock</title>
+  <meta name="description" content="Explore QuickDock's modules: System Monitor, Clipboard Manager, Productivity Tools, Developer Toolkit, and File Transfer.">
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="../" class="brand">
+        <img src="../assets/images/logo.png" alt="QuickDock Logo">
+        <span>QuickDock</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../features/" class="active">Features</a></li>
+        <li><a href="../notch/">Notch</a></li>
+        <li><a href="../clipboard/">Clipboard</a></li>
+        <li><a href="../docs/">Docs</a></li>
+        <li><a href="../changelog/">Changelog</a></li>
+        <li><a href="../download/" class="btn-primary">Download Free</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title">Modular Architecture. Infinite Utility.</h1>
+      <p class="page-subtitle">Every utility is built as an independent, lightweight module loaded on-demand to keep idle resource footprint near zero.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Feature 1: System Monitoring -->
+      <div class="feature-split">
+        <div class="split-content">
+          <div class="section-tag">Module 01</div>
+          <h2 class="section-title">Hardware Telemetry & Battery Health</h2>
+          <p class="section-desc">
+            Keep tabs on your PC without heavy overlays. QuickDock provides low-overhead CPU, RAM, and storage utilization gauges, battery discharge rates, thermal warnings, and a process inspector that pinpoints rogue background tasks.
+          </p>
+          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
+            <li>Radial rings and sparkline graphs</li>
+            <li>Detailed 2x2 cards for Battery, Network, Performance, and Audio Volume</li>
+            <li>Zero-latency WMI and Win32 performance counter interop</li>
+          </ul>
+        </div>
+        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
+          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Live Telemetry Gauges</div>
+          <div class="rings-row" style="margin-bottom: 20px;">
+            <div class="ring-item">
+              <div class="ring-visual">24%</div>
+              <div class="ring-label">CPU</div>
+            </div>
+            <div class="ring-item">
+              <div class="ring-visual">68%</div>
+              <div class="ring-label">RAM</div>
+            </div>
+            <div class="ring-item">
+              <div class="ring-visual">4%</div>
+              <div class="ring-label">DISK</div>
+            </div>
+          </div>
+          <div style="font-size:11px; color:#A1A1AA; text-align:center;">Updates every 1000ms while expanded. Pauses instantly when collapsed.</div>
+        </div>
+      </div>
+
+      <!-- Feature 2: Screen Time -->
+      <div class="feature-split reverse">
+        <div class="split-content">
+          <div class="section-tag">Module 02</div>
+          <h2 class="section-title">Screen Time & Productivity Insights</h2>
+          <p class="section-desc">
+            Gain clarity on your work habits without sending data to external servers. QuickDock measures foreground window focus time, tracks application usage, and displays daily goals with a 7-day retrospective chart.
+          </p>
+          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
+            <li>Per-app breakdown with percentage bar visualization</li>
+            <li>Configurable daily screen time limits with gentle notifications</li>
+            <li>Encrypted local SQLite storage with zero network access</li>
+          </ul>
+        </div>
+        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
+          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Today's Breakdown</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div>
+              <div style="font-size:24px; font-weight:800;">4h 12m</div>
+              <div style="font-size:11px; color:#71717A;">Screen time today</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:14px; font-weight:700; color:#22C55E;">2h 48m left</div>
+              <div style="font-size:11px; color:#71717A;">of 7h daily limit</div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #1F1F24; padding-top:10px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+              <span>Google Chrome</span>
+              <span>1h 45m (42%)</span>
+            </div>
+            <div style="height:4px; background:#27272A; border-radius:2px; overflow:hidden;">
+              <div style="width:42%; height:100%; background:#FFFFFF;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature 3: Developer Toolkit -->
+      <div class="feature-split">
+        <div class="split-content">
+          <div class="section-tag">Module 03</div>
+          <h2 class="section-title">Developer Swiss Army Knife</h2>
+          <p class="section-desc">
+            Never Google for online converters or open untrusted formatting websites again. Everything you need to inspect, format, and debug payloads lives right inside the notch.
+          </p>
+          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
+            <li>JSON formatter, validator, and minifier with syntax error reporting</li>
+            <li>Base64 text and image encoder/decoder</li>
+            <li>UUID/GUID v4 generator with uppercase/hyphen options</li>
+            <li>UNIX timestamp converter with millisecond resolution</li>
+            <li>Developer process port inspector (`netstat` correlation)</li>
+          </ul>
+        </div>
+        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
+          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Built-in Developer Utilities</div>
+          <div class="code-block" style="margin:0 0 10px 0;">
+            <pre><code>// Instant JSON Validator
+{
+  "quickdock": "v1.0.0",
+  "status": "ready",
+  "port_binding": 8080
+}</code></pre>
+          </div>
+          <div style="font-size:11px; color:#22C55E; font-weight:600;">✓ Valid JSON Payload · 52 Bytes</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="brand">
+            <img src="../assets/images/logo.png" alt="QuickDock">
+            <span>QuickDock</span>
+          </a>
+          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../features/">Features</a></li>
+            <li><a href="../notch/">Notch Interaction</a></li>
+            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../download/">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../docs/">Documentation</a></li>
+            <li><a href="../changelog/">Changelog</a></li>
+            <li><a href="../privacy/">Privacy Policy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Author</h4>
+          <ul>
+            <li><span>JOJIN JOHN</span></li>
+            <li><span>Master Build v1.0.0</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
+        <span>Made for Windows 11</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

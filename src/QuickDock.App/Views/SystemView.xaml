@@ -10,204 +10,240 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid>
-        <!-- Body -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      Padding="0,0,8,0">
-            <StackPanel Spacing="12">
+    <Grid Margin="16,8,16,10" RowSpacing="12" ColumnSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-                <!-- Hardware Performance Grid -->
-                <controls:QuickDockSection Title="Compute &amp; Memory" />
-                <Grid ColumnSpacing="12">
+        <!-- ==================== CARD 1: BATTERY ==================== -->
+        <Border Grid.Row="0" Grid.Column="0"
+                Background="#141417"
+                BorderBrush="#222226"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE83F;" FontSize="12" Foreground="#A1A1AA" />
+                        <TextBlock Text="Battery" FontSize="12" FontWeight="SemiBold" Foreground="#E4E4E7" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.BatteryHealthText, Mode=OneWay}"
+                               FontSize="11" Foreground="#71717A" VerticalAlignment="Center" />
+                </Grid>
+
+                <!-- Body: 80% Plugged in -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,4,0,4">
+                    <TextBlock Text="{x:Bind ViewModel.BatteryPercentText, Mode=OneWay}"
+                               FontSize="32" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                    <TextBlock Text="{x:Bind ViewModel.BatteryStateText, Mode=OneWay}"
+                               FontSize="12" Foreground="#8E8E93" VerticalAlignment="Bottom" Margin="0,0,0,6" />
+                </StackPanel>
+
+                <!-- Horizontal White Fill Bar -->
+                <Grid Grid.Row="2" Height="6" Margin="0,4,0,0">
+                    <Border CornerRadius="3" Background="#27272A" />
+                    <Border CornerRadius="3" Background="#FFFFFF" HorizontalAlignment="Left"
+                            Width="{x:Bind ViewModel.BatteryPercentValue, Mode=OneWay}" MaxWidth="280" />
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ==================== CARD 2: NETWORK ==================== -->
+        <Border Grid.Row="0" Grid.Column="1"
+                Background="#141417"
+                BorderBrush="#222226"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE701;" FontSize="12" Foreground="#A1A1AA" />
+                    <TextBlock Text="Network" FontSize="12" FontWeight="SemiBold" Foreground="#E4E4E7" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Body: SSID + Speed -->
+                <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,2,0,2">
+                    <TextBlock Text="{x:Bind ViewModel.NetworkSsidText, Mode=OneWay}"
+                               FontSize="26" FontWeight="Bold" Foreground="#FFFFFF" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{x:Bind ViewModel.NetworkSpeedText, Mode=OneWay}"
+                               FontSize="11" Foreground="#8E8E93" Margin="0,2,0,0" />
+                </StackPanel>
+
+                <!-- Down / Up Sparklines -->
+                <Grid Grid.Row="2" Margin="0,4,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-
-                    <!-- CPU Card -->
-                    <Border Grid.Column="0"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="16">
-                        <StackPanel Spacing="8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE950;" FontSize="15" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                    <TextBlock Text="Processor" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.CpuUsageText, Mode=OneWay}"
-                                           FontWeight="Bold" FontSize="15" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            </Grid>
-
-                            <ProgressBar Value="{x:Bind ViewModel.CpuUsageValue, Mode=OneWay}" Maximum="100" />
-                            <TextBlock Text="{x:Bind ViewModel.CpuModelText, Mode=OneWay}"
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       TextTrimming="CharacterEllipsis" />
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <TextBlock Text="↓" FontSize="12" Foreground="#FFFFFF" FontWeight="Bold" />
+                        <TextBlock Text="{x:Bind ViewModel.NetworkDownSpeedText, Mode=OneWay}" FontSize="11" Foreground="#FFFFFF" />
+                        <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Margin="4,0,0,0">
+                            <Border Width="2" Height="5" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="8" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="4" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="10" Background="#FFFFFF" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="6" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
                         </StackPanel>
-                    </Border>
-
-                    <!-- Memory Card -->
-                    <Border Grid.Column="1"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="16">
-                        <StackPanel Spacing="8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE7F4;" FontSize="15" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                    <TextBlock Text="Physical RAM" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.MemoryPercentageText, Mode=OneWay}"
-                                           FontWeight="Bold" FontSize="15" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            </Grid>
-
-                            <ProgressBar Value="{x:Bind ViewModel.MemoryPercentage, Mode=OneWay}" Maximum="100" />
-                            <TextBlock Text="{x:Bind ViewModel.MemoryText, Mode=OneWay}"
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="↑" FontSize="12" Foreground="#FFFFFF" FontWeight="Bold" />
+                        <TextBlock Text="{x:Bind ViewModel.NetworkUpSpeedText, Mode=OneWay}" FontSize="11" Foreground="#FFFFFF" />
+                        <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center" Margin="4,0,0,0">
+                            <Border Width="2" Height="4" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="7" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="10" Background="#FFFFFF" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="5" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="2" Height="9" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
                         </StackPanel>
-                    </Border>
+                    </StackPanel>
                 </Grid>
+            </Grid>
+        </Border>
 
-                <!-- Graphics & Storage Grid -->
-                <controls:QuickDockSection Title="Graphics &amp; Storage" />
-                <Grid ColumnSpacing="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+        <!-- ==================== CARD 3: PERFORMANCE ==================== -->
+        <Border Grid.Row="1" Grid.Column="0"
+                Background="#141417"
+                BorderBrush="#222226"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <!-- GPU Card -->
-                    <Border Grid.Column="0"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="16">
-                        <StackPanel Spacing="8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xE770;" FontSize="15" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                    <TextBlock Text="GPU" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.GpuMemoryText, Mode=OneWay}"
-                                           FontWeight="SemiBold" FontSize="12" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            </Grid>
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE950;" FontSize="12" Foreground="#A1A1AA" />
+                    <TextBlock Text="Performance" FontSize="12" FontWeight="SemiBold" Foreground="#E4E4E7" VerticalAlignment="Center" />
+                </StackPanel>
 
-                            <TextBlock Text="{x:Bind ViewModel.GpuNameText, Mode=OneWay}"
-                                       FontWeight="Medium" FontSize="12" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="Hardware Video Memory"
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        </StackPanel>
-                    </Border>
-
-                    <!-- Disk Card -->
-                    <Border Grid.Column="1"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="16">
-                        <StackPanel Spacing="8">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
-                                    <FontIcon Glyph="&#xEDA2;" FontSize="15" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                    <TextBlock Text="{x:Bind ViewModel.DiskNameText, Mode=OneWay}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.DiskUsagePercentageText, Mode=OneWay}"
-                                           FontWeight="SemiBold" FontSize="12" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            </Grid>
-
-                            <ProgressBar Value="{x:Bind ViewModel.DiskUsagePercentage, Mode=OneWay}" Maximum="100" />
-                            <TextBlock Text="{x:Bind ViewModel.DiskSpaceText, Mode=OneWay}"
-                                       FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        </StackPanel>
-                    </Border>
-                </Grid>
-
-                <!-- Power & Connectivity Grid -->
-                <controls:QuickDockSection Title="Power, Connectivity &amp; Uptime" />
-                <Grid ColumnSpacing="12">
+                <!-- 3 Columns: CPU, RAM, Disk -->
+                <Grid Grid.Row="1" Margin="0,6,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Battery Card -->
-                    <Border Grid.Column="0"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="14">
-                        <StackPanel Spacing="6">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE83F;" FontSize="14" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                <TextBlock Text="Power / Battery" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <TextBlock Text="{x:Bind ViewModel.BatteryText, Mode=OneWay}"
-                                       FontWeight="Medium" FontSize="13" />
+                    <!-- CPU -->
+                    <StackPanel Grid.Column="0" Spacing="2">
+                        <TextBlock Text="{x:Bind ViewModel.CpuUsageText, Mode=OneWay}"
+                                   FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="CPU" FontSize="10" FontWeight="SemiBold" Foreground="#71717A" />
+                        <StackPanel Orientation="Horizontal" Spacing="2" Height="14" VerticalAlignment="Bottom" Margin="0,4,0,0">
+                            <Border Width="3" Height="6" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="10" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="7" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="14" Background="#FFFFFF" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="9" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
                         </StackPanel>
-                    </Border>
+                    </StackPanel>
 
-                    <!-- Network Card -->
-                    <Border Grid.Column="1"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="14">
-                        <StackPanel Spacing="6">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xEC27;" FontSize="14" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                <TextBlock Text="{x:Bind ViewModel.NetworkTypeText, Mode=OneWay}" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <TextBlock Text="{x:Bind ViewModel.NetworkStatusText, Mode=OneWay}"
-                                       FontWeight="Medium" FontSize="13" />
-                        </StackPanel>
-                    </Border>
+                    <!-- RAM -->
+                    <StackPanel Grid.Column="1" Spacing="2">
+                        <TextBlock Text="{x:Bind ViewModel.MemoryPercentageText, Mode=OneWay}"
+                                   FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="RAM" FontSize="10" FontWeight="SemiBold" Foreground="#71717A" />
+                        <Border Height="16" Background="#27272A" CornerRadius="2" Margin="0,4,0,0">
+                            <Border Background="#44FFFFFF" CornerRadius="2" HorizontalAlignment="Stretch" />
+                        </Border>
+                    </StackPanel>
 
-                    <!-- Uptime Card -->
-                    <Border Grid.Column="2"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="14">
-                        <StackPanel Spacing="6">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                <TextBlock Text="System Uptime" FontWeight="SemiBold" FontSize="12" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <TextBlock Text="{x:Bind ViewModel.UptimeText, Mode=OneWay}"
-                                       FontWeight="Medium" FontSize="13" />
+                    <!-- DISK -->
+                    <StackPanel Grid.Column="2" Spacing="2">
+                        <TextBlock Text="{x:Bind ViewModel.DiskUsagePercentageText, Mode=OneWay}"
+                                   FontSize="24" FontWeight="Bold" Foreground="#FFFFFF" />
+                        <TextBlock Text="Disk" FontSize="10" FontWeight="SemiBold" Foreground="#71717A" />
+                        <StackPanel Orientation="Horizontal" Spacing="2" Height="14" VerticalAlignment="Bottom" Margin="0,4,0,0">
+                            <Border Width="3" Height="4" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="8" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="6" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="11" Background="#FFFFFF" CornerRadius="1" VerticalAlignment="Bottom" />
+                            <Border Width="3" Height="7" Background="#8E8E93" CornerRadius="1" VerticalAlignment="Bottom" />
                         </StackPanel>
-                    </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ==================== CARD 4: VOLUME ==================== -->
+        <Border Grid.Row="1" Grid.Column="1"
+                Background="#141417"
+                BorderBrush="#222226"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="&#xE767;" FontSize="12" Foreground="#A1A1AA" />
+                        <TextBlock Text="Volume" FontSize="12" FontWeight="SemiBold" Foreground="#E4E4E7" VerticalAlignment="Center" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                        <TextBlock Text="{x:Bind ViewModel.VolumeDeviceName, Mode=OneWay}"
+                                   FontSize="11" Foreground="#8E8E93" VerticalAlignment="Center" />
+                        <FontIcon Glyph="&#xE70D;" FontSize="9" Foreground="#71717A" VerticalAlignment="Center" />
+                    </StackPanel>
                 </Grid>
 
-            </StackPanel>
-        </ScrollViewer>
+                <!-- Volume Big Value -->
+                <TextBlock Grid.Row="1"
+                           Text="{x:Bind ViewModel.VolumePercentText, Mode=OneWay}"
+                           FontSize="32" FontWeight="Bold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+
+                <!-- Volume Slider -->
+                <Grid Grid.Row="2" Margin="0,4,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Slider Grid.Column="0"
+                            Value="{x:Bind ViewModel.VolumePercent, Mode=TwoWay}"
+                            Minimum="0" Maximum="100"
+                            Foreground="#FFFFFF"
+                            VerticalAlignment="Center"
+                            Margin="0,0,12,0" />
+                    <FontIcon Grid.Column="1" Glyph="&#xE767;" FontSize="16" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                </Grid>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
-

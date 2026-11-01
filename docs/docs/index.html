@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — QuickDock</title>
+  <meta name="description" content="QuickDock User Guide: Installation, keyboard shortcuts, multi-monitor settings, module customization, and troubleshooting.">
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="../" class="brand">
+        <img src="../assets/images/logo.png" alt="QuickDock Logo">
+        <span>QuickDock</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../features/">Features</a></li>
+        <li><a href="../notch/">Notch</a></li>
+        <li><a href="../clipboard/">Clipboard</a></li>
+        <li><a href="../docs/" class="active">Docs</a></li>
+        <li><a href="../changelog/">Changelog</a></li>
+        <li><a href="../download/" class="btn-primary">Download Free</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="page-header">
+    <div class="container">
+      <h1 class="page-title">QuickDock Documentation</h1>
+      <p class="page-subtitle">Complete guide to using, configuring, and personalizing QuickDock on Windows 11.</p>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="docs-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="docs-sidebar">
+          <div class="docs-nav-group">
+            <div class="docs-nav-title">Getting Started</div>
+            <ul class="docs-nav-list">
+              <li><a href="#installation" class="active">Installation</a></li>
+              <li><a href="#first-launch">First Launch</a></li>
+              <li><a href="#shortcuts">Global Shortcuts</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-title">Configuration</div>
+            <ul class="docs-nav-list">
+              <li><a href="#multi-monitor">Multi-Monitor Setup</a></li>
+              <li><a href="#modules">Enabling Modules</a></li>
+              <li><a href="#settings-window">Settings Window</a></li>
+            </ul>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-title">Support</div>
+            <ul class="docs-nav-list">
+              <li><a href="#troubleshooting">Troubleshooting</a></li>
+              <li><a href="#database">Database & Reset</a></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <article class="docs-content">
+          
+          <h2 id="installation">Installation</h2>
+          <p>
+            QuickDock is distributed as a single standalone executable installer: <code>QuickDock-1.0.0-win-x64.exe</code>.
+          </p>
+          <ol>
+            <li>Download the installer from the <a href="../download/">Download page</a> or GitHub Releases.</li>
+            <li>Run <code>QuickDock-1.0.0-win-x64.exe</code>. The installer will unpack files to <code>%LocalAppData%\QuickDock</code> and register startup shortcuts.</li>
+            <li>QuickDock starts immediately and pins itself to the top of your screen.</li>
+          </ol>
+
+          <div class="callout">
+            <div class="callout-title">Portable & Silent Installation</div>
+            <p>You can execute the setup silently using the <code>/S</code> flag from any command prompt or automated deployment script.</p>
+          </div>
+
+          <h2 id="first-launch">First Launch & Interaction</h2>
+          <p>
+            When QuickDock starts, it displays a minimal notch capsule centered at the top of your display showing the current time and battery percentage.
+          </p>
+          <ul>
+            <li><strong>Hovering:</strong> Move your mouse cursor into the notch area. After a 150ms debounce period, the dock smoothly expands into the full dashboard.</li>
+            <li><strong>Auto-Collapsing:</strong> Moving your mouse out of the expanded dock activates a 200ms grace period. If your cursor remains outside the dock boundary, it smoothly collapses back into the resting notch capsule.</li>
+            <li><strong>Pinning:</strong> You can click the settings icon or toggle the visibility mode in Settings to keep the dock pinned open.</li>
+          </ul>
+
+          <h2 id="shortcuts">Global Keyboard Shortcuts</h2>
+          <p>QuickDock registers global Windows hotkeys so you can access your tools from any active application or full-screen game:</p>
+          <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border-light); text-align: left;">
+                <th style="padding: 10px 0;">Shortcut</th>
+                <th style="padding: 10px 0;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 10px 0;"><kbd style="background:#F4F4F5; border:1px solid #D4D4D8; border-radius:4px; padding:2px 8px; font-weight:600;">Ctrl + Space</kbd></td>
+                <td style="padding: 10px 0; color: var(--text-muted);">Toggle Notch Expand / Collapse (on cursor's active monitor)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 10px 0;"><kbd style="background:#F4F4F5; border:1px solid #D4D4D8; border-radius:4px; padding:2px 8px; font-weight:600;">Win + Shift + V</kbd></td>
+                <td style="padding: 10px 0; color: var(--text-muted);">Directly jump to Clipboard History view</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--border-light);">
+                <td style="padding: 10px 0;"><kbd style="background:#F4F4F5; border:1px solid #D4D4D8; border-radius:4px; padding:2px 8px; font-weight:600;">Esc</kbd></td>
+                <td style="padding: 10px 0; color: var(--text-muted);">Collapse notch immediately</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2 id="multi-monitor">Multi-Monitor Setup</h2>
+          <p>
+            QuickDock automatically recognizes all connected physical monitors upon startup. If you add or remove an external display while QuickDock is running, the app catches the <code>WM_DISPLAYCHANGE</code> event and automatically generates a new notch window on the added display without needing a restart.
+          </p>
+
+          <h2 id="modules">Configuring Modules</h2>
+          <p>
+            You can selectively enable or disable dock modules in <strong>Settings → Modules</strong>. Modules that are toggled off are not instantiated into memory, preserving RAM. Available modules include:
+          </p>
+          <ul>
+            <li><strong>Essentials:</strong> Home Dashboard, System Monitor, Timers & Stopwatches, Weather Forecast, World Clock, Calendar.</li>
+            <li><strong>Productivity:</strong> Clipboard History, Quick Notes, File Shelf, LAN Drop, Unit Converter, Quick Links, Flash Messages.</li>
+            <li><strong>Insights:</strong> Screen Time Tracker, Process Resource Inspector.</li>
+          </ul>
+
+          <h2 id="database">Database & Reset</h2>
+          <p>
+            All configuration and local history is stored under:
+          </p>
+          <div class="code-block">
+            <button class="copy-btn" data-clipboard-target="dbPath">Copy</button>
+            <pre id="dbPath"><code>%LocalAppData%\QuickDock\quickdock.db</code></pre>
+          </div>
+          <p>
+            To perform a complete factory reset, quit QuickDock and delete the <code>%LocalAppData%\QuickDock</code> folder.
+          </p>
+
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="../" class="brand">
+            <img src="../assets/images/logo.png" alt="QuickDock">
+            <span>QuickDock</span>
+          </a>
+          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="../features/">Features</a></li>
+            <li><a href="../notch/">Notch Interaction</a></li>
+            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../download/">Download</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="../docs/">Documentation</a></li>
+            <li><a href="../changelog/">Changelog</a></li>
+            <li><a href="../privacy/">Privacy Policy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Author</h4>
+          <ul>
+            <li><span>JOJIN JOHN</span></li>
+            <li><span>Master Build v1.0.0</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
+        <span>Made for Windows 11</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../assets/js/main.js"></script>
+</body>
+</html>

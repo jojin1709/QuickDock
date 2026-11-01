@@ -76,7 +76,7 @@ public sealed class WindowPositioningService : IWindowPositioningService
         return (x, y, width, height);
     }
 
-    public void ConfigureDockWindow(IntPtr hWnd)
+    public void ConfigureDockWindow(IntPtr hWnd, MonitorInfo? targetMonitor = null)
     {
         if (hWnd == IntPtr.Zero) return;
 
@@ -97,7 +97,7 @@ public sealed class WindowPositioningService : IWindowPositioningService
 
             bool alwaysOnTop = _settingsManager.CurrentSettings.Behavior.AlwaysOnTop;
             SetAlwaysOnTop(hWnd, alwaysOnTop);
-            SetDockState(hWnd, isExpanded: false);
+            SetDockState(hWnd, isExpanded: false, targetMonitor);
             _logger.LogInformation("Dock window successfully configured (AlwaysOnTop={AlwaysOnTop}).", alwaysOnTop);
         }
         catch (Exception ex)
@@ -127,19 +127,19 @@ public sealed class WindowPositioningService : IWindowPositioningService
         }
     }
 
-    public void SetDockState(IntPtr hWnd, bool isExpanded)
+    public void SetDockState(IntPtr hWnd, bool isExpanded, MonitorInfo? targetMonitor = null)
     {
-        Reposition(hWnd, isExpanded);
+        Reposition(hWnd, isExpanded, targetMonitor);
     }
 
-    public void Reposition(IntPtr hWnd, bool isExpanded)
+    public void Reposition(IntPtr hWnd, bool isExpanded, MonitorInfo? targetMonitor = null)
     {
         if (hWnd == IntPtr.Zero) return;
 
         try
         {
             var behavior = _settingsManager.CurrentSettings.Behavior;
-            var targetMonitor = _monitorService.GetTargetMonitor(behavior.MonitorTarget, behavior.FollowActiveMonitor);
+            targetMonitor ??= _monitorService.GetTargetMonitor(behavior.MonitorTarget, behavior.FollowActiveMonitor);
 
             var (x, y, width, height) = CalculatePlacement(
                 isExpanded,

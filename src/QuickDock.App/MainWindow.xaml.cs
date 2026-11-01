@@ -6,7 +6,9 @@ using Microsoft.UI.Xaml.Media;
 using QuickDock.App.ViewModels;
 using QuickDock.Core.Events;
 using QuickDock.Core.Interfaces;
+using QuickDock.Core.Models;
 using QuickDock.Core.Settings;
+using QuickDock.Core.StateMachine;
 using QuickDock.Infrastructure.Windows;
 using Windows.System;
 
@@ -32,14 +34,41 @@ public sealed partial class MainWindow : Window
     private readonly NativeMethods.SUBCLASSPROC _windowSubclassProc;
 
     private readonly DispatcherTimer _hoverTimer;
+    private readonly DispatcherTimer _collapseTimer;
     private readonly DispatcherTimer _tickTimer;
     private readonly DispatcherTimer _monitorFollowTimer;
+    private readonly NotchStateMachine _stateMachine = new();
+
     private int _metricsCounter;
     private IntPtr _previousForegroundHwnd = IntPtr.Zero;
     private bool _isExplicitExit = false;
     private string? _currentDockMonitorId;
 
     public MainViewModel ViewModel { get; }
+
+    private MonitorInfo? _targetMonitor;
+    public MonitorInfo? TargetMonitor
+    {
+        get => _targetMonitor;
+        set
+        {
+            _targetMonitor = value;
+            if (_hWnd != IntPtr.Zero && value != null)
+            {
+                _positioningService.SetDockState(_hWnd, ViewModel.IsExpanded, value);
+            }
+        }
+    }
+
+    public bool IsPrimaryInstance { get; set; } = true;
+
+    public void UpdatePlacement()
+    {
+        if (_hWnd != IntPtr.Zero)
+        {
+            _positioningService.SetDockState(_hWnd, ViewModel.IsExpanded, TargetMonitor);
+        }
+    }
 
     public MainWindow(
         MainViewModel viewModel,
@@ -130,6 +159,13 @@ public sealed partial class MainWindow : Window
         };
         _hoverTimer.Tick += OnHoverTimerTick;
 
+        // Auto collapse grace-period timer (~200ms)
+        _collapseTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(200)
+        };
+        _collapseTimer.Tick += OnCollapseTimerTick;
+
         // Periodic clock & system metrics refresh timer
         _tickTimer = new DispatcherTimer
         {
@@ -146,71 +182,74 @@ public sealed partial class MainWindow : Window
         _monitorFollowTimer.Tick += OnMonitorFollowTick;
         _monitorFollowTimer.Start();
 
-        // Register Global Hotkey (Ctrl + Space)
-        _hotkeyService.Register(_hWnd, () =>
+        // Register Global Hotkey (Ctrl + Space) only on Primary window
+        if (IsPrimaryInstance)
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _hotkeyService.Register(_hWnd, () =>
             {
-                if (ViewModel.IsExpanded)
+                DispatcherQueue.TryEnqueue(() =>
                 {
-                    ViewModel.Collapse();
-                }
-                else
-                {
-                    CapturePreviousForeground();
-                    ViewModel.Expand();
-                    BringToFront();
-                }
+                    if (ViewModel.IsExpanded)
+                    {
+                        ViewModel.Collapse();
+                    }
+                    else
+                    {
+                        CapturePreviousForeground();
+                        ViewModel.Expand();
+                        BringToFront();
+                    }
+                });
             });
-        });
 
-        // Initialize System Tray
-        _systemTrayService.Initialize(
-            _hWnd,
-            onToggleDock: () => DispatcherQueue.TryEnqueue(() =>
-            {
-                if (ViewModel.IsExpanded)
+            // Initialize System Tray
+            _systemTrayService.Initialize(
+                _hWnd,
+                onToggleDock: () => DispatcherQueue.TryEnqueue(() =>
                 {
-                    ViewModel.Collapse();
-                }
-                else
+                    if (ViewModel.IsExpanded)
+                    {
+                        ViewModel.Collapse();
+                    }
+                    else
+                    {
+                        CapturePreviousForeground();
+                        ViewModel.Expand();
+                        BringToFront();
+                    }
+                }),
+                onOpenSettings: () => DispatcherQueue.TryEnqueue(() =>
                 {
                     CapturePreviousForeground();
-                    ViewModel.Expand();
+                    ViewModel.OpenSettings();
                     BringToFront();
-                }
-            }),
-            onOpenSettings: () => DispatcherQueue.TryEnqueue(() =>
-            {
-                CapturePreviousForeground();
-                ViewModel.OpenSettings();
-                BringToFront();
-            }),
-            onToggleStartup: () => DispatcherQueue.TryEnqueue(() =>
-            {
-                bool cur = _startupService.IsStartupEnabled();
-                _startupService.SetStartupEnabled(!cur);
-                _settingsManager.CurrentSettings.Behavior.StartWithWindows = !cur;
-                _ = _settingsManager.SaveAsync(_settingsManager.CurrentSettings);
-            }),
-            isStartupEnabled: () => _startupService.IsStartupEnabled(),
-            onTogglePerformanceMode: () => DispatcherQueue.TryEnqueue(() =>
-            {
-                _logger.LogInformation("Performance mode toggled from tray.");
-            }),
-            onAbout: () => DispatcherQueue.TryEnqueue(() =>
-            {
-                CapturePreviousForeground();
-                ViewModel.OpenSettings();
-                BringToFront();
-            }),
-            onRestart: () => DispatcherQueue.TryEnqueue(RestartApplication),
-            onExit: () => DispatcherQueue.TryEnqueue(() =>
-            {
-                _isExplicitExit = true;
-                Close();
-            })
-        );
+                }),
+                onToggleStartup: () => DispatcherQueue.TryEnqueue(() =>
+                {
+                    bool cur = _startupService.IsStartupEnabled();
+                    _startupService.SetStartupEnabled(!cur);
+                    _settingsManager.CurrentSettings.Behavior.StartWithWindows = !cur;
+                    _ = _settingsManager.SaveAsync(_settingsManager.CurrentSettings);
+                }),
+                isStartupEnabled: () => _startupService.IsStartupEnabled(),
+                onTogglePerformanceMode: () => DispatcherQueue.TryEnqueue(() =>
+                {
+                    _logger.LogInformation("Performance mode toggled from tray.");
+                }),
+                onAbout: () => DispatcherQueue.TryEnqueue(() =>
+                {
+                    CapturePreviousForeground();
+                    ViewModel.OpenSettings();
+                    BringToFront();
+                }),
+                onRestart: () => DispatcherQueue.TryEnqueue(RestartApplication),
+                onExit: () => DispatcherQueue.TryEnqueue(() =>
+                {
+                    _isExplicitExit = true;
+                    Close();
+                })
+            );
+        }
 
         // Fullscreen detection
         if (_fullscreenService is FullscreenDetectionService concreteFullscreenService)
@@ -340,6 +379,10 @@ public sealed partial class MainWindow : Window
     private void OnExpansionStateChanged(bool isExpanded)
     {
         _hoverTimer.Stop();
+        _collapseTimer.Stop();
+
+        // Update state machine
+        _stateMachine.ForceSetState(isExpanded ? NotchState.Expanded : NotchState.Collapsed);
 
         // Update UI visibility
         if (isExpanded)
@@ -354,13 +397,17 @@ public sealed partial class MainWindow : Window
         }
 
         // Resize & reposition window on targeted monitor
-        _positioningService.SetDockState(_hWnd, isExpanded);
-        _systemTrayService.UpdateDockState(isExpanded);
+        _positioningService.SetDockState(_hWnd, isExpanded, TargetMonitor);
+        if (IsPrimaryInstance)
+        {
+            _systemTrayService.UpdateDockState(isExpanded);
+        }
 
         if (isExpanded)
         {
             _metricsCounter = 0;
-            ViewModel.Home.RefreshMetrics();
+            // Asynchronous non-blocking metrics fetch
+            _ = Task.Run(() => ViewModel.Home.RefreshMetrics());
             BringToFront();
         }
         else
@@ -371,6 +418,9 @@ public sealed partial class MainWindow : Window
 
     private void OnIdlePointerEntered(object sender, PointerRoutedEventArgs e)
     {
+        _collapseTimer.Stop();
+        _stateMachine.PointerEntered(NotchZone.Notch);
+
         if (!ViewModel.IsExpanded)
         {
             _hoverTimer.Stop();
@@ -382,6 +432,39 @@ public sealed partial class MainWindow : Window
     private void OnIdlePointerExited(object sender, PointerRoutedEventArgs e)
     {
         _hoverTimer.Stop();
+        _stateMachine.PointerLeft(NotchZone.Notch);
+
+        if (ViewModel.IsExpanded)
+        {
+            _collapseTimer.Stop();
+            _collapseTimer.Start();
+        }
+    }
+
+    private void OnExpandedPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        _collapseTimer.Stop();
+        _stateMachine.PointerEntered(NotchZone.Dashboard);
+    }
+
+    private void OnExpandedPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        _stateMachine.PointerLeft(NotchZone.Dashboard);
+
+        if (ViewModel.IsExpanded)
+        {
+            _collapseTimer.Stop();
+            _collapseTimer.Start();
+        }
+    }
+
+    private void OnCollapseTimerTick(object? sender, object e)
+    {
+        _collapseTimer.Stop();
+        if (ViewModel.IsExpanded && !_stateMachine.IsPointerInInteractionZone)
+        {
+            ViewModel.Collapse();
+        }
     }
 
     private void OnHoverTimerTick(object? sender, object e)
@@ -397,6 +480,7 @@ public sealed partial class MainWindow : Window
     private void OnIdlePointerPressed(object sender, PointerRoutedEventArgs e)
     {
         _hoverTimer.Stop();
+        _collapseTimer.Stop();
         CapturePreviousForeground();
         ViewModel.Expand();
     }
