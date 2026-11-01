@@ -317,7 +317,7 @@ public class DeveloperTests
             await File.WriteAllBytesAsync(tempFile, data);
 
             double lastProgress = 0;
-            var progress = new Progress<double>(p => lastProgress = p);
+            var progress = new SynchronousProgress<double>(p => lastProgress = p);
 
             var res = await service.HashFileAsync(tempFile, DeveloperHashAlgorithm.SHA256, progress);
 
@@ -325,13 +325,17 @@ public class DeveloperTests
             string expected = Convert.ToHexStringLower(sha.ComputeHash(data));
 
             Assert.Equal(expected, res.HexHash);
-            await Task.Delay(100);
             Assert.True(lastProgress >= 0.99);
         }
         finally
         {
             if (File.Exists(tempFile)) File.Delete(tempFile);
         }
+    }
+
+    private sealed class SynchronousProgress<T>(Action<T> action) : IProgress<T>
+    {
+        public void Report(T value) => action(value);
     }
 
     #endregion
