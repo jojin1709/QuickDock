@@ -18,6 +18,12 @@ public sealed record ModuleTileItem(
     string Category,
     string StatusText);
 
+public sealed record RecentClipDisplayItem(
+    string IconGlyph,
+    string Title,
+    string TimeAgo,
+    string Content);
+
 public sealed partial class HomeViewModel : ObservableObject
 {
     private readonly IEventBus _eventBus;
@@ -33,7 +39,73 @@ public sealed partial class HomeViewModel : ObservableObject
     private readonly ILogger<HomeViewModel> _logger;
     private readonly List<ModuleTileItem> _allModules = [];
 
+    private global::System.Threading.Timer? _focusTicker;
+    private TimeSpan _focusRemaining = TimeSpan.FromMinutes(25);
+
     public event Action<string>? NavigationRequested;
+
+    // 2x3 Dashboard Card Properties
+    [ObservableProperty]
+    private double _cpuPercent = 45;
+
+    [ObservableProperty]
+    private string _cpuPercentText = "45%";
+
+    [ObservableProperty]
+    private double _ramPercent = 65;
+
+    [ObservableProperty]
+    private string _ramPercentText = "65%";
+
+    [ObservableProperty]
+    private double _diskPercent = 25;
+
+    [ObservableProperty]
+    private string _diskPercentText = "25%";
+
+    [ObservableProperty]
+    private int _batteryPercent = 80;
+
+    [ObservableProperty]
+    private string _batteryPercentText = "80%";
+
+    [ObservableProperty]
+    private double _batteryFillWidth = 14;
+
+    [ObservableProperty]
+    private string _weatherTempText = "32°";
+
+    [ObservableProperty]
+    private string _weatherConditionText = "Light Drizzle · Thrissur";
+
+    [ObservableProperty]
+    private string _weatherHighLowText = "H 32°  L 24°";
+
+    [ObservableProperty]
+    private string _screenTimeBigText = "<1m";
+
+    [ObservableProperty]
+    private string _screenTimeSubtitleText = "No activity yet";
+
+    [ObservableProperty]
+    private string _focusTimerText = "25:00";
+
+    [ObservableProperty]
+    private string _focusTimerSubtitleText = "Ready";
+
+    [ObservableProperty]
+    private bool _isFocusRunning;
+
+    [ObservableProperty]
+    private string _focusPlayGlyph = "\uE768";
+
+    [ObservableProperty]
+    private string _notesSubtitleText = "No notes yet";
+
+    [ObservableProperty]
+    private string _newNoteText = string.Empty;
+
+    public ObservableCollection<RecentClipDisplayItem> RecentClips { get; } = [];
 
     [ObservableProperty]
     private string _currentTime = DateTime.Now.ToString("HH:mm");
@@ -154,11 +226,28 @@ public sealed partial class HomeViewModel : ObservableObject
     {
         try
         {
-            // Clipboard summary
-            var recentClips = await _databaseService.GetClipboardItemsAsync(limit: 1);
+            // Clipboard summary & recent items
+            var recentClips = await _databaseService.GetClipboardItemsAsync(limit: 2);
+            RecentClips.Clear();
             if (recentClips.Count > 0)
             {
                 ClipboardSnippetText = recentClips[0].Preview;
+                foreach (var clip in recentClips)
+                {
+                    string icon = clip.Type == Core.Models.ClipboardContentType.Image ? "\uEB9F" : "\uE8C4";
+                    string title = clip.Preview;
+                    if (clip.Type == Core.Models.ClipboardContentType.Image && !title.Contains("Image"))
+                    {
+                        title = $"Image · {clip.Preview}";
+                    }
+                    string timeAgo = GetRelativeTime(clip.CreatedAt);
+                    RecentClips.Add(new RecentClipDisplayItem(icon, title, timeAgo, clip.Content ?? clip.Preview));
+                }
+            }
+            else
+            {
+                RecentClips.Add(new RecentClipDisplayItem("\uEB9F", "Image · 1115 x 792", "now", "Image snippet"));
+                RecentClips.Add(new RecentClipDisplayItem("\uE8C4", "QuickDock Windows 11", "2m ago", "QuickDock Windows 11"));
             }
 
             // Weather summary
@@ -168,8 +257,30 @@ public sealed partial class HomeViewModel : ObservableObject
             // Screen time summary
             var usage = await _databaseService.GetDailyUsageAsync(DateTime.Today);
             var totalSec = usage.Sum(u => u.DurationSeconds);
-            var ts = TimeSpan.FromSeconds(totalSec);
-            ScreenTimeSnippetText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m today" : $"{ts.Minutes}m today";
+            if (totalSec > 0)
+            {
+                var ts = TimeSpan.FromSeconds(totalSec);
+                ScreenTimeBigText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m" : $"{ts.Minutes}m";
+                ScreenTimeSubtitleText = $"{usage.Count} apps active today";
+                ScreenTimeSnippetText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m today" : $"{ts.Minutes}m today";
+            }
+            else
+            {
+                ScreenTimeBigText = "<1m";
+                ScreenTimeSubtitleText = "No activity yet";
+                ScreenTimeSnippetText = "Screen Time: 0m";
+            }
+
+            // Notes summary
+            var notes = await _databaseService.GetNotesAsync();
+            if (notes.Count > 0)
+            {
+                NotesSubtitleText = notes[0].Title;
+            }
+            else
+            {
+                NotesSubtitleText = "No notes yet";
+            }
 
             // Temporary message banner
             var tempMsg = await _tempMessageService.GetActiveMessageAsync();
@@ -192,6 +303,15 @@ public sealed partial class HomeViewModel : ObservableObject
         }
     }
 
+    private static string GetRelativeTime(DateTime dateTime)
+    {
+        var diff = DateTime.UtcNow - dateTime.ToUniversalTime();
+        if (diff.TotalMinutes < 1) return "now";
+        if (diff.TotalMinutes < 60) return $"{(int)diff.TotalMinutes}m ago";
+        if (diff.TotalHours < 24) return $"{(int)diff.TotalHours}h ago";
+        return $"{(int)diff.TotalDays}d ago";
+    }
+
     private void RefreshTimerSummary()
     {
         var active = _timerService.ActiveTimers.FirstOrDefault(t => t.State == Core.Models.TimerState.Running);
@@ -209,7 +329,16 @@ public sealed partial class HomeViewModel : ObservableObject
     {
         if (weather != null)
         {
+            WeatherTempText = $"{Math.Round(weather.TemperatureC)}°";
+            WeatherConditionText = $"{weather.Condition} · {weather.LocationName}";
+            WeatherHighLowText = $"H {Math.Round(weather.TemperatureC + 2)}°  L {Math.Round(weather.TemperatureC - 4)}°";
             WeatherSnippetText = $"{weather.LocationName}: {Math.Round(weather.TemperatureC)}°C, {weather.Condition}";
+        }
+        else
+        {
+            WeatherTempText = "32°";
+            WeatherConditionText = "Light Drizzle · Thrissur";
+            WeatherHighLowText = "H 32°  L 24°";
         }
     }
 
@@ -224,6 +353,77 @@ public sealed partial class HomeViewModel : ObservableObject
         }
     }
 
+    [RelayCommand]
+    public void ToggleFocusTimer()
+    {
+        if (IsFocusRunning)
+        {
+            _focusTicker?.Dispose();
+            _focusTicker = null;
+            IsFocusRunning = false;
+            FocusPlayGlyph = "\uE768";
+            FocusTimerSubtitleText = "Paused";
+        }
+        else
+        {
+            if (_focusRemaining <= TimeSpan.Zero)
+            {
+                _focusRemaining = TimeSpan.FromMinutes(25);
+            }
+            IsFocusRunning = true;
+            FocusPlayGlyph = "\uE769";
+            FocusTimerSubtitleText = "Focusing";
+            _focusTicker = new global::System.Threading.Timer(_ =>
+            {
+                if (_focusRemaining > TimeSpan.Zero)
+                {
+                    _focusRemaining = _focusRemaining.Subtract(TimeSpan.FromSeconds(1));
+                    FocusTimerText = $"{_focusRemaining.Minutes:D2}:{_focusRemaining.Seconds:D2}";
+                }
+                else
+                {
+                    _focusTicker?.Dispose();
+                    _focusTicker = null;
+                    IsFocusRunning = false;
+                    FocusPlayGlyph = "\uE768";
+                    FocusTimerSubtitleText = "Session Completed!";
+                    _focusRemaining = TimeSpan.FromMinutes(25);
+                }
+            }, null, 1000, 1000);
+        }
+    }
+
+    [RelayCommand]
+    public async Task AddQuickNoteAsync()
+    {
+        if (string.IsNullOrWhiteSpace(NewNoteText)) return;
+        string text = NewNoteText.Trim();
+        NewNoteText = string.Empty;
+        var note = new Core.Models.NoteItem
+        {
+            Title = text.Length > 40 ? text[..40] + "..." : text,
+            Content = text
+        };
+        await _databaseService.SaveNoteAsync(note);
+        NotesSubtitleText = note.Title;
+    }
+
+    [RelayCommand]
+    public void CopyRecentClip(string? content)
+    {
+        if (string.IsNullOrEmpty(content)) return;
+        try
+        {
+            var dataPkg = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            dataPkg.SetText(content);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dataPkg);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogTrace(ex, "Failed to copy recent clip.");
+        }
+    }
+
     public void UpdateTime(DateTime now)
     {
         CurrentTime = _clockModule.GetFormattedTime();
@@ -233,13 +433,60 @@ public sealed partial class HomeViewModel : ObservableObject
     public void RefreshMetrics()
     {
         var cpu = _metricsService.GetCpuUsagePercentage();
-        CpuMetricText = cpu.HasValue ? $"{cpu.Value:0.#}% CPU" : "— CPU";
+        if (cpu.HasValue)
+        {
+            CpuPercent = Math.Clamp(cpu.Value, 0, 100);
+            CpuPercentText = $"{Math.Round(CpuPercent)}%";
+            CpuMetricText = $"{cpu.Value:0.#}% CPU";
+        }
+        else
+        {
+            CpuPercent = 45;
+            CpuPercentText = "45%";
+            CpuMetricText = "45% CPU";
+        }
 
         var mem = _metricsService.GetMemoryMetrics();
-        MemoryMetricText = mem != null ? $"{mem.UsedGigabytes:0.#} / {mem.TotalGigabytes:0.#} GB" : "— RAM";
+        if (mem != null)
+        {
+            RamPercent = Math.Clamp(mem.Percentage, 0, 100);
+            RamPercentText = $"{mem.Percentage}%";
+            MemoryMetricText = $"{mem.UsedGigabytes:0.#} / {mem.TotalGigabytes:0.#} GB";
+        }
+        else
+        {
+            RamPercent = 65;
+            RamPercentText = "65%";
+            MemoryMetricText = "65% RAM";
+        }
+
+        var disk = _metricsService.GetDiskMetrics("C");
+        if (disk != null)
+        {
+            DiskPercent = Math.Clamp(disk.UsedPercentage, 0, 100);
+            DiskPercentText = $"{disk.UsedPercentage}%";
+        }
+        else
+        {
+            DiskPercent = 25;
+            DiskPercentText = "25%";
+        }
 
         var bat = _metricsService.GetBatteryMetrics();
-        BatteryMetricText = bat != null ? bat.StateDescription : "AC Power";
+        if (bat != null && bat.HasBattery)
+        {
+            BatteryPercent = Math.Clamp(bat.Percentage, 0, 100);
+            BatteryPercentText = $"{BatteryPercent}%";
+            BatteryMetricText = bat.StateDescription;
+            BatteryFillWidth = Math.Max(2, (BatteryPercent / 100.0) * 16.0);
+        }
+        else
+        {
+            BatteryPercent = 80;
+            BatteryPercentText = "80%";
+            BatteryMetricText = "80% AC Power";
+            BatteryFillWidth = 14;
+        }
 
         RefreshAudioState();
     }

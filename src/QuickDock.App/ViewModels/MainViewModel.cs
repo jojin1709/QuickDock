@@ -347,6 +347,18 @@ public sealed partial class MainViewModel : ObservableObject
         _ = Home.RefreshSummaryDataAsync();
     }
 
+    [RelayCommand]
+    public void ToggleAlwaysOnTop()
+    {
+        Settings.AlwaysOnTop = !Settings.AlwaysOnTop;
+    }
+
+    [RelayCommand]
+    public void OpenDeveloperDefault() => OpenDeveloper("Git");
+
+    [RelayCommand]
+    public void OpenNetworkSecurityDefault() => OpenNetworkSecurity("Overview");
+
     private void EnsureExpanded(string trigger)
     {
         if (!IsExpanded)

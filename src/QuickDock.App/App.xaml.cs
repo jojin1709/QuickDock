@@ -216,51 +216,58 @@ public partial class App : Application
         };
     }
 
-    protected override async void OnLaunched(LaunchActivatedEventArgs args)
+    protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var uiDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
-
         _logger?.LogInformation("Entered OnLaunched on UI thread.");
         try
         {
+            // 1. Immediately instantiate and activate MainWindow synchronously on the UI thread
+            _window = Services.GetRequiredService<MainWindow>();
+
             var lifecycle = Services.GetRequiredService<IAppLifecycleService>();
-            await lifecycle.StartAsync();
-
-            var database = Services.GetRequiredService<IDatabaseService>();
-            await database.InitializeAsync();
-
-            var clipboard = Services.GetRequiredService<IClipboardService>();
-            await clipboard.StartListeningAsync();
-
-            var screenTime = Services.GetRequiredService<IScreenTimeService>();
-            if (Services.GetRequiredService<ISettingsManager>().CurrentSettings.ScreenTime.TrackingEnabled)
-            {
-                screenTime.StartTracking();
-            }
-
-            uiDispatcher.TryEnqueue(() =>
+            _window.Closed += async (s, e) =>
             {
                 try
                 {
-                    _window = Services.GetRequiredService<MainWindow>();
-
-                    _window.Closed += async (s, e) =>
-                    {
-                        await lifecycle.StopAsync();
-                    };
-
-                    _window.Activate();
-                    _logger?.LogInformation("QuickDock MainWindow activated successfully on UI thread.");
+                    await lifecycle.StopAsync();
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogCritical(ex, "Failed to instantiate or activate MainWindow on UI thread.");
+                    _logger?.LogError(ex, "Error stopping lifecycle on window close.");
+                }
+            };
+
+            _window.Activate();
+            _logger?.LogInformation("QuickDock MainWindow activated successfully on UI thread.");
+
+            // 2. Start core background services asynchronously without blocking the UI thread
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await lifecycle.StartAsync();
+
+                    var database = Services.GetRequiredService<IDatabaseService>();
+                    await database.InitializeAsync();
+
+                    var clipboard = Services.GetRequiredService<IClipboardService>();
+                    await clipboard.StartListeningAsync();
+
+                    var screenTime = Services.GetRequiredService<IScreenTimeService>();
+                    if (Services.GetRequiredService<ISettingsManager>().CurrentSettings.ScreenTime.TrackingEnabled)
+                    {
+                        screenTime.StartTracking();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogError(ex, "Error starting background services.");
                 }
             });
         }
         catch (Exception ex)
         {
-            _logger?.LogError(ex, "Failed to launch QuickDock MainWindow.");
+            _logger?.LogCritical(ex, "Failed to launch QuickDock MainWindow.");
         }
     }
 }

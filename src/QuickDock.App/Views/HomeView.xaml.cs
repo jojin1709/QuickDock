@@ -46,6 +46,26 @@ public sealed partial class HomeView : UserControl
         }
     }
 
+    private void OnCopyClipClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement fe && fe.Tag is string content)
+        {
+            ViewModel?.CopyRecentClipCommand.Execute(content);
+        }
+    }
+
+    private void OnNewNoteKeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            if (ViewModel?.AddQuickNoteCommand.CanExecute(null) == true)
+            {
+                ViewModel.AddQuickNoteCommand.Execute(null);
+            }
+            e.Handled = true;
+        }
+    }
+
     public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
 
     private Visibility HasSystemModules(HomeViewModel? vm) => vm?.FilteredSystemModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;

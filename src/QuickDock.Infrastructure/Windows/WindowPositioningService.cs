@@ -11,13 +11,13 @@ public sealed class WindowPositioningService : IWindowPositioningService
     private readonly ILogger<WindowPositioningService> _logger;
 
     // Base dimensions at 100% DPI (96 DPI)
-    public const int BaseIdleWidth = 440;
-    public const int BaseIdleHeight = 48;
+    public const int BaseIdleWidth = 290;
+    public const int BaseIdleHeight = 34;
 
-    public const int BaseExpandedWidth = 860;
-    public const int BaseExpandedHeight = 560;
+    public const int BaseExpandedWidth = 820;
+    public const int BaseExpandedHeight = 540;
 
-    public const int BaseTopMargin = 12;
+    public const int BaseTopMargin = 0;
 
     public WindowPositioningService(
         IMonitorService monitorService,
@@ -82,26 +82,8 @@ public sealed class WindowPositioningService : IWindowPositioningService
 
         try
         {
-            long style = NativeMethods.GetWindowLongPtr(hWnd, NativeMethods.GWL_STYLE).ToInt64();
-            style &= ~NativeMethods.WS_CAPTION;
-            style &= ~NativeMethods.WS_THICKFRAME;
-            style &= ~NativeMethods.WS_MINIMIZEBOX;
-            style &= ~NativeMethods.WS_MAXIMIZEBOX;
-            style |= NativeMethods.WS_POPUP;
-            NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_STYLE, new IntPtr(style));
-
             bool alwaysOnTop = _settingsManager.CurrentSettings.Behavior.AlwaysOnTop;
-            long exStyle = NativeMethods.GetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE).ToInt64();
-            if (alwaysOnTop)
-            {
-                exStyle |= NativeMethods.WS_EX_TOPMOST;
-            }
-            else
-            {
-                exStyle &= ~NativeMethods.WS_EX_TOPMOST;
-            }
-            NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE, new IntPtr(exStyle));
-
+            SetAlwaysOnTop(hWnd, alwaysOnTop);
             SetDockState(hWnd, isExpanded: false);
             _logger.LogInformation("Dock window successfully configured (AlwaysOnTop={AlwaysOnTop}).", alwaysOnTop);
         }

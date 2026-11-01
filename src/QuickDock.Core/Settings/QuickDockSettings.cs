@@ -108,7 +108,7 @@ public sealed class BehaviorSettings
     public int HoverDelayMs { get; set; } = 150;
     public bool HoverExpansionEnabled { get; set; } = true;
     public bool DetectFullscreen { get; set; } = true;
-    public bool HideInFullscreen { get; set; } = true;
+    public bool HideInFullscreen { get; set; } = false;
     public bool AlwaysOnTop { get; set; } = true;
     public bool FollowActiveMonitor { get; set; } = true;
     public string MonitorTarget { get; set; } = "Active";

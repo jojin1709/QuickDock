@@ -12,70 +12,71 @@
 
     <Grid x:Name="RootWindowGrid" Background="Transparent" KeyDown="OnRootKeyDown">
 
-        <!-- ==================== IDLE COMPACT DOCK ==================== -->
+        <!-- ==================== IDLE COMPACT NOTCH ==================== -->
         <Border x:Name="IdleDockBorder"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Background="{ThemeResource DockBackgroundBrush}"
-                BorderBrush="{ThemeResource DockBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="{StaticResource DockCornerRadius}"
-                Padding="14,0"
+                Background="#000000"
+                BorderBrush="#44FFFFFF"
+                BorderThickness="0,0,0,1.5"
+                CornerRadius="0,0,16,16"
+                Padding="0"
                 PointerEntered="OnIdlePointerEntered"
                 PointerExited="OnIdlePointerExited"
                 PointerPressed="OnIdlePointerPressed">
 
-            <Grid ColumnSpacing="12" VerticalAlignment="Center">
+            <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
-                    <!-- Logo Glyph -->
+                    <!-- Left: Clock 11:59 AM -->
                     <ColumnDefinition Width="Auto" />
-                    <!-- QuickDock Label -->
-                    <ColumnDefinition Width="Auto" />
-                    <!-- Clock -->
-                    <ColumnDefinition Width="Auto" />
-                    <!-- Divider -->
+                    <!-- Spacer / Notch Center -->
                     <ColumnDefinition Width="*" />
-                    <!-- Metrics Status Pill -->
-                    <ColumnDefinition Width="Auto" />
-                    <!-- Expand Indicator -->
+                    <!-- Right: Battery 80 -->
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <!-- Logo -->
-                <controls:QuickDockIcon Grid.Column="0"
-                                        Width="20" Height="20"
-                                        GlyphBrush="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                        VerticalAlignment="Center" />
-
-                <!-- Brand -->
-                <TextBlock Grid.Column="1"
-                           Text="QuickDock"
-                           FontWeight="SemiBold"
-                           FontSize="12"
-                           VerticalAlignment="Center" />
-
-                <!-- Idle Clock -->
-                <TextBlock Grid.Column="2"
+                <!-- Left Time -->
+                <TextBlock Grid.Column="0"
                            Text="{x:Bind ViewModel.Home.CurrentTime, Mode=OneWay}"
-                           FontWeight="Medium"
+                           FontWeight="Bold"
                            FontSize="12"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                           VerticalAlignment="Center" />
+                           Foreground="#FFFFFF"
+                           VerticalAlignment="Center"
+                           Margin="18,0,0,0" />
 
-                <!-- Metrics Pill in Idle Dock -->
-                <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <controls:QuickDockStatusPill Text="{x:Bind ViewModel.Home.CpuMetricText, Mode=OneWay}"
-                                                  DotBrush="{ThemeResource StatusAccentBrush}" />
-                    <controls:QuickDockStatusPill Text="{x:Bind ViewModel.Home.VolumeMetricText, Mode=OneWay}"
-                                                  DotBrush="{ThemeResource StatusInactiveBrush}" />
+                <!-- Right Battery Level -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            VerticalAlignment="Center"
+                            Margin="0,0,18,0">
+                    <!-- Battery Outline -->
+                    <Border Width="22" Height="11"
+                            CornerRadius="3"
+                            BorderThickness="1"
+                            BorderBrush="#88FFFFFF"
+                            Padding="1"
+                            VerticalAlignment="Center">
+                        <!-- Battery Fill Bar -->
+                        <Border HorizontalAlignment="Left"
+                                CornerRadius="1.5"
+                                Width="{x:Bind ViewModel.Home.BatteryFillWidth, Mode=OneWay}"
+                                Height="7"
+                                Background="#22C55E" />
+                    </Border>
+                    <!-- Battery Nipple -->
+                    <Border Width="1.5" Height="4"
+                            CornerRadius="0.5"
+                            Background="#88FFFFFF"
+                            VerticalAlignment="Center"
+                            Margin="-2,0,3,0" />
+                    <!-- Battery Percentage Text -->
+                    <TextBlock Text="{x:Bind ViewModel.Home.BatteryPercent, Mode=OneWay}"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="#FFFFFF"
+                               VerticalAlignment="Center" />
                 </StackPanel>
-
-                <!-- Expand Indicator (Chevron Down) -->
-                <FontIcon Grid.Column="5"
-                          Glyph="&#xE70D;"
-                          FontSize="10"
-                          Foreground="{ThemeResource TextFillColorTertiaryBrush}"
-                          VerticalAlignment="Center" />
             </Grid>
         </Border>
 
@@ -83,58 +84,101 @@
         <Border x:Name="ExpandedPanelBorder"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
-                Background="{ThemeResource DockBackgroundBrush}"
-                BorderBrush="{ThemeResource DockBorderBrush}"
+                Background="#0D0D10"
+                BorderBrush="#242428"
                 BorderThickness="1"
-                CornerRadius="{StaticResource DockCornerRadius}"
-                Padding="18,14"
+                CornerRadius="0,0,20,20"
+                Padding="0"
                 Visibility="Collapsed">
 
-            <Grid RowSpacing="10">
+            <Grid>
                 <Grid.RowDefinitions>
-                    <!-- Expanded Header (Top edge bar) -->
+                    <!-- Top Header Bar -->
                     <RowDefinition Height="Auto" />
-                    <!-- Main Content (Home, System, or Settings) -->
+                    <!-- Main Content Views -->
                     <RowDefinition Height="*" />
+                    <!-- Floating Bottom Dock Navbar -->
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <!-- Top Header Bar of Expanded Panel -->
-                <Grid Grid.Row="0">
+                <!-- ==================== TOP HEADER BAR ==================== -->
+                <Grid Grid.Row="0" Margin="20,14,20,4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left: Logo & Title -->
+                    <!-- Left: Squircle Logo + "Home" + Date -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <controls:QuickDockIcon Width="18" Height="18"
-                                                GlyphBrush="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                                VerticalAlignment="Center" />
-                        <TextBlock Text="QuickDock"
+                        <controls:QuickDockIcon Width="22" Height="22" VerticalAlignment="Center" />
+                        <TextBlock Text="Home"
                                    FontWeight="SemiBold"
-                                   FontSize="12"
-                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   FontSize="16"
+                                   Foreground="#FFFFFF"
                                    VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Bind ViewModel.Home.CurrentDate, Mode=OneWay}"
+                                   FontSize="12"
+                                   Foreground="#8E8E93"
+                                   VerticalAlignment="Center"
+                                   Margin="4,2,0,0" />
                     </StackPanel>
 
-                    <!-- Right: Collapse Button -->
-                    <Button Grid.Column="2"
-                            ToolTipService.ToolTip="Collapse dock (Esc)"
-                            Command="{x:Bind ViewModel.CollapseCommand, Mode=OneWay}"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            Padding="8,6"
-                            CornerRadius="6"
-                            VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Esc" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
-                            <FontIcon Glyph="&#xE70E;" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
+                    <!-- Right Controls: Battery Pill + Pin + Settings + Close -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <!-- Battery Status Pill -->
+                        <Border Background="#1C1C1F"
+                                BorderBrush="#27272A"
+                                BorderThickness="1"
+                                CornerRadius="12"
+                                Padding="8,4"
+                                VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Border Width="18" Height="9"
+                                        CornerRadius="2.5"
+                                        BorderThickness="1"
+                                        BorderBrush="#88FFFFFF"
+                                        Padding="1"
+                                        VerticalAlignment="Center">
+                                    <Border HorizontalAlignment="Left"
+                                            CornerRadius="1"
+                                            Width="{x:Bind ViewModel.Home.BatteryFillWidth, Mode=OneWay}"
+                                            Height="5"
+                                            Background="#22C55E" />
+                                </Border>
+                                <TextBlock Text="{x:Bind ViewModel.Home.BatteryPercentText, Mode=OneWay}"
+                                           FontSize="11"
+                                           FontWeight="Medium"
+                                           Foreground="#E4E4E7"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Settings Gear Button -->
+                        <Button ToolTipService.ToolTip="Settings"
+                                Command="{x:Bind ViewModel.OpenSettingsCommand, Mode=OneWay}"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Padding="7"
+                                CornerRadius="8"
+                                VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE713;" FontSize="13" Foreground="#A1A1AA" />
+                        </Button>
+
+                        <!-- Close/Collapse Button -->
+                        <Button ToolTipService.ToolTip="Collapse dock (Esc)"
+                                Command="{x:Bind ViewModel.CollapseCommand, Mode=OneWay}"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Padding="7"
+                                CornerRadius="8"
+                                VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#A1A1AA" />
+                        </Button>
+                    </StackPanel>
                 </Grid>
 
-                <!-- Content Views -->
+                <!-- ==================== MAIN CONTENT VIEWS ==================== -->
                 <Grid Grid.Row="1">
                     <views:HomeView x:Name="MainHomeView"
                                     ViewModel="{x:Bind ViewModel.Home, Mode=OneWay}"
@@ -216,6 +260,176 @@
                                                MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
                                                Visibility="{x:Bind IsNetworkSecurityVisible(ViewModel.CurrentView), Mode=OneWay}" />
                 </Grid>
+
+                <!-- ==================== FLOATING BOTTOM DOCK NAVBAR ==================== -->
+                <Border Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Background="#141416"
+                        BorderBrush="#242428"
+                        BorderThickness="1"
+                        CornerRadius="24"
+                        Padding="5,4"
+                        Margin="0,4,0,12">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <!-- Home -->
+                        <Button ToolTipService.ToolTip="Home"
+                                Command="{x:Bind ViewModel.OpenHomeCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Home'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE80F;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Home'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- System -->
+                        <Button ToolTipService.ToolTip="System"
+                                Command="{x:Bind ViewModel.OpenSystemCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'System'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE770;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'System'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Clipboard -->
+                        <Button ToolTipService.ToolTip="Clipboard"
+                                Command="{x:Bind ViewModel.OpenClipboardCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Clipboard'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xF0E3;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Clipboard'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Notes -->
+                        <Button ToolTipService.ToolTip="Notes"
+                                Command="{x:Bind ViewModel.OpenNotesCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Notes'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE70B;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Notes'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Focus / Timer -->
+                        <Button ToolTipService.ToolTip="Focus Timer"
+                                Command="{x:Bind ViewModel.OpenTimerCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Timer'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE916;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Timer'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Files -->
+                        <Button ToolTipService.ToolTip="Files"
+                                Command="{x:Bind ViewModel.OpenFileShelfCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'FileShelf'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xED43;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'FileShelf'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- QuickDrop -->
+                        <Button ToolTipService.ToolTip="QuickDrop"
+                                Command="{x:Bind ViewModel.OpenQuickDropCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'QuickDrop'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE72D;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'QuickDrop'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Weather -->
+                        <Button ToolTipService.ToolTip="Weather"
+                                Command="{x:Bind ViewModel.OpenWeatherCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Weather'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE753;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Weather'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Screen Time -->
+                        <Button ToolTipService.ToolTip="Screen Time"
+                                Command="{x:Bind ViewModel.OpenScreenTimeCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'ScreenTime'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE9D9;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'ScreenTime'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- DevTools -->
+                        <Button ToolTipService.ToolTip="DevTools"
+                                Command="{x:Bind ViewModel.OpenDeveloperDefaultCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Developer'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE943;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Developer'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Network -->
+                        <Button ToolTipService.ToolTip="Network Security"
+                                Command="{x:Bind ViewModel.OpenNetworkSecurityDefaultCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'NetworkSecurity'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xEC27;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'NetworkSecurity'), Mode=OneWay}" />
+                        </Button>
+
+                        <!-- Settings -->
+                        <Button ToolTipService.ToolTip="Settings"
+                                Command="{x:Bind ViewModel.OpenSettingsCommand}"
+                                Width="36" Height="36"
+                                CornerRadius="18"
+                                Padding="0"
+                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Settings'), Mode=OneWay}"
+                                BorderBrush="Transparent">
+                            <FontIcon Glyph="&#xE713;"
+                                      FontSize="15"
+                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Settings'), Mode=OneWay}" />
+                        </Button>
+                    </StackPanel>
+                </Border>
+
             </Grid>
         </Border>
 

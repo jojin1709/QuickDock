@@ -37,7 +37,7 @@ public sealed class FullscreenDetectionService : IFullscreenService
         {
             _hHook = NativeMethods.SetWinEventHook(
                 NativeMethods.EVENT_SYSTEM_FOREGROUND,
-                NativeMethods.EVENT_OBJECT_LOCATIONCHANGE,
+                NativeMethods.EVENT_SYSTEM_FOREGROUND,
                 IntPtr.Zero,
                 _winEventProc,
                 0,
@@ -120,6 +120,13 @@ public sealed class FullscreenDetectionService : IFullscreenService
         string className = sbClass.ToString();
 
         if (className is "Progman" or "WorkerW" or "Shell_TrayWnd" or "Windows.UI.Core.CoreWindow")
+        {
+            return false;
+        }
+
+        // Standard windows with a caption/titlebar are regular maximized windows, not fullscreen apps
+        long style = NativeMethods.GetWindowLongPtr(hWnd, NativeMethods.GWL_STYLE).ToInt64();
+        if ((style & NativeMethods.WS_CAPTION) == NativeMethods.WS_CAPTION)
         {
             return false;
         }

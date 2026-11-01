@@ -10,330 +10,471 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid RowSpacing="12">
+    <Grid Margin="16,8,16,10" RowSpacing="12" ColumnSpacing="12">
         <Grid.RowDefinitions>
-            <!-- Header bar with clock, search, metrics, settings -->
-            <RowDefinition Height="Auto" />
-            <!-- Scrollable modules section -->
+            <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <!-- Top Header Controls -->
-        <Grid Grid.Row="0" ColumnSpacing="12" Margin="4,0,4,4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <!-- ==================== CARD 1: SCREEN TIME ==================== -->
+        <Border Grid.Row="0" Grid.Column="0"
+                Background="#18181B"
+                BorderBrush="#27272A"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-            <!-- Time & Date -->
-            <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                <TextBlock Text="{x:Bind ViewModel.CurrentTime, Mode=OneWay}"
-                           FontSize="20"
-                           FontWeight="SemiBold"
-                           Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                <TextBlock Text="{x:Bind ViewModel.CurrentDate, Mode=OneWay}"
-                           FontSize="11"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE9D9;" FontSize="11" Foreground="#A1A1AA" />
+                    <TextBlock Text="SCREEN TIME"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#A1A1AA"
+                               CharacterSpacing="60"
+                               VerticalAlignment="Center" />
+                </StackPanel>
 
-            <!-- Search Filter -->
-            <TextBox Grid.Column="1"
-                     PlaceholderText="Search modules..."
-                     Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     VerticalAlignment="Center"
-                     MaxWidth="260"
-                     CornerRadius="{StaticResource SearchBoxCornerRadius}">
-            </TextBox>
+                <!-- Body -->
+                <Grid Grid.Row="1" Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <!-- Real System Metrics Status Bar -->
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.CpuMetricText, Mode=OneWay}"
-                                              DotBrush="{ThemeResource StatusAccentBrush}" />
-                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.MemoryMetricText, Mode=OneWay}"
-                                              DotBrush="{ThemeResource StatusAccentBrush}" />
-                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.BatteryMetricText, Mode=OneWay}"
-                                              DotBrush="{ThemeResource StatusActiveBrush}" />
-                <controls:QuickDockStatusPill Text="{x:Bind ViewModel.VolumeMetricText, Mode=OneWay}"
-                                              DotBrush="{ThemeResource StatusInactiveBrush}" />
-            </StackPanel>
+                    <!-- Large Text & Subtitle -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Bind ViewModel.ScreenTimeBigText, Mode=OneWay}"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF" />
+                        <TextBlock Text="{x:Bind ViewModel.ScreenTimeSubtitleText, Mode=OneWay}"
+                                   FontSize="12"
+                                   Foreground="#71717A"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
 
-            <!-- Settings Button -->
-            <Button Grid.Column="3"
-                    ToolTipService.ToolTip="Settings"
-                    Command="{x:Bind MainViewModel.OpenSettingsCommand, Mode=OneWay}"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Padding="8"
-                    CornerRadius="6"
-                    VerticalAlignment="Center">
-                <FontIcon Glyph="&#xE713;" FontSize="16" />
-            </Button>
-        </Grid>
+                    <!-- Mini Vertical Sparkline Bar Chart -->
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="4"
+                                VerticalAlignment="Bottom"
+                                Margin="0,0,2,4">
+                        <Border Width="5" Height="10" CornerRadius="2.5" Background="#2E2E33" VerticalAlignment="Bottom" />
+                        <Border Width="5" Height="16" CornerRadius="2.5" Background="#2E2E33" VerticalAlignment="Bottom" />
+                        <Border Width="5" Height="8"  CornerRadius="2.5" Background="#2E2E33" VerticalAlignment="Bottom" />
+                        <Border Width="5" Height="24" CornerRadius="2.5" Background="#2E2E33" VerticalAlignment="Bottom" />
+                        <Border Width="5" Height="14" CornerRadius="2.5" Background="#2E2E33" VerticalAlignment="Bottom" />
+                        <Border Width="5" Height="36" CornerRadius="2.5" Background="#FFFFFF" VerticalAlignment="Bottom" />
+                        <Border Width="5" Height="12" CornerRadius="2.5" Background="#2E2E33" VerticalAlignment="Bottom" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
 
-        <!-- Module Catalog Scroll Area -->
-        <ScrollViewer Grid.Row="1"
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      Padding="0,0,8,0">
-            <StackPanel Spacing="14">
+        <!-- ==================== CARD 2: SYSTEM (3 Radial Rings) ==================== -->
+        <Border Grid.Row="0" Grid.Column="1"
+                Background="#18181B"
+                BorderBrush="#27272A"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                <!-- Temporary Message Banner -->
-                <Border Visibility="{x:Bind GetBoolVisibility(ViewModel.HasTemporaryMessage), Mode=OneWay}"
-                        Background="{ThemeResource CardBackgroundBrush}"
-                        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
-                        BorderThickness="1"
-                        CornerRadius="8"
-                        Padding="12,8">
-                    <Grid ColumnSpacing="8">
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE770;" FontSize="11" Foreground="#A1A1AA" />
+                    <TextBlock Text="SYSTEM"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#A1A1AA"
+                               CharacterSpacing="60"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- 3 Circular Rings -->
+                <Grid Grid.Row="1" Margin="0,8,0,0" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Ring 1: CPU -->
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center" Spacing="4">
+                        <Grid Width="46" Height="46">
+                            <Ellipse Width="46" Height="46" Stroke="#27272A" StrokeThickness="3.5" />
+                            <Ellipse Width="46" Height="46" Stroke="#3B82F6" StrokeThickness="3.5" StrokeDashArray="3 1" />
+                            <TextBlock Text="{x:Bind ViewModel.CpuPercentText, Mode=OneWay}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Text="CPU"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#71717A"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Ring 2: RAM -->
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="4">
+                        <Grid Width="46" Height="46">
+                            <Ellipse Width="46" Height="46" Stroke="#27272A" StrokeThickness="3.5" />
+                            <Ellipse Width="46" Height="46" Stroke="#10B981" StrokeThickness="3.5" StrokeDashArray="3.5 1" />
+                            <TextBlock Text="{x:Bind ViewModel.RamPercentText, Mode=OneWay}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Text="RAM"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#71717A"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Ring 3: DISK -->
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center" Spacing="4">
+                        <Grid Width="46" Height="46">
+                            <Ellipse Width="46" Height="46" Stroke="#27272A" StrokeThickness="3.5" />
+                            <Ellipse Width="46" Height="46" Stroke="#8B5CF6" StrokeThickness="3.5" StrokeDashArray="1 2" />
+                            <TextBlock Text="{x:Bind ViewModel.DiskPercentText, Mode=OneWay}"
+                                       FontSize="10"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Grid>
+                        <TextBlock Text="DISK"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="#71717A"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ==================== CARD 3: WEATHER ==================== -->
+        <Border Grid.Row="0" Grid.Column="2"
+                Background="#18181B"
+                BorderBrush="#27272A"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE753;" FontSize="11" Foreground="#A1A1AA" />
+                    <TextBlock Text="WEATHER"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#A1A1AA"
+                               CharacterSpacing="60"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Body -->
+                <Grid Grid.Row="1" Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Grid.Column="0" Glyph="&#xE783;" FontSize="14" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.TemporaryMessageText, Mode=OneWay}" FontSize="12" FontWeight="Medium" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                        <Button Grid.Column="2" Command="{x:Bind ViewModel.DismissTemporaryMessageCommand}" Background="Transparent" BorderBrush="Transparent" Padding="4">
-                            <FontIcon Glyph="&#xE711;" FontSize="11" />
-                        </Button>
+
+                        <!-- Large Temp -->
+                        <TextBlock Grid.Column="0"
+                                   Text="{x:Bind ViewModel.WeatherTempText, Mode=OneWay}"
+                                   FontSize="34"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF"
+                                   VerticalAlignment="Center" />
+
+                        <!-- Weather Sun/Cloud Glyph -->
+                        <FontIcon Grid.Column="1"
+                                  Glyph="&#xE753;"
+                                  FontSize="30"
+                                  Foreground="#FBBF24"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,4,0" />
                     </Grid>
-                </Border>
 
-                <!-- Productivity Summaries Strip -->
-                <Grid ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Border Grid.Column="0" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xF0E3;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.ClipboardSnippetText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Column="1" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE916;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.ActiveTimerText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Column="2" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE753;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.WeatherSnippetText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
-
-                    <Border Grid.Column="3" Padding="8,6" Background="{ThemeResource CardBackgroundBrush}" BorderBrush="{ThemeResource TileStrokeBrush}" BorderThickness="1" CornerRadius="6">
-                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xEC58;" FontSize="11" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScreenTimeSnippetText, Mode=OneWay}" FontSize="11" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Border>
+                    <!-- Subtitle & High/Low -->
+                    <StackPanel Grid.Row="1" VerticalAlignment="Bottom">
+                        <TextBlock Text="{x:Bind ViewModel.WeatherConditionText, Mode=OneWay}"
+                                   FontSize="12"
+                                   Foreground="#D4D4D8"
+                                   TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{x:Bind ViewModel.WeatherHighLowText, Mode=OneWay}"
+                                   FontSize="11"
+                                   Foreground="#71717A"
+                                   Margin="0,2,0,0" />
+                    </StackPanel>
                 </Grid>
+            </Grid>
+        </Border>
 
-                <!-- Quick Controls: Volume & Media -->
-                <Grid ColumnSpacing="12">
+        <!-- ==================== CARD 4: FOCUS (Pomodoro Timer) ==================== -->
+        <Border Grid.Row="1" Grid.Column="0"
+                Background="#18181B"
+                BorderBrush="#27272A"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE916;" FontSize="11" Foreground="#A1A1AA" />
+                    <TextBlock Text="FOCUS"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#A1A1AA"
+                               CharacterSpacing="60"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Body -->
+                <Grid Grid.Row="1" Margin="0,10,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Volume Card -->
-                    <Border Grid.Column="0"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="12,10">
-                        <Grid ColumnSpacing="10" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                    <!-- Countdown & Subtitle -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Bind ViewModel.FocusTimerText, Mode=OneWay}"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="#FFFFFF" />
+                        <TextBlock Text="{x:Bind ViewModel.FocusTimerSubtitleText, Mode=OneWay}"
+                                   FontSize="12"
+                                   Foreground="#71717A"
+                                   Margin="0,4,0,0" />
+                    </StackPanel>
 
-                            <!-- Mute Toggle Button -->
-                            <Button Grid.Column="0"
-                                    Command="{x:Bind ViewModel.ToggleMuteCommand, Mode=OneWay}"
-                                    Background="Transparent"
-                                    BorderBrush="Transparent"
-                                    Padding="6"
-                                    CornerRadius="6"
-                                    VerticalAlignment="Center"
-                                    ToolTipService.ToolTip="Toggle Mute">
-                                <FontIcon Glyph="{x:Bind ViewModel.VolumeGlyph, Mode=OneWay}" FontSize="15"
-                                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                            </Button>
+                    <!-- Circular Play/Pause Action Button -->
+                    <Button Grid.Column="1"
+                            Command="{x:Bind ViewModel.ToggleFocusTimerCommand}"
+                            Background="#FFFFFF"
+                            BorderBrush="Transparent"
+                            Width="44" Height="44"
+                            CornerRadius="22"
+                            Padding="0"
+                            VerticalAlignment="Center">
+                        <FontIcon Glyph="{x:Bind ViewModel.FocusPlayGlyph, Mode=OneWay}"
+                                  FontSize="16"
+                                  Foreground="#000000"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                    </Button>
+                </Grid>
+            </Grid>
+        </Border>
 
-                            <!-- Volume Slider & Device Label -->
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
-                                <TextBlock Text="{x:Bind ViewModel.AudioDeviceName, Mode=OneWay}"
-                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           TextTrimming="CharacterEllipsis" />
-                                <Slider Value="{x:Bind ViewModel.VolumeLevel, Mode=TwoWay}"
-                                        Minimum="0" Maximum="100" StepFrequency="1"
-                                        Margin="0,-6,0,-6" />
-                            </StackPanel>
+        <!-- ==================== CARD 5: CLIPBOARD ==================== -->
+        <Border Grid.Row="1" Grid.Column="1"
+                Background="#18181B"
+                BorderBrush="#27272A"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                            <!-- Volume % Text -->
-                            <TextBlock Grid.Column="2"
-                                       Text="{x:Bind ViewModel.VolumeMetricText, Mode=OneWay}"
-                                       FontWeight="SemiBold" FontSize="12"
-                                       VerticalAlignment="Center" Width="40" TextAlignment="Right" />
-                        </Grid>
-                    </Border>
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xF0E3;" FontSize="11" Foreground="#A1A1AA" />
+                    <TextBlock Text="CLIPBOARD"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#A1A1AA"
+                               CharacterSpacing="60"
+                               VerticalAlignment="Center" />
+                </StackPanel>
 
-                    <!-- Media Controller Card -->
-                    <Border Grid.Column="1"
-                            Background="{ThemeResource CardBackgroundBrush}"
-                            BorderBrush="{ThemeResource TileStrokeBrush}"
-                            BorderThickness="1"
-                            CornerRadius="{StaticResource CardCornerRadius}"
-                            Padding="12,10">
-                        <Grid ColumnSpacing="10" VerticalAlignment="Center">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <!-- Media Icon -->
-                            <Border Grid.Column="0"
-                                    Background="{ThemeResource PillBackgroundBrush}"
-                                    BorderBrush="{ThemeResource TileStrokeBrush}"
+                <!-- 2 Recent Items -->
+                <ItemsControl Grid.Row="1"
+                              ItemsSource="{x:Bind ViewModel.RecentClips, Mode=OneWay}"
+                              Margin="0,8,0,0"
+                              VerticalAlignment="Center">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:RecentClipDisplayItem">
+                            <Border Background="#202024"
+                                    BorderBrush="#2A2A2E"
                                     BorderThickness="1"
-                                    CornerRadius="6"
-                                    Width="32" Height="32">
-                                <FontIcon Glyph="&#xE8D6;" FontSize="14"
-                                          Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    CornerRadius="8"
+                                    Padding="8,6"
+                                    Margin="0,0,0,6">
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Thumbnail Glyph -->
+                                    <Border Grid.Column="0"
+                                            Width="22" Height="22"
+                                            Background="#2A2A2E"
+                                            CornerRadius="4">
+                                        <FontIcon Glyph="{x:Bind IconGlyph}"
+                                                  FontSize="11"
+                                                  Foreground="#A1A1AA"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center" />
+                                    </Border>
+
+                                    <!-- Title/Dimensions -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="{x:Bind Title}"
+                                               FontSize="11"
+                                               Foreground="#E4E4E7"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" />
+
+                                    <!-- Time Ago -->
+                                    <TextBlock Grid.Column="2"
+                                               Text="{x:Bind TimeAgo}"
+                                               FontSize="10"
+                                               Foreground="#71717A"
+                                               VerticalAlignment="Center" />
+
+                                    <!-- Copy Action -->
+                                    <Button Grid.Column="3"
+                                            Click="OnCopyClipClick"
+                                            Tag="{x:Bind Content}"
+                                            Background="Transparent"
+                                            BorderBrush="Transparent"
+                                            Padding="4"
+                                            CornerRadius="4"
+                                            VerticalAlignment="Center">
+                                        <FontIcon Glyph="&#xE8C8;" FontSize="11" Foreground="#A1A1AA" />
+                                    </Button>
+                                </Grid>
                             </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Border>
 
-                            <!-- Media Track & Artist -->
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                <TextBlock Text="{x:Bind ViewModel.MediaTitle, Mode=OneWay}"
-                                           FontWeight="SemiBold" FontSize="12"
-                                           TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="{x:Bind ViewModel.MediaArtist, Mode=OneWay}"
-                                           FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                           TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
+        <!-- ==================== CARD 6: NOTES ==================== -->
+        <Border Grid.Row="1" Grid.Column="2"
+                Background="#18181B"
+                BorderBrush="#27272A"
+                BorderThickness="1"
+                CornerRadius="16"
+                Padding="16,14">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                            <!-- Transport Controls -->
-                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
-                                <Button Command="{x:Bind ViewModel.SkipPreviousCommand, Mode=OneWay}"
-                                        Background="Transparent" BorderBrush="Transparent"
-                                        Padding="6" CornerRadius="6"
-                                        ToolTipService.ToolTip="Previous Track">
-                                    <FontIcon Glyph="&#xE892;" FontSize="12" />
-                                </Button>
-                                <Button Command="{x:Bind ViewModel.TogglePlayPauseCommand, Mode=OneWay}"
-                                        Background="{ThemeResource PillBackgroundBrush}"
-                                        BorderBrush="{ThemeResource TileStrokeBrush}"
-                                        Padding="8,6" CornerRadius="6"
-                                        ToolTipService.ToolTip="Play / Pause">
-                                    <FontIcon Glyph="{x:Bind ViewModel.PlayPauseGlyph, Mode=OneWay}" FontSize="12"
-                                              Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
-                                </Button>
-                                <Button Command="{x:Bind ViewModel.SkipNextCommand, Mode=OneWay}"
-                                        Background="Transparent" BorderBrush="Transparent"
-                                        Padding="6" CornerRadius="6"
-                                        ToolTipService.ToolTip="Next Track">
-                                    <FontIcon Glyph="&#xE893;" FontSize="12" />
-                                </Button>
-                            </StackPanel>
+                <!-- Header -->
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="&#xE70B;" FontSize="11" Foreground="#A1A1AA" />
+                    <TextBlock Text="NOTES"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="#A1A1AA"
+                               CharacterSpacing="60"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Body -->
+                <Grid Grid.Row="1" Margin="0,8,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Latest note or "No notes yet" -->
+                    <TextBlock Grid.Row="0"
+                               Text="{x:Bind ViewModel.NotesSubtitleText, Mode=OneWay}"
+                               FontSize="12"
+                               Foreground="#71717A"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center" />
+
+                    <!-- Quick Note Pill Input Box -->
+                    <Border Grid.Row="1"
+                            Background="#222226"
+                            BorderBrush="#2E2E33"
+                            BorderThickness="1"
+                            CornerRadius="16"
+                            Height="34"
+                            Padding="10,0,4,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox Grid.Column="0"
+                                     PlaceholderText="Write a note..."
+                                     Text="{x:Bind ViewModel.NewNoteText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     FontSize="12"
+                                     Foreground="#FFFFFF"
+                                     KeyDown="OnNewNoteKeyDown"
+                                     VerticalAlignment="Center"
+                                     Padding="0" />
+
+                            <Button Grid.Column="1"
+                                    Command="{x:Bind ViewModel.AddQuickNoteCommand}"
+                                    Background="#FFFFFF"
+                                    BorderBrush="Transparent"
+                                    Width="26" Height="26"
+                                    CornerRadius="13"
+                                    Padding="0"
+                                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE710;" FontSize="11" Foreground="#000000" />
+                            </Button>
                         </Grid>
                     </Border>
                 </Grid>
+            </Grid>
+        </Border>
 
-                <!-- System Controls -->
-                <StackPanel Visibility="{x:Bind HasSystemModules(ViewModel), Mode=OneWay}">
-                    <controls:QuickDockSection Title="System Controls" Badge="3" />
-                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredSystemModules, Mode=OneWay}">
-                        <ItemsRepeater.Layout>
-                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
-                        </ItemsRepeater.Layout>
-                        <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ModuleTileItem">
-                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
-                                                              Title="{x:Bind Title}"
-                                                              Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}"
-                                                              Tapped="OnTileTapped"
-                                                              Tag="{x:Bind}" />
-                            </DataTemplate>
-                        </ItemsRepeater.ItemTemplate>
-                    </ItemsRepeater>
-                </StackPanel>
-
-                <!-- Productivity Section -->
-                <StackPanel Visibility="{x:Bind HasProductivityModules(ViewModel), Mode=OneWay}">
-                    <controls:QuickDockSection Title="Productivity" Badge="4" />
-                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredProductivityModules, Mode=OneWay}">
-                        <ItemsRepeater.Layout>
-                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
-                        </ItemsRepeater.Layout>
-                        <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ModuleTileItem">
-                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
-                                                              Title="{x:Bind Title}"
-                                                              Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}"
-                                                              Tapped="OnTileTapped"
-                                                              Tag="{x:Bind}" />
-                            </DataTemplate>
-                        </ItemsRepeater.ItemTemplate>
-                    </ItemsRepeater>
-                </StackPanel>
-
-                <!-- Utilities Section -->
-                <StackPanel Visibility="{x:Bind HasUtilityModules(ViewModel), Mode=OneWay}">
-                    <controls:QuickDockSection Title="Utilities" Badge="3" />
-                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredUtilityModules, Mode=OneWay}">
-                        <ItemsRepeater.Layout>
-                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
-                        </ItemsRepeater.Layout>
-                        <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ModuleTileItem">
-                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
-                                                              Title="{x:Bind Title}"
-                                                              Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}"
-                                                              Tapped="OnTileTapped"
-                                                              Tag="{x:Bind}" />
-                            </DataTemplate>
-                        </ItemsRepeater.ItemTemplate>
-                    </ItemsRepeater>
-                </StackPanel>
-
-                <!-- Developer & Advanced Section -->
-                <StackPanel Visibility="{x:Bind HasDeveloperModules(ViewModel), Mode=OneWay}">
-                    <controls:QuickDockSection Title="Developer &amp; AI" Badge="3" />
-                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.FilteredDeveloperModules, Mode=OneWay}">
-                        <ItemsRepeater.Layout>
-                            <UniformGridLayout MinItemWidth="240" MinRowSpacing="8" MinColumnSpacing="8" Orientation="Horizontal" />
-                        </ItemsRepeater.Layout>
-                        <ItemsRepeater.ItemTemplate>
-                            <DataTemplate x:DataType="vm:ModuleTileItem">
-                                <controls:QuickDockModuleTile Glyph="{x:Bind Glyph}"
-                                                              Title="{x:Bind Title}"
-                                                              Subtitle="{x:Bind Subtitle}"
-                                                              StatusText="{x:Bind StatusText}"
-                                                              Tapped="OnTileTapped"
-                                                              Tag="{x:Bind}" />
-                            </DataTemplate>
-                        </ItemsRepeater.ItemTemplate>
-                    </ItemsRepeater>
-                </StackPanel>
-
-            </StackPanel>
-        </ScrollViewer>
     </Grid>
 </UserControl>

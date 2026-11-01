@@ -73,14 +73,21 @@ public sealed partial class MainWindow : Window
 
         ViewModel.SetDispatcherQueue(DispatcherQueue);
 
-        // Suppress QuickDock from Alt+Tab switcher and taskbar
+        // Native WinUI 3 Borderless, Titlebarless, AlwaysOnTop OverlappedPresenter
         try
         {
-            AppWindow.IsShownInSwitchers = false;
+            if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
+            {
+                presenter.SetBorderAndTitleBar(false, false);
+                presenter.IsResizable = false;
+                presenter.IsMaximizable = false;
+                presenter.IsMinimizable = false;
+                presenter.IsAlwaysOnTop = _settingsManager.CurrentSettings.Behavior.AlwaysOnTop;
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to set AppWindow.IsShownInSwitchers to false.");
+            _logger.LogWarning(ex, "Failed to configure OverlappedPresenter.");
         }
 
         try
@@ -288,31 +295,19 @@ public sealed partial class MainWindow : Window
             {
                 if (isFullscreen)
                 {
-                    _logger.LogInformation("Fullscreen application active. Hiding QuickDock.");
+                    _logger.LogInformation("Fullscreen application active. Hiding QuickDock visually.");
                     if (ViewModel.IsExpanded)
                     {
                         ViewModel.Collapse();
                     }
-                    try
-                    {
-                        AppWindow.Hide();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to hide AppWindow during fullscreen.");
-                    }
+                    RootWindowGrid.Opacity = 0;
+                    RootWindowGrid.IsHitTestVisible = false;
                 }
                 else
                 {
-                    _logger.LogInformation("Fullscreen application exited. Restoring QuickDock.");
-                    try
-                    {
-                        AppWindow.Show();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to restore AppWindow after fullscreen.");
-                    }
+                    _logger.LogInformation("Fullscreen application exited. Restoring QuickDock visually.");
+                    RootWindowGrid.Opacity = 1;
+                    RootWindowGrid.IsHitTestVisible = true;
                     _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
                 }
             }
@@ -501,6 +496,18 @@ public sealed partial class MainWindow : Window
 
     private Visibility IsNetworkSecurityVisible(string currentView) =>
         string.Equals(currentView, "NetworkSecurity", StringComparison.OrdinalIgnoreCase) ? Visibility.Visible : Visibility.Collapsed;
+
+    public Brush GetNavBackground(string currentView, string targetView)
+    {
+        bool isActive = string.Equals(currentView, targetView, StringComparison.OrdinalIgnoreCase);
+        return new SolidColorBrush(isActive ? Microsoft.UI.Colors.White : Microsoft.UI.Colors.Transparent);
+    }
+
+    public Brush GetNavForeground(string currentView, string targetView)
+    {
+        bool isActive = string.Equals(currentView, targetView, StringComparison.OrdinalIgnoreCase);
+        return new SolidColorBrush(isActive ? Microsoft.UI.Colors.Black : Windows.UI.Color.FromArgb(255, 161, 161, 170));
+    }
 
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
