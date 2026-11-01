@@ -206,7 +206,7 @@
 
                         <!-- Close/Collapse Button -->
                         <Button ToolTipService.ToolTip="Collapse dock (Esc)"
-                                Command="{x:Bind ViewModel.CollapseCommand, Mode=OneWay}"
+                                Click="OnCloseButtonClick"
                                 Background="Transparent"
                                 BorderBrush="Transparent"
                                 Padding="7"

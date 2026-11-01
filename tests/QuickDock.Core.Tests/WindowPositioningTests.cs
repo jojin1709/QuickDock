@@ -117,4 +117,51 @@ public class WindowPositioningTests
         Assert.Equal(290, w);
         Assert.Equal(34, h);
     }
+
+    [Fact]
+    public void CalculatePlacement_NegativeCoordinates_MonitorToLeftOfPrimary()
+    {
+        var service = CreateService();
+        int leftWorkX = -1920;
+        int leftWorkY = 0;
+        int leftWorkWidth = 1920;
+        int leftWorkHeight = 1080;
+
+        var (x, y, w, h) = service.CalculatePlacement(
+            isExpanded: false,
+            workX: leftWorkX,
+            workY: leftWorkY,
+            workWidth: leftWorkWidth,
+            workHeight: leftWorkHeight,
+            scaleFactor: 1.0);
+
+        Assert.Equal(-1920 + (1920 - 290) / 2, x);
+        Assert.Equal(0, y);
+        Assert.Equal(290, w);
+        Assert.Equal(34, h);
+    }
+
+    [Fact]
+    public void CalculatePlacement_NegativeCoordinates_MonitorAbovePrimary()
+    {
+        var service = CreateService();
+        int aboveWorkX = 0;
+        int aboveWorkY = -1440;
+        int aboveWorkWidth = 2560;
+        int aboveWorkHeight = 1440;
+
+        var (x, y, w, h) = service.CalculatePlacement(
+            isExpanded: true,
+            workX: aboveWorkX,
+            workY: aboveWorkY,
+            workWidth: aboveWorkWidth,
+            workHeight: aboveWorkHeight,
+            scaleFactor: 1.25);
+
+        var (expW, expH) = service.GetDockDimensions(true, 1.25);
+        Assert.Equal((2560 - expW) / 2, x);
+        Assert.Equal(-1440, y);
+        Assert.Equal(expW, w);
+        Assert.Equal(expH, h);
+    }
 }

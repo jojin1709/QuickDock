@@ -10,7 +10,7 @@
 </head>
 <body>
 
-  <!-- Site Navigation -->
+  <!-- Site Navigation Header -->
   <header class="site-header">
     <div class="container nav-container">
       <a href="../" class="brand">
@@ -21,15 +21,31 @@
         <li><a href="../features/">Features</a></li>
         <li><a href="../notch/">Notch</a></li>
         <li><a href="../clipboard/" class="active">Clipboard</a></li>
-        <li><a href="../docs/">Docs</a></li>
+        <li><a href="../docs/">Documentation</a></li>
         <li><a href="../changelog/">Changelog</a></li>
-        <li><a href="../download/" class="btn-primary">Download Free</a></li>
       </ul>
+      <div class="header-right">
+        <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" class="header-gh-btn" title="GitHub Repository">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </a>
+        <a href="../download/" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          Get QuickDock
+        </a>
+      </div>
     </div>
   </header>
 
+  <!-- Page Header -->
   <div class="page-header">
     <div class="container">
+      <div class="hero-tagline-wrap" style="justify-content: center;">
+        <span class="hero-tag">SEARCHABLE LOCAL ARCHIVE</span>
+      </div>
       <h1 class="page-title">Instant Clipboard History</h1>
       <p class="page-subtitle">Search, pin, and paste anything you copied. Protected by automatic secret detection and encrypted local storage.</p>
     </div>
@@ -40,42 +56,51 @@
 
       <div class="feature-split">
         <div class="split-content">
-          <div class="section-tag">Privacy & Security First</div>
+          <div class="section-tag">PRIVACY &amp; SECURITY FIRST</div>
           <h2 class="section-title">Zero Leaks. Built-in Data Sanitization.</h2>
           <p class="section-desc">
             QuickDock inspects copied text on the fly using pattern recognition to detect sensitive tokens, API keys, private passwords, and credit card numbers.
           </p>
-          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
-            <li>Auto-masking keeps passwords shielded on screen.</li>
-            <li>Configurable ignore rules for password managers (1Password, Bitwarden, KeePass).</li>
-            <li>Stored in a local, encrypted SQLite database with optional auto-purge after 24h, 7 days, or 30 days.</li>
+          <ul class="feature-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Auto-masking keeps passwords shielded on screen.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Configurable ignore rules for password managers (1Password, Bitwarden, KeePass).</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Stored in a local, encrypted SQLite database with auto-purge options.</span>
+            </li>
           </ul>
         </div>
-        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
-          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Clipboard History Preview</div>
+        <div class="split-visual" style="padding: 24px;">
+          <div style="font-size:11px; font-weight:700; color:#71717A; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">Clipboard History Preview</div>
           
-          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="background:#16161B; border:1px solid #27272D; border-radius:8px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-size:12px; font-weight:600;">git commit -m "feat(notch): multi-monitor"</div>
-              <div style="font-size:10px; color:#71717A;">Copied 2m ago · Shell</div>
+              <div style="font-size:12px; font-weight:600; color:#FFFFFF;">git commit -m "feat(notch): multi-monitor"</div>
+              <div style="font-size:10px; color:#71717A; margin-top:2px;">Copied 2m ago · Shell command</div>
             </div>
-            <span style="font-size:11px; color:#A1A1AA; cursor:pointer;">Copy</span>
+            <button style="background:#27272D; color:#FFFFFF; border:none; padding:4px 10px; border-radius:4px; font-size:10px; cursor:pointer;">Copy</button>
           </div>
 
-          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:10px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="background:#16161B; border:1px solid #27272D; border-radius:8px; padding:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-size:12px; font-weight:600; font-family:monospace; color:#E4E4E7;">••••••••••••••••••••••••••••••••</div>
-              <div style="font-size:10px; color:#EAB308;">Detected Secret: API Key (Masked)</div>
+              <div style="font-size:10px; color:#EAB308; margin-top:2px;">Detected Secret: API Key (Masked)</div>
             </div>
-            <span style="font-size:11px; color:#A1A1AA; cursor:pointer;">Reveal</span>
+            <button style="background:#27272D; color:#FFFFFF; border:none; padding:4px 10px; border-radius:4px; font-size:10px; cursor:pointer;">Reveal</button>
           </div>
 
-          <div style="background:#141417; border:1px solid #27272A; border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="background:#16161B; border:1px solid #27272D; border-radius:8px; padding:12px; display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <div style="font-size:12px; font-weight:600;">https://github.com/jojin1709/QuickDock</div>
-              <div style="font-size:10px; color:#71717A;">Copied 14m ago · Link</div>
+              <div style="font-size:12px; font-weight:600; color:#FFFFFF;">https://github.com/jojin1709/QuickDock</div>
+              <div style="font-size:10px; color:#71717A; margin-top:2px;">Copied 14m ago · Web Link</div>
             </div>
-            <span style="font-size:11px; color:#A1A1AA; cursor:pointer;">Copy</span>
+            <button style="background:#27272D; color:#FFFFFF; border:none; padding:4px 10px; border-radius:4px; font-size:10px; cursor:pointer;">Copy</button>
           </div>
         </div>
       </div>
@@ -83,23 +108,54 @@
     </div>
   </section>
 
+  <!-- Section: Bottom Download CTA Banner -->
+  <section class="container">
+    <div class="download-banner-card">
+      <div class="download-banner-left">
+        <div class="download-circle-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="download-banner-title">Get QuickDock</h3>
+          <p class="download-banner-sub">A free, local and reliable productivity dock for Windows 11.</p>
+        </div>
+      </div>
+      <div class="download-banner-actions">
+        <a href="../download/" class="btn-primary" style="padding: 12px 24px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 5.479l7.377-1.016v7.127H3V5.48zm0 13.042l7.377 1.017v-7.04H3v6.023zm8.333 1.148L21 21V11.59H11.333v8.079zm0-15.338V11.59H21V3l-9.667 1.331z"/>
+          </svg>
+          Download for Windows
+        </a>
+        <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" class="btn-secondary" style="padding: 12px 20px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          View Source
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container">
-      <div class="footer-grid">
+      <div class="footer-top">
         <div class="footer-brand">
           <a href="../" class="brand">
             <img src="../assets/images/logo.png" alt="QuickDock">
             <span>QuickDock</span>
           </a>
-          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+          <p>The notch for Windows.</p>
         </div>
         <div class="footer-col">
           <h4>Product</h4>
           <ul>
             <li><a href="../features/">Features</a></li>
-            <li><a href="../notch/">Notch Interaction</a></li>
-            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../notch/">Notch</a></li>
+            <li><a href="../clipboard/">Clipboard</a></li>
             <li><a href="../download/">Download</a></li>
           </ul>
         </div>
@@ -108,21 +164,26 @@
           <ul>
             <li><a href="../docs/">Documentation</a></li>
             <li><a href="../changelog/">Changelog</a></li>
-            <li><a href="../privacy/">Privacy Policy</a></li>
             <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Author</h4>
+          <h4>Legal</h4>
           <ul>
-            <li><span>JOJIN JOHN</span></li>
-            <li><span>Master Build v1.0.0</span></li>
+            <li><a href="../privacy/">Privacy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
-        <span>Made for Windows 11</span>
+        <span>© 2026 QuickDock. Free and open source.</span>
+        <div class="footer-socials">
+          <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   </footer>
@@ -130,4 +191,3 @@
   <script src="../assets/js/main.js"></script>
 </body>
 </html>
-

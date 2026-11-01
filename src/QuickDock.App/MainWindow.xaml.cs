@@ -1,14 +1,17 @@
+using System;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using QuickDock.App.Services;
 using QuickDock.App.ViewModels;
 using QuickDock.Core.Events;
 using QuickDock.Core.Interfaces;
 using QuickDock.Core.Models;
 using QuickDock.Core.Settings;
-using QuickDock.Core.StateMachine;
 using QuickDock.Infrastructure.Windows;
 using Windows.System;
 
@@ -18,6 +21,7 @@ public sealed partial class MainWindow : Window
 {
     private static readonly UIntPtr MainWindowSubclassId = new(1001);
 
+    private readonly IServiceProvider _serviceProvider;
     private readonly IWindowPositioningService _positioningService;
     private readonly IMonitorService _monitorService;
     private readonly IFullscreenService _fullscreenService;
@@ -32,19 +36,14 @@ public sealed partial class MainWindow : Window
     private readonly IntPtr _hWnd;
     private readonly uint _activateMsg;
     private readonly NativeMethods.SUBCLASSPROC _windowSubclassProc;
-
-    private readonly DispatcherTimer _hoverTimer;
-    private readonly DispatcherTimer _collapseTimer;
     private readonly DispatcherTimer _tickTimer;
-    private readonly DispatcherTimer _monitorFollowTimer;
-    private readonly NotchStateMachine _stateMachine = new();
 
     private int _metricsCounter;
     private IntPtr _previousForegroundHwnd = IntPtr.Zero;
-    private bool _isExplicitExit = false;
-    private string? _currentDockMonitorId;
+    private bool _isExplicitExit;
 
     public MainViewModel ViewModel { get; }
+    public bool IsExpanded { get; private set; }
 
     private MonitorInfo? _targetMonitor;
     public MonitorInfo? TargetMonitor
@@ -55,7 +54,7 @@ public sealed partial class MainWindow : Window
             _targetMonitor = value;
             if (_hWnd != IntPtr.Zero && value != null)
             {
-                _positioningService.SetDockState(_hWnd, ViewModel.IsExpanded, value);
+                _positioningService.SetDockState(_hWnd, IsExpanded, value);
             }
         }
     }
@@ -64,13 +63,14 @@ public sealed partial class MainWindow : Window
 
     public void UpdatePlacement()
     {
-        if (_hWnd != IntPtr.Zero)
+        if (_hWnd != IntPtr.Zero && TargetMonitor != null)
         {
-            _positioningService.SetDockState(_hWnd, ViewModel.IsExpanded, TargetMonitor);
+            _positioningService.SetDockState(_hWnd, IsExpanded, TargetMonitor);
         }
     }
 
     public MainWindow(
+        IServiceProvider serviceProvider,
         MainViewModel viewModel,
         IWindowPositioningService positioningService,
         IMonitorService monitorService,
@@ -86,6 +86,7 @@ public sealed partial class MainWindow : Window
         _logger = logger;
         _logger.LogInformation("MainWindow constructor starting...");
 
+        _serviceProvider = serviceProvider;
         ViewModel = viewModel;
         _positioningService = positioningService;
         _monitorService = monitorService;
@@ -115,7 +116,7 @@ public sealed partial class MainWindow : Window
                 if (!_isExplicitExit)
                 {
                     args.Cancel = true;
-                    ViewModel.Collapse();
+                    Collapse();
                 }
             };
 
@@ -134,12 +135,7 @@ public sealed partial class MainWindow : Window
         }
 
         _monitorService.SetDockHandle(_hWnd);
-        var initialMon = _monitorService.GetTargetMonitor(
-            _settingsManager.CurrentSettings.Behavior.MonitorTarget,
-            _settingsManager.CurrentSettings.Behavior.FollowActiveMonitor);
-        _currentDockMonitorId = initialMon.DeviceId;
-
-        _positioningService.ConfigureDockWindow(_hWnd);
+        _positioningService.ConfigureDockWindow(_hWnd, TargetMonitor);
 
         // Register custom activation message for single-instance
         _activateMsg = NativeMethods.RegisterWindowMessageW("QUICKDOCK_ACTIVATE_INSTANCE");
@@ -152,20 +148,6 @@ public sealed partial class MainWindow : Window
             concreteNotificationService.RegisterTrayHandle(_hWnd);
         }
 
-        // Hover expand timer (configurable delay)
-        _hoverTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(_settingsManager.CurrentSettings.Behavior.HoverDelayMs)
-        };
-        _hoverTimer.Tick += OnHoverTimerTick;
-
-        // Auto collapse grace-period timer (~200ms)
-        _collapseTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(200)
-        };
-        _collapseTimer.Tick += OnCollapseTimerTick;
-
         // Periodic clock & system metrics refresh timer
         _tickTimer = new DispatcherTimer
         {
@@ -174,14 +156,6 @@ public sealed partial class MainWindow : Window
         _tickTimer.Tick += OnTickTimer;
         _tickTimer.Start();
 
-        // Multi-monitor cursor tracking timer (smoothly moves dock across screens)
-        _monitorFollowTimer = new DispatcherTimer
-        {
-            Interval = TimeSpan.FromMilliseconds(200)
-        };
-        _monitorFollowTimer.Tick += OnMonitorFollowTick;
-        _monitorFollowTimer.Start();
-
         // Register Global Hotkey (Ctrl + Space) only on Primary window
         if (IsPrimaryInstance)
         {
@@ -189,16 +163,7 @@ public sealed partial class MainWindow : Window
             {
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    if (ViewModel.IsExpanded)
-                    {
-                        ViewModel.Collapse();
-                    }
-                    else
-                    {
-                        CapturePreviousForeground();
-                        ViewModel.Expand();
-                        BringToFront();
-                    }
+                    _serviceProvider.GetService<NotchWindowManager>()?.ToggleDockOnActiveMonitor();
                 });
             });
 
@@ -207,16 +172,7 @@ public sealed partial class MainWindow : Window
                 _hWnd,
                 onToggleDock: () => DispatcherQueue.TryEnqueue(() =>
                 {
-                    if (ViewModel.IsExpanded)
-                    {
-                        ViewModel.Collapse();
-                    }
-                    else
-                    {
-                        CapturePreviousForeground();
-                        ViewModel.Expand();
-                        BringToFront();
-                    }
+                    _serviceProvider.GetService<NotchWindowManager>()?.ToggleDockOnActiveMonitor();
                 }),
                 onOpenSettings: () => DispatcherQueue.TryEnqueue(() =>
                 {
@@ -259,8 +215,6 @@ public sealed partial class MainWindow : Window
         _fullscreenService.FullscreenStateChanged += OnFullscreenStateChanged;
         _fullscreenService.StartMonitoring();
 
-        ViewModel.DockExpansionStateChanged += OnExpansionStateChanged;
-
         // Auto-collapse when losing focus
         Activated += OnWindowActivated;
         Closed += OnWindowClosed;
@@ -274,10 +228,58 @@ public sealed partial class MainWindow : Window
                 ApplyTheme(e.Settings.Appearance.Theme);
                 ApplyBackdrop(e.Settings.Appearance.Backdrop);
                 _positioningService.SetAlwaysOnTop(_hWnd, e.Settings.Behavior.AlwaysOnTop);
-                _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
+                _positioningService.Reposition(_hWnd, IsExpanded, TargetMonitor);
             });
             return Task.CompletedTask;
         });
+    }
+
+    public void Expand()
+    {
+        if (IsExpanded) return;
+        IsExpanded = true;
+        _logger.LogInformation("Notch window expanded on monitor {Monitor}", TargetMonitor?.DeviceName ?? "Default");
+
+        IdleDockBorder.Visibility = Visibility.Collapsed;
+        ExpandedPanelBorder.Visibility = Visibility.Visible;
+
+        _positioningService.SetDockState(_hWnd, isExpanded: true, TargetMonitor);
+        if (IsPrimaryInstance)
+        {
+            _systemTrayService.UpdateDockState(true);
+        }
+
+        _serviceProvider.GetService<NotchWindowManager>()?.OnWindowExpanding(this);
+
+        _metricsCounter = 0;
+        _ = Task.Run(() => ViewModel.Home.RefreshMetrics());
+        BringToFront();
+    }
+
+    public void Collapse()
+    {
+        if (!IsExpanded) return;
+        IsExpanded = false;
+        _logger.LogInformation("Notch window collapsed on monitor {Monitor}", TargetMonitor?.DeviceName ?? "Default");
+
+        ExpandedPanelBorder.Visibility = Visibility.Collapsed;
+        IdleDockBorder.Visibility = Visibility.Visible;
+
+        _positioningService.SetDockState(_hWnd, isExpanded: false, TargetMonitor);
+        if (IsPrimaryInstance)
+        {
+            _systemTrayService.UpdateDockState(false);
+        }
+
+        _serviceProvider.GetService<NotchWindowManager>()?.OnWindowCollapsing(this);
+
+        RestorePreviousForeground();
+    }
+
+    public void ToggleExpand()
+    {
+        if (IsExpanded) Collapse();
+        else Expand();
     }
 
     private IntPtr WindowSubclassProcedure(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, UIntPtr uIdSubclass, UIntPtr dwRefData)
@@ -288,10 +290,7 @@ public sealed partial class MainWindow : Window
             DispatcherQueue.TryEnqueue(() =>
             {
                 CapturePreviousForeground();
-                if (!ViewModel.IsExpanded)
-                {
-                    ViewModel.Expand();
-                }
+                Expand();
                 BringToFront();
             });
             return IntPtr.Zero;
@@ -302,7 +301,17 @@ public sealed partial class MainWindow : Window
             _logger.LogInformation("WM_DPICHANGED received, updating dock dimensions and positioning.");
             DispatcherQueue.TryEnqueue(() =>
             {
-                _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
+                _serviceProvider.GetService<NotchWindowManager>()?.OnDpiChanged(_hWnd, TargetMonitor);
+            });
+            return IntPtr.Zero;
+        }
+
+        if (uMsg == NativeMethods.WM_DISPLAYCHANGE || uMsg == NativeMethods.WM_SETTINGCHANGE)
+        {
+            _logger.LogInformation("Display topology changed (uMsg=0x{Msg:X}). Reconciling monitors...", uMsg);
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                _serviceProvider.GetService<NotchWindowManager>()?.SynchronizeWindows();
             });
             return IntPtr.Zero;
         }
@@ -338,7 +347,7 @@ public sealed partial class MainWindow : Window
     {
         ViewModel.Home.UpdateTime(DateTime.Now);
 
-        if (ViewModel.IsExpanded)
+        if (IsExpanded)
         {
             _metricsCounter++;
             if (_metricsCounter >= 3)
@@ -358,9 +367,9 @@ public sealed partial class MainWindow : Window
                 if (isFullscreen)
                 {
                     _logger.LogInformation("Fullscreen application active. Hiding QuickDock visually.");
-                    if (ViewModel.IsExpanded)
+                    if (IsExpanded)
                     {
-                        ViewModel.Collapse();
+                        Collapse();
                     }
                     RootWindowGrid.Opacity = 0;
                     RootWindowGrid.IsHitTestVisible = false;
@@ -370,126 +379,33 @@ public sealed partial class MainWindow : Window
                     _logger.LogInformation("Fullscreen application exited. Restoring QuickDock visually.");
                     RootWindowGrid.Opacity = 1;
                     RootWindowGrid.IsHitTestVisible = true;
-                    _positioningService.Reposition(_hWnd, ViewModel.IsExpanded);
+                    _positioningService.Reposition(_hWnd, isExpanded: false, TargetMonitor);
                 }
             }
         });
     }
 
-    private void OnExpansionStateChanged(bool isExpanded)
-    {
-        _hoverTimer.Stop();
-        _collapseTimer.Stop();
-
-        // Update state machine
-        _stateMachine.ForceSetState(isExpanded ? NotchState.Expanded : NotchState.Collapsed);
-
-        // Update UI visibility
-        if (isExpanded)
-        {
-            IdleDockBorder.Visibility = Visibility.Collapsed;
-            ExpandedPanelBorder.Visibility = Visibility.Visible;
-        }
-        else
-        {
-            ExpandedPanelBorder.Visibility = Visibility.Collapsed;
-            IdleDockBorder.Visibility = Visibility.Visible;
-        }
-
-        // Resize & reposition window on targeted monitor
-        _positioningService.SetDockState(_hWnd, isExpanded, TargetMonitor);
-        if (IsPrimaryInstance)
-        {
-            _systemTrayService.UpdateDockState(isExpanded);
-        }
-
-        if (isExpanded)
-        {
-            _metricsCounter = 0;
-            // Asynchronous non-blocking metrics fetch
-            _ = Task.Run(() => ViewModel.Home.RefreshMetrics());
-            BringToFront();
-        }
-        else
-        {
-            RestorePreviousForeground();
-        }
-    }
-
-    private void OnIdlePointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-        _collapseTimer.Stop();
-        _stateMachine.PointerEntered(NotchZone.Notch);
-
-        if (!ViewModel.IsExpanded)
-        {
-            _hoverTimer.Stop();
-            _hoverTimer.Interval = TimeSpan.FromMilliseconds(_settingsManager.CurrentSettings.Behavior.HoverDelayMs);
-            _hoverTimer.Start();
-        }
-    }
-
-    private void OnIdlePointerExited(object sender, PointerRoutedEventArgs e)
-    {
-        _hoverTimer.Stop();
-        _stateMachine.PointerLeft(NotchZone.Notch);
-
-        if (ViewModel.IsExpanded)
-        {
-            _collapseTimer.Stop();
-            _collapseTimer.Start();
-        }
-    }
-
-    private void OnExpandedPointerEntered(object sender, PointerRoutedEventArgs e)
-    {
-        _collapseTimer.Stop();
-        _stateMachine.PointerEntered(NotchZone.Dashboard);
-    }
-
-    private void OnExpandedPointerExited(object sender, PointerRoutedEventArgs e)
-    {
-        _stateMachine.PointerLeft(NotchZone.Dashboard);
-
-        if (ViewModel.IsExpanded)
-        {
-            _collapseTimer.Stop();
-            _collapseTimer.Start();
-        }
-    }
-
-    private void OnCollapseTimerTick(object? sender, object e)
-    {
-        _collapseTimer.Stop();
-        if (ViewModel.IsExpanded && !_stateMachine.IsPointerInInteractionZone)
-        {
-            ViewModel.Collapse();
-        }
-    }
-
-    private void OnHoverTimerTick(object? sender, object e)
-    {
-        _hoverTimer.Stop();
-        if (!ViewModel.IsExpanded)
-        {
-            CapturePreviousForeground();
-            ViewModel.Expand();
-        }
-    }
-
     private void OnIdlePointerPressed(object sender, PointerRoutedEventArgs e)
     {
-        _hoverTimer.Stop();
-        _collapseTimer.Stop();
         CapturePreviousForeground();
-        ViewModel.Expand();
+        Expand();
     }
+
+    private void OnCloseButtonClick(object sender, RoutedEventArgs e)
+    {
+        Collapse();
+    }
+
+    private void OnIdlePointerEntered(object sender, PointerRoutedEventArgs e) { }
+    private void OnIdlePointerExited(object sender, PointerRoutedEventArgs e) { }
+    private void OnExpandedPointerEntered(object sender, PointerRoutedEventArgs e) { }
+    private void OnExpandedPointerExited(object sender, PointerRoutedEventArgs e) { }
 
     private void OnRootKeyDown(object sender, KeyRoutedEventArgs e)
     {
-        if (e.Key == VirtualKey.Escape && ViewModel.IsExpanded)
+        if (e.Key == VirtualKey.Escape && IsExpanded)
         {
-            ViewModel.Collapse();
+            Collapse();
             e.Handled = true;
         }
     }
@@ -498,9 +414,9 @@ public sealed partial class MainWindow : Window
     {
         if (args.WindowActivationState == WindowActivationState.Deactivated)
         {
-            if (ViewModel.IsExpanded && _settingsManager.CurrentSettings.Behavior.AutoHide)
+            if (IsExpanded && _settingsManager.CurrentSettings.Behavior.AutoHide)
             {
-                ViewModel.Collapse();
+                Collapse();
             }
         }
     }
@@ -616,28 +532,12 @@ public sealed partial class MainWindow : Window
         return new SolidColorBrush(isActive ? Microsoft.UI.Colors.Black : Windows.UI.Color.FromArgb(255, 161, 161, 170));
     }
 
-    private void OnMonitorFollowTick(object? sender, object e)
-    {
-        if (!ViewModel.IsExpanded && _settingsManager.CurrentSettings.Behavior.FollowActiveMonitor)
-        {
-            var activeMonitor = _monitorService.GetActiveMonitor();
-            if (_currentDockMonitorId != null &&
-                !string.Equals(_currentDockMonitorId, activeMonitor.DeviceId, StringComparison.OrdinalIgnoreCase))
-            {
-                _currentDockMonitorId = activeMonitor.DeviceId;
-                _positioningService.Reposition(_hWnd, isExpanded: false);
-            }
-        }
-    }
-
     private Visibility IsBackVisible(string currentView) =>
         string.Equals(currentView, "Home", StringComparison.OrdinalIgnoreCase) ? Visibility.Collapsed : Visibility.Visible;
 
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();
-        _hoverTimer.Stop();
-        _monitorFollowTimer.Stop();
         _fullscreenService.StopMonitoring();
         _fullscreenService.Dispose();
         _hotkeyService.Dispose();

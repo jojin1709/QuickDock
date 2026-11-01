@@ -10,7 +10,7 @@
 </head>
 <body>
 
-  <!-- Site Navigation -->
+  <!-- Site Navigation Header -->
   <header class="site-header">
     <div class="container nav-container">
       <a href="../" class="brand">
@@ -21,16 +21,32 @@
         <li><a href="../features/" class="active">Features</a></li>
         <li><a href="../notch/">Notch</a></li>
         <li><a href="../clipboard/">Clipboard</a></li>
-        <li><a href="../docs/">Docs</a></li>
+        <li><a href="../docs/">Documentation</a></li>
         <li><a href="../changelog/">Changelog</a></li>
-        <li><a href="../download/" class="btn-primary">Download Free</a></li>
       </ul>
+      <div class="header-right">
+        <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" class="header-gh-btn" title="GitHub Repository">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+        </a>
+        <a href="../download/" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+          Get QuickDock
+        </a>
+      </div>
     </div>
   </header>
 
+  <!-- Page Header -->
   <div class="page-header">
     <div class="container">
-      <h1 class="page-title">Modular Architecture. Infinite Utility.</h1>
+      <div class="hero-tagline-wrap" style="justify-content: center;">
+        <span class="hero-tag">MODULAR ARCHITECTURE</span>
+      </div>
+      <h1 class="page-title">Eighteen Native Tools.</h1>
       <p class="page-subtitle">Every utility is built as an independent, lightweight module loaded on-demand to keep idle resource footprint near zero.</p>
     </div>
   </div>
@@ -41,31 +57,40 @@
       <!-- Feature 1: System Monitoring -->
       <div class="feature-split">
         <div class="split-content">
-          <div class="section-tag">Module 01</div>
-          <h2 class="section-title">Hardware Telemetry & Battery Health</h2>
+          <div class="section-tag">MODULE 01</div>
+          <h2 class="section-title">Hardware Telemetry &amp; Battery Health</h2>
           <p class="section-desc">
             Keep tabs on your PC without heavy overlays. QuickDock provides low-overhead CPU, RAM, and storage utilization gauges, battery discharge rates, thermal warnings, and a process inspector that pinpoints rogue background tasks.
           </p>
-          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
-            <li>Radial rings and sparkline graphs</li>
-            <li>Detailed 2x2 cards for Battery, Network, Performance, and Audio Volume</li>
-            <li>Zero-latency WMI and Win32 performance counter interop</li>
+          <ul class="feature-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Radial rings and sparkline graphs with per-process inspector.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Detailed 2×2 cards for Battery, Network, Performance, and Audio Volume.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Zero-latency WMI and Win32 performance counter interop.</span>
+            </li>
           </ul>
         </div>
-        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
-          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Live Telemetry Gauges</div>
-          <div class="rings-row" style="margin-bottom: 20px;">
-            <div class="ring-item">
-              <div class="ring-visual">24%</div>
-              <div class="ring-label">CPU</div>
+        <div class="split-visual" style="padding: 28px;">
+          <div style="font-size:11px; font-weight:700; color:#71717A; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">Live Telemetry Gauges</div>
+          <div class="rings-container" style="margin-bottom: 24px;">
+            <div class="ring-unit">
+              <div class="ring-circle" style="width:48px; height:48px; font-size:11px; border-top-color:#FFFFFF; border-right-color:#FFFFFF;">24%</div>
+              <div class="ring-name" style="font-size:10px;">CPU</div>
             </div>
-            <div class="ring-item">
-              <div class="ring-visual">68%</div>
-              <div class="ring-label">RAM</div>
+            <div class="ring-unit">
+              <div class="ring-circle" style="width:48px; height:48px; font-size:11px; border-top-color:#FFFFFF; border-right-color:#FFFFFF; border-bottom-color:#FFFFFF;">68%</div>
+              <div class="ring-name" style="font-size:10px;">RAM</div>
             </div>
-            <div class="ring-item">
-              <div class="ring-visual">4%</div>
-              <div class="ring-label">DISK</div>
+            <div class="ring-unit">
+              <div class="ring-circle" style="width:48px; height:48px; font-size:11px; border-top-color:#FFFFFF; border-right-color:#27272D;">4%</div>
+              <div class="ring-name" style="font-size:10px;">DISK</div>
             </div>
           </div>
           <div style="font-size:11px; color:#A1A1AA; text-align:center;">Updates every 1000ms while expanded. Pauses instantly when collapsed.</div>
@@ -75,22 +100,31 @@
       <!-- Feature 2: Screen Time -->
       <div class="feature-split reverse">
         <div class="split-content">
-          <div class="section-tag">Module 02</div>
-          <h2 class="section-title">Screen Time & Productivity Insights</h2>
+          <div class="section-tag">MODULE 02</div>
+          <h2 class="section-title">Screen Time &amp; Productivity Insights</h2>
           <p class="section-desc">
             Gain clarity on your work habits without sending data to external servers. QuickDock measures foreground window focus time, tracks application usage, and displays daily goals with a 7-day retrospective chart.
           </p>
-          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
-            <li>Per-app breakdown with percentage bar visualization</li>
-            <li>Configurable daily screen time limits with gentle notifications</li>
-            <li>Encrypted local SQLite storage with zero network access</li>
+          <ul class="feature-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Per-app breakdown with percentage bar visualization.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Configurable daily screen time limits with gentle notifications.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Encrypted local SQLite storage with zero network access.</span>
+            </li>
           </ul>
         </div>
-        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
-          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Today's Breakdown</div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div class="split-visual" style="padding: 28px;">
+          <div style="font-size:11px; font-weight:700; color:#71717A; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:16px;">Today's Breakdown</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
             <div>
-              <div style="font-size:24px; font-weight:800;">4h 12m</div>
+              <div style="font-size:26px; font-weight:800;">4h 12m</div>
               <div style="font-size:11px; color:#71717A;">Screen time today</div>
             </div>
             <div style="text-align:right;">
@@ -98,12 +132,12 @@
               <div style="font-size:11px; color:#71717A;">of 7h daily limit</div>
             </div>
           </div>
-          <div style="border-top:1px solid #1F1F24; padding-top:10px;">
-            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+          <div style="border-top:1px solid #1F1F24; padding-top:14px;">
+            <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;">
               <span>Google Chrome</span>
-              <span>1h 45m (42%)</span>
+              <span style="color:#A1A1AA;">1h 45m (42%)</span>
             </div>
-            <div style="height:4px; background:#27272A; border-radius:2px; overflow:hidden;">
+            <div style="height:5px; background:#27272D; border-radius:3px; overflow:hidden;">
               <div style="width:42%; height:100%; background:#FFFFFF;"></div>
             </div>
           </div>
@@ -113,22 +147,33 @@
       <!-- Feature 3: Developer Toolkit -->
       <div class="feature-split">
         <div class="split-content">
-          <div class="section-tag">Module 03</div>
+          <div class="section-tag">MODULE 03</div>
           <h2 class="section-title">Developer Swiss Army Knife</h2>
           <p class="section-desc">
-            Never Google for online converters or open untrusted formatting websites again. Everything you need to inspect, format, and debug payloads lives right inside the notch.
+            Never search for online converters or open untrusted formatting websites again. Everything you need to inspect, format, and debug payloads lives right inside the notch.
           </p>
-          <ul style="margin: 16px 0 0 20px; color: var(--text-muted); font-size: 14px;">
-            <li>JSON formatter, validator, and minifier with syntax error reporting</li>
-            <li>Base64 text and image encoder/decoder</li>
-            <li>UUID/GUID v4 generator with uppercase/hyphen options</li>
-            <li>UNIX timestamp converter with millisecond resolution</li>
-            <li>Developer process port inspector (`netstat` correlation)</li>
+          <ul class="feature-list">
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>JSON formatter, validator, and minifier with error syntax highlighting.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Base64 text and image encoder/decoder.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>UUID/GUID v4 generator and timestamp converter.</span>
+            </li>
+            <li>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Developer process port inspector (netstat correlation).</span>
+            </li>
           </ul>
         </div>
-        <div class="split-visual" style="background:#0A0A0C; border-color:#222226; color:#FFFFFF;">
-          <div style="font-size:12px; font-weight:700; color:#71717A; text-transform:uppercase; margin-bottom:12px;">Built-in Developer Utilities</div>
-          <div class="code-block" style="margin:0 0 10px 0;">
+        <div class="split-visual" style="padding: 24px;">
+          <div style="font-size:11px; font-weight:700; color:#71717A; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:12px;">Built-in Developer Utilities</div>
+          <div class="code-block" style="margin:0 0 12px 0;">
             <pre><code>// Instant JSON Validator
 {
   "quickdock": "v1.0.0",
@@ -146,23 +191,54 @@
     </div>
   </section>
 
+  <!-- Section: Bottom Download CTA Banner -->
+  <section class="container">
+    <div class="download-banner-card">
+      <div class="download-banner-left">
+        <div class="download-circle-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="download-banner-title">Get QuickDock</h3>
+          <p class="download-banner-sub">A free, local and reliable productivity dock for Windows 11.</p>
+        </div>
+      </div>
+      <div class="download-banner-actions">
+        <a href="../download/" class="btn-primary" style="padding: 12px 24px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 5.479l7.377-1.016v7.127H3V5.48zm0 13.042l7.377 1.017v-7.04H3v6.023zm8.333 1.148L21 21V11.59H11.333v8.079zm0-15.338V11.59H21V3l-9.667 1.331z"/>
+          </svg>
+          Download for Windows
+        </a>
+        <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" class="btn-secondary" style="padding: 12px 20px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          View Source
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- Site Footer -->
   <footer class="site-footer">
     <div class="container">
-      <div class="footer-grid">
+      <div class="footer-top">
         <div class="footer-brand">
           <a href="../" class="brand">
             <img src="../assets/images/logo.png" alt="QuickDock">
             <span>QuickDock</span>
           </a>
-          <p>Native dynamic notch and island utility for Windows 11. Designed for speed, privacy, and precision.</p>
+          <p>The notch for Windows.</p>
         </div>
         <div class="footer-col">
           <h4>Product</h4>
           <ul>
             <li><a href="../features/">Features</a></li>
-            <li><a href="../notch/">Notch Interaction</a></li>
-            <li><a href="../clipboard/">Clipboard Manager</a></li>
+            <li><a href="../notch/">Notch</a></li>
+            <li><a href="../clipboard/">Clipboard</a></li>
             <li><a href="../download/">Download</a></li>
           </ul>
         </div>
@@ -171,21 +247,26 @@
           <ul>
             <li><a href="../docs/">Documentation</a></li>
             <li><a href="../changelog/">Changelog</a></li>
-            <li><a href="../privacy/">Privacy Policy</a></li>
             <li><a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener">GitHub</a></li>
           </ul>
         </div>
         <div class="footer-col">
-          <h4>Author</h4>
+          <h4>Legal</h4>
           <ul>
-            <li><span>JOJIN JOHN</span></li>
-            <li><span>Master Build v1.0.0</span></li>
+            <li><a href="../privacy/">Privacy</a></li>
+            <li><a href="https://github.com/jojin1709/QuickDock/blob/master/LICENSE" target="_blank" rel="noopener">License</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
-        <span>&copy; 2026 JOJIN JOHN. All rights reserved.</span>
-        <span>Made for Windows 11</span>
+        <span>© 2026 QuickDock. Free and open source.</span>
+        <div class="footer-socials">
+          <a href="https://github.com/jojin1709/QuickDock" target="_blank" rel="noopener" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+          </a>
+        </div>
       </div>
     </div>
   </footer>
@@ -193,4 +274,3 @@
   <script src="../assets/js/main.js"></script>
 </body>
 </html>
-

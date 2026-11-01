@@ -351,6 +351,7 @@ public partial class MainWindow : Window
                 key.SetValue("DisplayIcon", $"{appExe},0");
                 key.SetValue("InstallLocation", installDir);
                 key.SetValue("UninstallString", $"\"{uninstallerExe}\" /uninstall");
+                key.SetValue("QuietUninstallString", $"\"{uninstallerExe}\" /uninstall /quiet");
                 key.SetValue("URLInfoAbout", "https://www.linkedin.com/in/jojin-john/");
                 key.SetValue("HelpLink", "https://github.com/jojin1709/QuickDock/issues");
                 key.SetValue("EstimatedSize", 320000, RegistryValueKind.DWord);
