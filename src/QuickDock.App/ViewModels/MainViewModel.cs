@@ -16,7 +16,51 @@ public sealed partial class MainViewModel : ObservableObject
     private bool _isExpanded;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CurrentViewTitle))]
+    [NotifyPropertyChangedFor(nameof(CurrentViewSubtitle))]
     private string _currentView = "Home"; // "Home", "System", "Settings", "Clipboard", "Timer", "Notes", "Calendar", "Weather", "Links", "ScreenTime", "FileShelf", "QuickDrop", "Converter", "Transfers"
+
+    public string CurrentViewTitle => CurrentView switch
+    {
+        "Home" => "Home",
+        "System" => "System Monitor",
+        "Settings" => "Settings",
+        "Clipboard" => "Clipboard History",
+        "Timer" => "Focus & Timer",
+        "Notes" => "Notes & Scratchpad",
+        "Calendar" => "Calendar & Events",
+        "Weather" => "Weather Forecast",
+        "Links" => "Saved Bookmarks",
+        "ScreenTime" => "Screen Time Analytics",
+        "FileShelf" => "File Shelf",
+        "QuickDrop" => "QuickDrop Transfer",
+        "Converter" => "File Converter",
+        "Transfers" => "Active Transfers",
+        "Developer" => "Developer Toolkit",
+        "NetworkSecurity" => "Network & Security",
+        _ => CurrentView
+    };
+
+    public string CurrentViewSubtitle => CurrentView switch
+    {
+        "Home" => Home.CurrentDate,
+        "System" => "Real-time hardware performance",
+        "Settings" => "Preferences and customization",
+        "Clipboard" => "Recently copied clips",
+        "Timer" => "Pomodoro & countdown timer",
+        "Notes" => "Quick markdown thoughts",
+        "Calendar" => "Schedule overview",
+        "Weather" => "Current conditions",
+        "Links" => "Quick access URLs",
+        "ScreenTime" => "Application usage insights",
+        "FileShelf" => "Staged files for sharing",
+        "QuickDrop" => "Local LAN transfer",
+        "Converter" => "Convert images and documents",
+        "Transfers" => "Downloads & file operations",
+        "Developer" => "Developer diagnostics & utilities",
+        "NetworkSecurity" => "Network telemetry & security posture",
+        _ => ""
+    };
 
     public HomeViewModel Home { get; }
     public SystemViewModel System { get; }

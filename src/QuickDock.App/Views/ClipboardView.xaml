@@ -11,60 +11,17 @@
 
     <Grid RowSpacing="10">
         <Grid.RowDefinitions>
-            <!-- Header bar with Back button -->
-            <RowDefinition Height="Auto" />
             <!-- Search & Actions -->
             <RowDefinition Height="Auto" />
             <!-- History Content -->
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <Grid Grid.Row="0" Margin="4,0,4,2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Button Grid.Column="0"
-                    Command="{x:Bind MainViewModel.OpenHomeCommand, Mode=OneWay}"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Padding="8"
-                    CornerRadius="6"
-                    VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <FontIcon Glyph="&#xE72B;" FontSize="14" />
-                    <TextBlock Text="Back" FontSize="13" VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
-
-            <TextBlock Grid.Column="1"
-                       Text="Clipboard Manager"
-                       FontSize="16"
-                       FontWeight="SemiBold"
-                       VerticalAlignment="Center"
-                       Margin="12,0,0,0" />
-
-            <!-- Pause / Resume Toggle -->
-            <Button Grid.Column="2"
-                    Command="{x:Bind ViewModel.TogglePauseCommand}"
-                    Background="Transparent"
-                    BorderBrush="Transparent"
-                    Padding="6,4"
-                    CornerRadius="6">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <FontIcon Glyph="{x:Bind ViewModel.PauseButtonGlyph, Mode=OneWay}" FontSize="13" />
-                    <TextBlock Text="{x:Bind ViewModel.PauseButtonText, Mode=OneWay}" FontSize="12" />
-                </StackPanel>
-            </Button>
-        </Grid>
-
         <!-- Search and Action Bar -->
-        <Grid Grid.Row="1" ColumnSpacing="8">
+        <Grid Grid.Row="0" ColumnSpacing="8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
@@ -73,14 +30,27 @@
                      Text="{x:Bind ViewModel.SearchQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      CornerRadius="6" />
 
+            <!-- Pause / Resume Toggle -->
             <Button Grid.Column="1"
+                    Command="{x:Bind ViewModel.TogglePauseCommand}"
+                    Background="Transparent"
+                    BorderBrush="#27272A"
+                    Padding="8,6"
+                    CornerRadius="6">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <FontIcon Glyph="{x:Bind ViewModel.PauseButtonGlyph, Mode=OneWay}" FontSize="12" />
+                    <TextBlock Text="{x:Bind ViewModel.PauseButtonText, Mode=OneWay}" FontSize="12" />
+                </StackPanel>
+            </Button>
+
+            <Button Grid.Column="2"
                     Content="Clear"
                     Command="{x:Bind ViewModel.ClearHistoryCommand}"
                     CornerRadius="6" />
         </Grid>
 
         <!-- Items View -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="12">
                 <!-- Pinned Items -->
                 <TextBlock Text="PINNED"

@@ -33,8 +33,11 @@ public sealed partial class MainWindow : Window
 
     private readonly DispatcherTimer _hoverTimer;
     private readonly DispatcherTimer _tickTimer;
+    private readonly DispatcherTimer _monitorFollowTimer;
     private int _metricsCounter;
     private IntPtr _previousForegroundHwnd = IntPtr.Zero;
+    private bool _isExplicitExit = false;
+    private string? _currentDockMonitorId;
 
     public MainViewModel ViewModel { get; }
 
@@ -74,8 +77,19 @@ public sealed partial class MainWindow : Window
         ViewModel.SetDispatcherQueue(DispatcherQueue);
 
         // Native WinUI 3 Borderless, Titlebarless, AlwaysOnTop OverlappedPresenter
+        // Hide completely from taskbar and Alt+Tab switcher
         try
         {
+            AppWindow.IsShownInSwitchers = false;
+            AppWindow.Closing += (sender, args) =>
+            {
+                if (!_isExplicitExit)
+                {
+                    args.Cancel = true;
+                    ViewModel.Collapse();
+                }
+            };
+
             if (AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter presenter)
             {
                 presenter.SetBorderAndTitleBar(false, false);
@@ -90,14 +104,11 @@ public sealed partial class MainWindow : Window
             _logger.LogWarning(ex, "Failed to configure OverlappedPresenter.");
         }
 
-        try
-        {
-            SystemBackdrop = new MicaBackdrop();
-        }
-        catch
-        {
-            // Mica fallback
-        }
+        _monitorService.SetDockHandle(_hWnd);
+        var initialMon = _monitorService.GetTargetMonitor(
+            _settingsManager.CurrentSettings.Behavior.MonitorTarget,
+            _settingsManager.CurrentSettings.Behavior.FollowActiveMonitor);
+        _currentDockMonitorId = initialMon.DeviceId;
 
         _positioningService.ConfigureDockWindow(_hWnd);
 
@@ -126,6 +137,14 @@ public sealed partial class MainWindow : Window
         };
         _tickTimer.Tick += OnTickTimer;
         _tickTimer.Start();
+
+        // Multi-monitor cursor tracking timer (smoothly moves dock across screens)
+        _monitorFollowTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(200)
+        };
+        _monitorFollowTimer.Tick += OnMonitorFollowTick;
+        _monitorFollowTimer.Start();
 
         // Register Global Hotkey (Ctrl + Space)
         _hotkeyService.Register(_hWnd, () =>
@@ -186,7 +205,11 @@ public sealed partial class MainWindow : Window
                 BringToFront();
             }),
             onRestart: () => DispatcherQueue.TryEnqueue(RestartApplication),
-            onExit: () => DispatcherQueue.TryEnqueue(Close)
+            onExit: () => DispatcherQueue.TryEnqueue(() =>
+            {
+                _isExplicitExit = true;
+                Close();
+            })
         );
 
         // Fullscreen detection
@@ -509,10 +532,28 @@ public sealed partial class MainWindow : Window
         return new SolidColorBrush(isActive ? Microsoft.UI.Colors.Black : Windows.UI.Color.FromArgb(255, 161, 161, 170));
     }
 
+    private void OnMonitorFollowTick(object? sender, object e)
+    {
+        if (!ViewModel.IsExpanded && _settingsManager.CurrentSettings.Behavior.FollowActiveMonitor)
+        {
+            var activeMonitor = _monitorService.GetActiveMonitor();
+            if (_currentDockMonitorId != null &&
+                !string.Equals(_currentDockMonitorId, activeMonitor.DeviceId, StringComparison.OrdinalIgnoreCase))
+            {
+                _currentDockMonitorId = activeMonitor.DeviceId;
+                _positioningService.Reposition(_hWnd, isExpanded: false);
+            }
+        }
+    }
+
+    private Visibility IsBackVisible(string currentView) =>
+        string.Equals(currentView, "Home", StringComparison.OrdinalIgnoreCase) ? Visibility.Collapsed : Visibility.Visible;
+
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();
         _hoverTimer.Stop();
+        _monitorFollowTimer.Stop();
         _fullscreenService.StopMonitoring();
         _fullscreenService.Dispose();
         _hotkeyService.Dispose();

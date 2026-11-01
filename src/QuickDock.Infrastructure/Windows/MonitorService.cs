@@ -7,12 +7,18 @@ namespace QuickDock.Infrastructure.Windows;
 public sealed class MonitorService : IMonitorService
 {
     private readonly ILogger<MonitorService> _logger;
+    private IntPtr _dockHwnd = IntPtr.Zero;
 
     public event EventHandler? MonitorsChanged;
 
     public MonitorService(ILogger<MonitorService> logger)
     {
         _logger = logger;
+    }
+
+    public void SetDockHandle(IntPtr hWnd)
+    {
+        _dockHwnd = hWnd;
     }
 
     public IReadOnlyList<MonitorInfo> GetAllMonitors()
@@ -119,27 +125,26 @@ public sealed class MonitorService : IMonitorService
 
         try
         {
-            // 1. Try foreground window
-            IntPtr fgHwnd = NativeMethods.GetForegroundWindow();
-            if (fgHwnd != IntPtr.Zero)
-            {
-                IntPtr hMon = NativeMethods.MonitorFromWindow(fgHwnd, NativeMethods.MONITOR_DEFAULTTONEAREST);
-                var match = FindMonitorByHandle(hMon, monitors);
-                if (match != null) return match;
-            }
-
-            // 2. Try cursor position
+            // 1. Try cursor position first (best representation of user's active focus across dual/multi monitors)
             if (NativeMethods.GetCursorPos(out var pt))
             {
                 IntPtr hMon = NativeMethods.MonitorFromPoint(pt, NativeMethods.MONITOR_DEFAULTTONEAREST);
                 var match = FindMonitorByHandle(hMon, monitors);
                 if (match != null) return match;
 
-                // Or check point in monitor bounds
                 var pointMatch = monitors.FirstOrDefault(m =>
                     pt.X >= m.BoundsX && pt.X < m.BoundsX + m.BoundsWidth &&
                     pt.Y >= m.BoundsY && pt.Y < m.BoundsY + m.BoundsHeight);
                 if (pointMatch != null) return pointMatch;
+            }
+
+            // 2. Try foreground window (excluding QuickDock's own window)
+            IntPtr fgHwnd = NativeMethods.GetForegroundWindow();
+            if (fgHwnd != IntPtr.Zero && fgHwnd != _dockHwnd)
+            {
+                IntPtr hMon = NativeMethods.MonitorFromWindow(fgHwnd, NativeMethods.MONITOR_DEFAULTTONEAREST);
+                var match = FindMonitorByHandle(hMon, monitors);
+                if (match != null) return match;
             }
         }
         catch (Exception ex)

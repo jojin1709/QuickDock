@@ -82,6 +82,19 @@ public sealed class WindowPositioningService : IWindowPositioningService
 
         try
         {
+            // 1. Remove from taskbar and Alt+Tab via extended styles
+            long exStyle = NativeMethods.GetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE).ToInt64();
+            exStyle |= NativeMethods.WS_EX_TOOLWINDOW;
+            exStyle &= ~NativeMethods.WS_EX_APPWINDOW;
+            NativeMethods.SetWindowLongPtr(hWnd, NativeMethods.GWL_EXSTYLE, new IntPtr(exStyle));
+
+            // 2. Disable default OS window border and standard window rounding
+            int cornerPreference = NativeMethods.DWMWCP_DONOTROUND;
+            NativeMethods.DwmSetWindowAttribute(hWnd, NativeMethods.DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference, sizeof(int));
+
+            uint colorNone = NativeMethods.DWMWA_COLOR_NONE;
+            NativeMethods.DwmSetWindowAttribute(hWnd, NativeMethods.DWMWA_BORDER_COLOR, ref colorNone, sizeof(uint));
+
             bool alwaysOnTop = _settingsManager.CurrentSettings.Behavior.AlwaysOnTop;
             SetAlwaysOnTop(hWnd, alwaysOnTop);
             SetDockState(hWnd, isExpanded: false);
@@ -149,6 +162,9 @@ public sealed class WindowPositioningService : IWindowPositioningService
                 NativeMethods.SWP_SHOWWINDOW | NativeMethods.SWP_FRAMECHANGED
             );
 
+            // Shape the HWND so corners outside the pill are physically transparent and not drawn by DWM
+            ApplyWindowRegion(hWnd, width, height, isExpanded);
+
             _logger.LogDebug(
                 "Dock repositioned on {MonitorName}. Expanded: {Expanded}, Pos: ({X},{Y}), Size: {W}x{H}, Scale: {Scale}",
                 targetMonitor.DeviceName, isExpanded, x, y, width, height, targetMonitor.ScaleFactor);
@@ -156,6 +172,28 @@ public sealed class WindowPositioningService : IWindowPositioningService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to reposition dock window.");
+        }
+    }
+
+    private static void ApplyWindowRegion(IntPtr hWnd, int width, int height, bool isExpanded)
+    {
+        if (hWnd == IntPtr.Zero || width <= 0 || height <= 0) return;
+
+        try
+        {
+            // Idle notch: corner radius 14 (diameter 28). Top starts at -10 to sit flush with top display bezel.
+            // Expanded dashboard: corner radius 20 (diameter 40). Top starts at -10 to sit flush with top display bezel.
+            int cornerDiameter = isExpanded ? 40 : 28;
+            IntPtr hRgn = NativeMethods.CreateRoundRectRgn(0, -10, width + 1, height + 1, cornerDiameter, cornerDiameter);
+            if (hRgn != IntPtr.Zero)
+            {
+                // Windows takes ownership of hRgn after successful SetWindowRgn
+                NativeMethods.SetWindowRgn(hWnd, hRgn, true);
+            }
+        }
+        catch
+        {
+            // Fallback gracefully
         }
     }
 }

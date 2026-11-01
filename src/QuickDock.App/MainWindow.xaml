@@ -17,13 +17,19 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Background="#000000"
-                BorderBrush="#44FFFFFF"
-                BorderThickness="0,0,0,1.5"
-                CornerRadius="0,0,16,16"
+                BorderBrush="#27272A"
+                BorderThickness="1,0,1,1"
+                CornerRadius="0,0,14,14"
                 Padding="0"
                 PointerEntered="OnIdlePointerEntered"
                 PointerExited="OnIdlePointerExited"
                 PointerPressed="OnIdlePointerPressed">
+
+            <Border.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition FromVerticalOffset="-10" />
+                </TransitionCollection>
+            </Border.Transitions>
 
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -85,11 +91,17 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Stretch"
                 Background="#0D0D10"
-                BorderBrush="#242428"
-                BorderThickness="1"
+                BorderBrush="#27272A"
+                BorderThickness="1,0,1,1"
                 CornerRadius="0,0,20,20"
                 Padding="0"
                 Visibility="Collapsed">
+
+            <Border.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition FromVerticalOffset="-12" />
+                </TransitionCollection>
+            </Border.Transitions>
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -109,15 +121,27 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left: Squircle Logo + "Home" + Date -->
+                    <!-- Left: Back button (when not on Home) + Squircle Logo + Dynamic Title + Subtitle -->
                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <!-- Back button if not on Home view -->
+                        <Button ToolTipService.ToolTip="Back to Home"
+                                Command="{x:Bind ViewModel.OpenHomeCommand, Mode=OneWay}"
+                                Visibility="{x:Bind IsBackVisible(ViewModel.CurrentView), Mode=OneWay}"
+                                Background="Transparent"
+                                BorderBrush="Transparent"
+                                Padding="6"
+                                Margin="0,0,2,0"
+                                CornerRadius="6"
+                                VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE72B;" FontSize="13" Foreground="#A1A1AA" />
+                        </Button>
                         <controls:QuickDockIcon Width="22" Height="22" VerticalAlignment="Center" />
-                        <TextBlock Text="Home"
+                        <TextBlock Text="{x:Bind ViewModel.CurrentViewTitle, Mode=OneWay}"
                                    FontWeight="SemiBold"
                                    FontSize="16"
                                    Foreground="#FFFFFF"
                                    VerticalAlignment="Center" />
-                        <TextBlock Text="{x:Bind ViewModel.Home.CurrentDate, Mode=OneWay}"
+                        <TextBlock Text="{x:Bind ViewModel.CurrentViewSubtitle, Mode=OneWay}"
                                    FontSize="12"
                                    Foreground="#8E8E93"
                                    VerticalAlignment="Center"
