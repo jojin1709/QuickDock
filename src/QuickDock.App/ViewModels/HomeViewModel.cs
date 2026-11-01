@@ -460,7 +460,7 @@ public sealed partial class HomeViewModel : ObservableObject
             MemoryMetricText = "65% RAM";
         }
 
-        var disk = _metricsService.GetDiskMetrics("C");
+        var disk = _metricsService.GetDiskMetrics();
         if (disk != null)
         {
             DiskPercent = Math.Clamp(disk.UsedPercentage, 0, 100);

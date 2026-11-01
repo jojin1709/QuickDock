@@ -32,4 +32,8 @@
     <!-- Embedded installation payload archive with fixed logical name -->
     <EmbeddedResource Include="payload.zip" LogicalName="payload.zip" />
   </ItemGroup>
+
+  <Target Name="EnsurePayloadZipBeforeBuild" BeforeTargets="BeforeBuild">
+    <Exec Command="powershell -Command &quot;if (-not (Test-Path 'payload.zip')) { New-Item -ItemType File -Path 'payload.dummy' -Force; Compress-Archive -Path 'payload.dummy' -DestinationPath 'payload.zip' -Force; Remove-Item 'payload.dummy' -Force }&quot;" Condition="!Exists('payload.zip')" />
+  </Target>
 </Project>

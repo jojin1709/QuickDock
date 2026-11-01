@@ -14,19 +14,36 @@ public static class Program
         string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "QuickDock");
         Directory.CreateDirectory(dir);
         string mutexName = $"Global\\QuickDock_SingleInstance_{Environment.UserName}";
-        _instanceMutex = new Mutex(true, mutexName, out bool isInitialInstance);
+        bool isInitialInstance;
+        try
+        {
+            _instanceMutex = new Mutex(true, mutexName, out isInitialInstance);
+        }
+        catch (AbandonedMutexException)
+        {
+            isInitialInstance = true;
+        }
 
         if (!isInitialInstance)
         {
-            // Another instance is already running; signal it to activate and bring to front
-            uint activateMsg = NativeMethods.RegisterWindowMessageW("QUICKDOCK_ACTIVATE_INSTANCE");
-            if (activateMsg != 0)
+            // Verify if there really is an active QuickDock process
+            var currentProc = System.Diagnostics.Process.GetCurrentProcess();
+            var existingProcs = System.Diagnostics.Process.GetProcessesByName("QuickDock.App")
+                .Where(p => p.Id != currentProc.Id)
+                .ToList();
+
+            if (existingProcs.Count > 0)
             {
-                NativeMethods.PostMessageW(NativeMethods.HWND_BROADCAST, activateMsg, IntPtr.Zero, IntPtr.Zero);
+                // Another instance is genuinely running; signal it to activate and bring to front
+                uint activateMsg = NativeMethods.RegisterWindowMessageW("QUICKDOCK_ACTIVATE_INSTANCE");
+                if (activateMsg != 0)
+                {
+                    NativeMethods.PostMessageW(NativeMethods.HWND_BROADCAST, activateMsg, IntPtr.Zero, IntPtr.Zero);
+                }
+                _instanceMutex?.Dispose();
+                _instanceMutex = null;
+                return;
             }
-            _instanceMutex.Dispose();
-            _instanceMutex = null;
-            return;
         }
 
         AppDomain.CurrentDomain.FirstChanceException += (s, e) =>

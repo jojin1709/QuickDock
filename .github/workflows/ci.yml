@@ -25,6 +25,10 @@ jobs:
       - name: Restore Dependencies
         run: dotnet restore QuickDock.slnx
 
+      - name: Create Stub Payload for Setup Project
+        run: |
+          powershell -Command "if (-not (Test-Path 'src/QuickDock.Setup/payload.zip')) { New-Item -ItemType File -Path 'src/QuickDock.Setup/payload.dummy' -Force; Compress-Archive -Path 'src/QuickDock.Setup/payload.dummy' -DestinationPath 'src/QuickDock.Setup/payload.zip' -Force; Remove-Item 'src/QuickDock.Setup/payload.dummy' -Force }"
+
       - name: Build Solution
         run: dotnet build QuickDock.slnx -c Release --no-restore
 
