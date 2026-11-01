@@ -138,6 +138,10 @@ public sealed class NotchWindowManager : IDisposable
     {
         foreach (var state in _dockStates.Values)
         {
+            var mon = state.Monitor;
+            bool onThisMonitor = px >= mon.BoundsX && px < (mon.BoundsX + mon.BoundsWidth) &&
+                                 py >= mon.BoundsY && py < (mon.BoundsY + mon.BoundsHeight);
+
             bool inHitZone = px >= state.TopHitZone.Left && px <= state.TopHitZone.Right &&
                              py >= state.TopHitZone.Top && py <= state.TopHitZone.Bottom;
 
@@ -149,7 +153,7 @@ public sealed class NotchWindowManager : IDisposable
 
             if (state.Window.IsExpanded)
             {
-                bool inZone = inExpanded || inHitZone || inIdle;
+                bool inZone = onThisMonitor && (inExpanded || inHitZone || inIdle);
                 if (inZone)
                 {
                     if (state.State == DockInteractionState.Closing)
@@ -173,7 +177,7 @@ public sealed class NotchWindowManager : IDisposable
             }
             else
             {
-                bool inZone = inHitZone || inIdle;
+                bool inZone = onThisMonitor && (inHitZone || inIdle);
                 if (inZone)
                 {
                     if (state.State == DockInteractionState.Closed)
@@ -300,8 +304,7 @@ public sealed class NotchWindowManager : IDisposable
             {
                 _logger.LogInformation("Creating notch window for monitor {Device} (Primary={Primary}, Scale={Scale:F2}).", monitor.DeviceId, monitor.IsPrimary, monitor.ScaleFactor);
                 var win = _serviceProvider.GetRequiredService<MainWindow>();
-                win.TargetMonitor = monitor;
-                win.IsPrimaryInstance = monitor.IsPrimary;
+                win.InitializeForMonitor(monitor, monitor.IsPrimary);
 
                 IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(win);
 
@@ -391,13 +394,15 @@ public sealed class NotchWindowManager : IDisposable
         int expY = mon.WorkY;
         state.ExpandedBounds = (expX, expY, expW, expH);
 
-        int hitTolerance = (int)Math.Round(30 * mon.ScaleFactor);
-        int hitDepth = (int)Math.Round(12 * mon.ScaleFactor);
+        int hitToleranceX = (int)Math.Round(40 * mon.ScaleFactor);
+        int hitDepth = (int)Math.Round(14 * mon.ScaleFactor);
+        int topEdge = Math.Min(mon.BoundsY, mon.WorkY);
+
         state.TopHitZone = (
-            Left: idleX - hitTolerance,
-            Right: idleX + idleW + hitTolerance,
-            Top: mon.WorkY,
-            Bottom: mon.WorkY + hitDepth
+            Left: idleX - hitToleranceX,
+            Right: idleX + idleW + hitToleranceX,
+            Top: topEdge,
+            Bottom: idleY + idleH + hitDepth
         );
     }
 

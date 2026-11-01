@@ -33,6 +33,8 @@ public class MockClipboardService : IClipboardService
         IsListening = false;
     }
 
+    public Task ProcessCurrentClipboardAsync() => Task.CompletedTask;
+
     public Task<List<ClipboardItem>> GetHistoryAsync(string? search = null, ClipboardContentType? filterType = null) => Task.FromResult(new List<ClipboardItem>());
     public Task CopyItemToClipboardAsync(ClipboardItem item) => Task.CompletedTask;
     public Task SetPinnedAsync(string id, bool isPinned) => Task.CompletedTask;

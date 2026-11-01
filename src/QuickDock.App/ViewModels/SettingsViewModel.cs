@@ -369,7 +369,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     // About
     [ObservableProperty]
-    private string _appVersion = "1.0.0";
+    private string _appVersion = "1.0.1";
 
     [ObservableProperty]
     private string _developerName = "JOJIN JOHN";
@@ -960,6 +960,91 @@ public sealed partial class SettingsViewModel : ObservableObject
             }
         }
         _ = SaveSettingsAndPublishAsync("Dock");
+    }
+
+    [RelayCommand]
+    public void SetTimeFormat(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) TimeFormatIndex = v; }
+
+    [RelayCommand]
+    public void SetTemperatureUnit(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) TemperatureUnitIndex = v; }
+
+    [RelayCommand]
+    public void SetWindSpeedUnit(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) WindSpeedUnitIndex = v; }
+
+    [RelayCommand]
+    public void SetVisibilityMode(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) VisibilityMode = v; }
+
+    [RelayCommand]
+    public void SetStyleMode(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) StyleMode = v; }
+
+    [RelayCommand]
+    public void SetThemeMode(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) ThemeMode = v; }
+
+    [RelayCommand]
+    public void SetNotchShape(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) NotchShapeIndex = v; }
+
+    [RelayCommand]
+    public void SetRestingLayout(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) RestingLayoutIndex = v; }
+
+    [RelayCommand]
+    public void SetOutlineWidth(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) OutlineWidthIndex = v; }
+
+    [RelayCommand]
+    public void SetShadowLevel(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) ShadowLevelIndex = v; }
+
+    [RelayCommand]
+    public void SetSoftEdgeLevel(object? p) { if (p != null && int.TryParse(p.ToString(), out int v)) SoftEdgeLevelIndex = v; }
+
+    [RelayCommand]
+    public void SetPreviewHover(object? p) { if (p != null && bool.TryParse(p.ToString(), out bool v)) PreviewIsHover = v; }
+
+    partial void OnTimeFormatIndexChanged(int value)
+    {
+        if (_isLoading) return;
+        _ = SaveSettingsAndPublishAsync("General");
+    }
+
+    partial void OnTemperatureUnitIndexChanged(int value)
+    {
+        if (_isLoading) return;
+        _ = SaveSettingsAndPublishAsync("General");
+    }
+
+    partial void OnWindSpeedUnitIndexChanged(int value)
+    {
+        if (_isLoading) return;
+        _ = SaveSettingsAndPublishAsync("General");
+    }
+
+    partial void OnVisibilityModeChanged(int value)
+    {
+        if (_isLoading) return;
+        _ = SaveSettingsAndPublishAsync("Notch");
+    }
+
+    partial void OnStyleModeChanged(int value)
+    {
+        if (_isLoading) return;
+        _ = SaveSettingsAndPublishAsync("Notch");
+    }
+
+    partial void OnThemeModeChanged(int value)
+    {
+        if (_isLoading) return;
+        var s = _settingsManager.CurrentSettings;
+        s.Appearance.Theme = value switch
+        {
+            1 => AppTheme.Dark,
+            2 => AppTheme.Light,
+            _ => AppTheme.Dark
+        };
+        _ = SaveSettingsAndPublishAsync("Appearance");
+    }
+
+    partial void OnNotchShapeIndexChanged(int value)
+    {
+        if (_isLoading) return;
+        _ = SaveSettingsAndPublishAsync("Notch");
     }
 
     // Notifications

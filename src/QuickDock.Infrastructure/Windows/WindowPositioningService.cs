@@ -168,9 +168,6 @@ public sealed class WindowPositioningService : IWindowPositioningService
                 swpFlags
             );
 
-            // Shape the HWND so corners outside the pill are physically transparent and not drawn by DWM
-            ApplyWindowRegion(hWnd, width, height, isExpanded, targetMonitor.ScaleFactor);
-
             _logger.LogDebug(
                 "Dock repositioned on {MonitorName}. Expanded: {Expanded}, Pos: ({X},{Y}), Size: {W}x{H}, Scale: {Scale}",
                 targetMonitor.DeviceName, isExpanded, x, y, width, height, targetMonitor.ScaleFactor);
@@ -178,30 +175,6 @@ public sealed class WindowPositioningService : IWindowPositioningService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to reposition dock window.");
-        }
-    }
-
-    private static void ApplyWindowRegion(IntPtr hWnd, int width, int height, bool isExpanded, double scaleFactor)
-    {
-        if (hWnd == IntPtr.Zero || width <= 0 || height <= 0) return;
-
-        try
-        {
-            if (scaleFactor <= 0) scaleFactor = 1.0;
-            // Idle notch: corner radius 14 (diameter 28). Top starts at -10 to sit flush with top display bezel.
-            // Expanded dashboard: corner radius 20 (diameter 40). Top starts at -10 to sit flush with top display bezel.
-            int cornerDiameter = (int)Math.Round((isExpanded ? 40 : 28) * scaleFactor);
-            int topOffset = (int)Math.Round(-10 * scaleFactor);
-            IntPtr hRgn = NativeMethods.CreateRoundRectRgn(0, topOffset, width + 1, height + 1, cornerDiameter, cornerDiameter);
-            if (hRgn != IntPtr.Zero)
-            {
-                // Windows takes ownership of hRgn after successful SetWindowRgn
-                NativeMethods.SetWindowRgn(hWnd, hRgn, true);
-            }
-        }
-        catch
-        {
-            // Fallback gracefully
         }
     }
 }

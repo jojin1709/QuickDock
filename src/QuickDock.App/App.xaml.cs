@@ -209,7 +209,7 @@ public partial class App : Application
                 services.AddSingleton<TransferManagerViewModel>();
                 services.AddSingleton<DeveloperViewModel>();
                 services.AddSingleton<NetworkSecurityViewModel>();
-                services.AddSingleton<MainViewModel>();
+                services.AddTransient<MainViewModel>();
                 services.AddSingleton<NotchWindowManager>();
                 services.AddTransient<MainWindow>();
             })

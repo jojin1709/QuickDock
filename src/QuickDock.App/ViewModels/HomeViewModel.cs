@@ -41,6 +41,24 @@ public sealed partial class HomeViewModel : ObservableObject
 
     private global::System.Threading.Timer? _focusTicker;
     private TimeSpan _focusRemaining = TimeSpan.FromMinutes(25);
+    private Microsoft.UI.Dispatching.DispatcherQueue? _dispatcherQueue;
+
+    public void SetDispatcherQueue(Microsoft.UI.Dispatching.DispatcherQueue? dispatcherQueue)
+    {
+        _dispatcherQueue = dispatcherQueue;
+    }
+
+    private void RunOnUI(Action action)
+    {
+        if (_dispatcherQueue != null && !_dispatcherQueue.HasThreadAccess)
+        {
+            _dispatcherQueue.TryEnqueue(() => action());
+        }
+        else
+        {
+            action();
+        }
+    }
 
     public event Action<string>? NavigationRequested;
 
@@ -216,8 +234,8 @@ public sealed partial class HomeViewModel : ObservableObject
 
         _audioService.VolumeChanged += OnAudioVolumeChanged;
         _mediaService.MediaChanged += OnMediaChanged;
-        _timerService.TimerUpdated += (s, t) => RefreshTimerSummary();
-        _weatherService.WeatherUpdated += (s, w) => RefreshWeatherSummary(w);
+        _timerService.TimerUpdated += (s, t) => RunOnUI(RefreshTimerSummary);
+        _weatherService.WeatherUpdated += (s, w) => RunOnUI(() => RefreshWeatherSummary(w));
 
         _ = RefreshSummaryDataAsync();
     }
@@ -228,74 +246,74 @@ public sealed partial class HomeViewModel : ObservableObject
         {
             // Clipboard summary & recent items
             var recentClips = await _databaseService.GetClipboardItemsAsync(limit: 2);
-            RecentClips.Clear();
-            if (recentClips.Count > 0)
-            {
-                ClipboardSnippetText = recentClips[0].Preview;
-                foreach (var clip in recentClips)
-                {
-                    string icon = clip.Type == Core.Models.ClipboardContentType.Image ? "\uEB9F" : "\uE8C4";
-                    string title = clip.Preview;
-                    if (clip.Type == Core.Models.ClipboardContentType.Image && !title.Contains("Image"))
-                    {
-                        title = $"Image · {clip.Preview}";
-                    }
-                    string timeAgo = GetRelativeTime(clip.CreatedAt);
-                    RecentClips.Add(new RecentClipDisplayItem(icon, title, timeAgo, clip.Content ?? clip.Preview));
-                }
-            }
-            else
-            {
-                RecentClips.Add(new RecentClipDisplayItem("\uEB9F", "Image · 1115 x 792", "now", "Image snippet"));
-                RecentClips.Add(new RecentClipDisplayItem("\uE8C4", "QuickDock Windows 11", "2m ago", "QuickDock Windows 11"));
-            }
-
-            // Weather summary
             var weather = _weatherService.CurrentWeather;
-            RefreshWeatherSummary(weather);
-
-            // Screen time summary
             var usage = await _databaseService.GetDailyUsageAsync(DateTime.Today);
-            var totalSec = usage.Sum(u => u.DurationSeconds);
-            if (totalSec > 0)
-            {
-                var ts = TimeSpan.FromSeconds(totalSec);
-                ScreenTimeBigText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m" : $"{ts.Minutes}m";
-                ScreenTimeSubtitleText = $"{usage.Count} apps active today";
-                ScreenTimeSnippetText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m today" : $"{ts.Minutes}m today";
-            }
-            else
-            {
-                ScreenTimeBigText = "<1m";
-                ScreenTimeSubtitleText = "No activity yet";
-                ScreenTimeSnippetText = "Screen Time: 0m";
-            }
-
-            // Notes summary
             var notes = await _databaseService.GetNotesAsync();
-            if (notes.Count > 0)
-            {
-                NotesSubtitleText = notes[0].Title;
-            }
-            else
-            {
-                NotesSubtitleText = "No notes yet";
-            }
-
-            // Temporary message banner
             var tempMsg = await _tempMessageService.GetActiveMessageAsync();
-            if (tempMsg != null)
-            {
-                _temporaryMessageId = tempMsg.Id;
-                TemporaryMessageText = tempMsg.Content;
-                HasTemporaryMessage = true;
-            }
-            else
-            {
-                HasTemporaryMessage = false;
-            }
 
-            RefreshTimerSummary();
+            RunOnUI(() =>
+            {
+                RecentClips.Clear();
+                if (recentClips.Count > 0)
+                {
+                    ClipboardSnippetText = recentClips[0].Preview;
+                    foreach (var clip in recentClips)
+                    {
+                        string icon = clip.Type == Core.Models.ClipboardContentType.Image ? "\uEB9F" : "\uE8C4";
+                        string title = clip.Preview;
+                        if (clip.Type == Core.Models.ClipboardContentType.Image && !title.Contains("Image"))
+                        {
+                            title = $"Image · {clip.Preview}";
+                        }
+                        string timeAgo = GetRelativeTime(clip.CreatedAt);
+                        RecentClips.Add(new RecentClipDisplayItem(icon, title, timeAgo, clip.Content ?? clip.Preview));
+                    }
+                }
+                else
+                {
+                    RecentClips.Add(new RecentClipDisplayItem("\uEB9F", "Image · 1115 x 792", "now", "Image snippet"));
+                    RecentClips.Add(new RecentClipDisplayItem("\uE8C4", "QuickDock Windows 11", "2m ago", "QuickDock Windows 11"));
+                }
+
+                RefreshWeatherSummary(weather);
+
+                var totalSec = usage.Sum(u => u.DurationSeconds);
+                if (totalSec > 0)
+                {
+                    var ts = TimeSpan.FromSeconds(totalSec);
+                    ScreenTimeBigText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m" : $"{ts.Minutes}m";
+                    ScreenTimeSubtitleText = $"{usage.Count} apps active today";
+                    ScreenTimeSnippetText = ts.TotalHours >= 1 ? $"{(int)ts.TotalHours}h {ts.Minutes}m today" : $"{ts.Minutes}m today";
+                }
+                else
+                {
+                    ScreenTimeBigText = "<1m";
+                    ScreenTimeSubtitleText = "No activity yet";
+                    ScreenTimeSnippetText = "Screen Time: 0m";
+                }
+
+                if (notes.Count > 0)
+                {
+                    NotesSubtitleText = notes[0].Title;
+                }
+                else
+                {
+                    NotesSubtitleText = "No notes yet";
+                }
+
+                if (tempMsg != null)
+                {
+                    _temporaryMessageId = tempMsg.Id;
+                    TemporaryMessageText = tempMsg.Content;
+                    HasTemporaryMessage = true;
+                }
+                else
+                {
+                    HasTemporaryMessage = false;
+                }
+
+                RefreshTimerSummary();
+            });
         }
         catch (Exception ex)
         {
@@ -375,20 +393,23 @@ public sealed partial class HomeViewModel : ObservableObject
             FocusTimerSubtitleText = "Focusing";
             _focusTicker = new global::System.Threading.Timer(_ =>
             {
-                if (_focusRemaining > TimeSpan.Zero)
+                RunOnUI(() =>
                 {
-                    _focusRemaining = _focusRemaining.Subtract(TimeSpan.FromSeconds(1));
-                    FocusTimerText = $"{_focusRemaining.Minutes:D2}:{_focusRemaining.Seconds:D2}";
-                }
-                else
-                {
-                    _focusTicker?.Dispose();
-                    _focusTicker = null;
-                    IsFocusRunning = false;
-                    FocusPlayGlyph = "\uE768";
-                    FocusTimerSubtitleText = "Session Completed!";
-                    _focusRemaining = TimeSpan.FromMinutes(25);
-                }
+                    if (_focusRemaining > TimeSpan.Zero)
+                    {
+                        _focusRemaining = _focusRemaining.Subtract(TimeSpan.FromSeconds(1));
+                        FocusTimerText = $"{_focusRemaining.Minutes:D2}:{_focusRemaining.Seconds:D2}";
+                    }
+                    else
+                    {
+                        _focusTicker?.Dispose();
+                        _focusTicker = null;
+                        IsFocusRunning = false;
+                        FocusPlayGlyph = "\uE768";
+                        FocusTimerSubtitleText = "Session Completed!";
+                        _focusRemaining = TimeSpan.FromMinutes(25);
+                    }
+                });
             }, null, 1000, 1000);
         }
     }
@@ -430,125 +451,138 @@ public sealed partial class HomeViewModel : ObservableObject
         CurrentDate = _clockModule.GetFormattedDate();
     }
 
+    private bool _isInternalVolumeUpdate;
+
     public void RefreshMetrics()
     {
         var cpu = _metricsService.GetCpuUsagePercentage();
-        if (cpu.HasValue)
-        {
-            CpuPercent = Math.Clamp(cpu.Value, 0, 100);
-            CpuPercentText = $"{Math.Round(CpuPercent)}%";
-            CpuMetricText = $"{cpu.Value:0.#}% CPU";
-        }
-        else
-        {
-            CpuPercent = 45;
-            CpuPercentText = "45%";
-            CpuMetricText = "45% CPU";
-        }
-
         var mem = _metricsService.GetMemoryMetrics();
-        if (mem != null)
-        {
-            RamPercent = Math.Clamp(mem.Percentage, 0, 100);
-            RamPercentText = $"{mem.Percentage}%";
-            MemoryMetricText = $"{mem.UsedGigabytes:0.#} / {mem.TotalGigabytes:0.#} GB";
-        }
-        else
-        {
-            RamPercent = 65;
-            RamPercentText = "65%";
-            MemoryMetricText = "65% RAM";
-        }
-
         var disk = _metricsService.GetDiskMetrics();
-        if (disk != null)
-        {
-            DiskPercent = Math.Clamp(disk.UsedPercentage, 0, 100);
-            DiskPercentText = $"{disk.UsedPercentage}%";
-        }
-        else
-        {
-            DiskPercent = 25;
-            DiskPercentText = "25%";
-        }
-
         var bat = _metricsService.GetBatteryMetrics();
-        if (bat != null && bat.HasBattery)
+
+        RunOnUI(() =>
         {
-            BatteryPercent = Math.Clamp(bat.Percentage, 0, 100);
-            BatteryPercentText = $"{BatteryPercent}%";
-            BatteryMetricText = bat.StateDescription;
-            BatteryFillWidth = Math.Max(2, (BatteryPercent / 100.0) * 16.0);
-        }
-        else
-        {
-            BatteryPercent = 80;
-            BatteryPercentText = "80%";
-            BatteryMetricText = "80% AC Power";
-            BatteryFillWidth = 14;
-        }
+            if (cpu.HasValue)
+            {
+                CpuPercent = Math.Clamp(cpu.Value, 0, 100);
+                CpuPercentText = $"{Math.Round(CpuPercent)}%";
+                CpuMetricText = $"{cpu.Value:0.#}% CPU";
+            }
+            else
+            {
+                CpuPercent = 45;
+                CpuPercentText = "45%";
+                CpuMetricText = "45% CPU";
+            }
+
+            if (mem != null)
+            {
+                RamPercent = Math.Clamp(mem.Percentage, 0, 100);
+                RamPercentText = $"{mem.Percentage}%";
+                MemoryMetricText = $"{mem.UsedGigabytes:0.#} / {mem.TotalGigabytes:0.#} GB";
+            }
+            else
+            {
+                RamPercent = 65;
+                RamPercentText = "65%";
+                MemoryMetricText = "65% RAM";
+            }
+
+            if (disk != null)
+            {
+                DiskPercent = Math.Clamp(disk.UsedPercentage, 0, 100);
+                DiskPercentText = $"{disk.UsedPercentage}%";
+            }
+            else
+            {
+                DiskPercent = 25;
+                DiskPercentText = "25%";
+            }
+
+            if (bat != null && bat.HasBattery)
+            {
+                BatteryPercent = Math.Clamp(bat.Percentage, 0, 100);
+                BatteryPercentText = $"{BatteryPercent}%";
+                BatteryMetricText = bat.StateDescription;
+                BatteryFillWidth = Math.Max(2, (BatteryPercent / 100.0) * 16.0);
+            }
+            else
+            {
+                BatteryPercent = 80;
+                BatteryPercentText = "80%";
+                BatteryMetricText = "80% AC Power";
+                BatteryFillWidth = 14;
+            }
+        });
 
         RefreshAudioState();
     }
 
-    private bool _isInternalVolumeUpdate;
-
-    private void RefreshAudioState()
+    public void RefreshAudioState()
     {
         float vol = _audioService.GetMasterVolume();
         bool muted = _audioService.GetMuteState();
 
-        _isInternalVolumeUpdate = true;
-        try
+        RunOnUI(() =>
         {
-            VolumeLevel = Math.Round(vol * 100);
-        }
-        finally
-        {
-            _isInternalVolumeUpdate = false;
-        }
+            _isInternalVolumeUpdate = true;
+            try
+            {
+                VolumeLevel = Math.Round(vol * 100);
+            }
+            finally
+            {
+                _isInternalVolumeUpdate = false;
+            }
 
-        IsMuted = muted;
-        AudioDeviceName = _audioService.GetDefaultDeviceName();
-        VolumeMetricText = muted ? "Muted" : $"{VolumeLevel:0}%";
-        VolumeGlyph = muted ? "\uE74F" : (vol < 0.33f ? "\uE992" : (vol < 0.66f ? "\uE993" : "\uE994"));
+            IsMuted = muted;
+            AudioDeviceName = _audioService.GetDefaultDeviceName();
+            VolumeMetricText = muted ? "Muted" : $"{VolumeLevel:0}%";
+            VolumeGlyph = muted ? "\uE74F" : (vol < 0.33f ? "\uE992" : (vol < 0.66f ? "\uE993" : "\uE994"));
+        });
     }
 
     private void OnAudioVolumeChanged(object? sender, AudioVolumeChangedEventArgs e)
     {
-        _isInternalVolumeUpdate = true;
-        try
+        RunOnUI(() =>
         {
-            VolumeLevel = Math.Round(e.NewVolume * 100);
-        }
-        finally
-        {
-            _isInternalVolumeUpdate = false;
-        }
+            _isInternalVolumeUpdate = true;
+            try
+            {
+                VolumeLevel = Math.Round(e.NewVolume * 100);
+            }
+            finally
+            {
+                _isInternalVolumeUpdate = false;
+            }
 
-        IsMuted = e.IsMuted;
-        VolumeMetricText = e.IsMuted ? "Muted" : $"{VolumeLevel:0}%";
-        VolumeGlyph = e.IsMuted ? "\uE74F" : (e.NewVolume < 0.33f ? "\uE992" : (e.NewVolume < 0.66f ? "\uE993" : "\uE994"));
+            IsMuted = e.IsMuted;
+            VolumeMetricText = e.IsMuted ? "Muted" : $"{VolumeLevel:0}%";
+            VolumeGlyph = e.IsMuted ? "\uE74F" : (e.NewVolume < 0.33f ? "\uE992" : (e.NewVolume < 0.66f ? "\uE993" : "\uE994"));
+        });
     }
 
     private void RefreshMediaState(MediaSessionSnapshot? media)
     {
-        if (media != null && media.HasSession)
+        RunOnUI(() =>
         {
-            HasMediaSession = true;
-            MediaTitle = string.IsNullOrWhiteSpace(media.Title) ? "Active Media" : media.Title;
-            MediaArtist = media.Artist;
-            IsMediaPlaying = media.PlaybackStatus == MediaPlaybackStatus.Playing;
-            PlayPauseGlyph = IsMediaPlaying ? "\uE769" : "\uE768"; // Pause vs Play
-        }
-        else
-        {
-            HasMediaSession = false;
-            MediaTitle = "No media playing";
-            MediaArtist = string.Empty;
-            IsMediaPlaying = false;
-            PlayPauseGlyph = "\uE768";
-        }
+            if (media != null && media.HasSession)
+            {
+                HasMediaSession = true;
+                MediaTitle = string.IsNullOrWhiteSpace(media.Title) ? "Active Media" : media.Title;
+                MediaArtist = media.Artist;
+                IsMediaPlaying = media.PlaybackStatus == MediaPlaybackStatus.Playing;
+                PlayPauseGlyph = IsMediaPlaying ? "\uE769" : "\uE768"; // Pause vs Play
+            }
+            else
+            {
+                HasMediaSession = false;
+                MediaTitle = "No media playing";
+                MediaArtist = string.Empty;
+                IsMediaPlaying = false;
+                PlayPauseGlyph = "\uE768";
+            }
+        });
     }
 
     private void OnMediaChanged(object? sender, MediaSessionSnapshot? e)

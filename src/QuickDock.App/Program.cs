@@ -11,6 +11,7 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Console.WriteLine("[DEBUG] Program.Main started.");
         string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "QuickDock");
         Directory.CreateDirectory(dir);
         string mutexName = $"Global\\QuickDock_SingleInstance_{Environment.UserName}";
@@ -26,6 +27,7 @@ public static class Program
 
         if (!isInitialInstance)
         {
+            Console.WriteLine("[DEBUG] Mutex indicates not initial instance.");
             // Verify if there really is an active QuickDock process
             var currentProc = System.Diagnostics.Process.GetCurrentProcess();
             var existingProcs = System.Diagnostics.Process.GetProcessesByName("QuickDock.App")
@@ -34,6 +36,7 @@ public static class Program
 
             if (existingProcs.Count > 0)
             {
+                Console.WriteLine("[DEBUG] Another instance already running. Exiting.");
                 // Another instance is genuinely running; signal it to activate and bring to front
                 uint activateMsg = NativeMethods.RegisterWindowMessageW("QUICKDOCK_ACTIVATE_INSTANCE");
                 if (activateMsg != 0)
@@ -72,28 +75,22 @@ public static class Program
 
         try
         {
+            Console.WriteLine("[DEBUG] Initializing ComWrappers...");
             WinRT.ComWrappersSupport.InitializeComWrappers();
 
-            bool isPackaged = false;
-            try
-            {
-                var package = Windows.ApplicationModel.Package.Current;
-                isPackaged = package != null;
-            }
-            catch
-            {
-                isPackaged = false;
-            }
-
-            // In self-contained unpackaged WinUI 3 (WindowsAppSDKSelfContained=true),
-            // do not invoke Bootstrap.Initialize because all runtime binaries are deployed side-by-side.
-
+            Console.WriteLine("[DEBUG] Calling Application.Start...");
             Application.Start((p) =>
             {
+                Console.WriteLine("[DEBUG] Inside Application.Start callback...");
                 var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
                 SynchronizationContext.SetSynchronizationContext(context);
                 new App();
             });
+            Console.WriteLine("[DEBUG] Application.Start completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[DEBUG] Exception in Main: {ex}");
         }
         finally
         {

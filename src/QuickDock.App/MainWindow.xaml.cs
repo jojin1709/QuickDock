@@ -6,6 +6,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using QuickDock.App.Services;
 using QuickDock.App.ViewModels;
 using QuickDock.Core.Events;
@@ -37,6 +38,10 @@ public sealed partial class MainWindow : Window
     private readonly uint _activateMsg;
     private readonly NativeMethods.SUBCLASSPROC _windowSubclassProc;
     private readonly DispatcherTimer _tickTimer;
+
+    private Storyboard? _expandStoryboard;
+    private Storyboard? _collapseStoryboard;
+    private DispatcherTimer? _clipboardPillTimer;
 
     private int _metricsCounter;
     private IntPtr _previousForegroundHwnd = IntPtr.Zero;
@@ -111,6 +116,14 @@ public sealed partial class MainWindow : Window
         try
         {
             AppWindow.IsShownInSwitchers = false;
+        }
+        catch
+        {
+            // IsShownInSwitchers throws E_NOTIMPL on some Windows App SDK versions; WS_EX_TOOLWINDOW in positioning service handles this natively
+        }
+
+        try
+        {
             AppWindow.Closing += (sender, args) =>
             {
                 if (!_isExplicitExit)
@@ -135,18 +148,15 @@ public sealed partial class MainWindow : Window
         }
 
         _monitorService.SetDockHandle(_hWnd);
-        _positioningService.ConfigureDockWindow(_hWnd, TargetMonitor);
 
         // Register custom activation message for single-instance
         _activateMsg = NativeMethods.RegisterWindowMessageW("QUICKDOCK_ACTIVATE_INSTANCE");
         _windowSubclassProc = WindowSubclassProcedure;
         NativeMethods.SetWindowSubclass(_hWnd, _windowSubclassProc, MainWindowSubclassId, UIntPtr.Zero);
 
-        // Register tray handle for notifications
-        if (_notificationService is NotificationService concreteNotificationService)
-        {
-            concreteNotificationService.RegisterTrayHandle(_hWnd);
-        }
+        // Setup fluid animations and clipboard toast notification
+        SetupAnimations();
+        SetupClipboardNotification();
 
         // Periodic clock & system metrics refresh timer
         _tickTimer = new DispatcherTimer
@@ -156,9 +166,49 @@ public sealed partial class MainWindow : Window
         _tickTimer.Tick += OnTickTimer;
         _tickTimer.Start();
 
-        // Register Global Hotkey (Ctrl + Space) only on Primary window
-        if (IsPrimaryInstance)
+        // Fullscreen detection
+        if (_fullscreenService is FullscreenDetectionService concreteFullscreenService)
         {
+            concreteFullscreenService.SetDockHandle(_hWnd);
+        }
+        _fullscreenService.FullscreenStateChanged += OnFullscreenStateChanged;
+        _fullscreenService.StartMonitoring();
+
+        // Auto-collapse when losing focus
+        Activated += OnWindowActivated;
+        Closed += OnWindowClosed;
+
+        ApplyTheme(_settingsManager.CurrentSettings.Appearance.Theme);
+        ApplyBackdrop(_settingsManager.CurrentSettings.Appearance.Backdrop);
+        _eventBus.Subscribe<SettingsChangedEvent>((e, ct) =>
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                ApplyTheme(e.Settings.Appearance.Theme);
+                ApplyBackdrop(e.Settings.Appearance.Backdrop);
+                _positioningService.SetAlwaysOnTop(_hWnd, e.Settings.Behavior.AlwaysOnTop);
+                _positioningService.Reposition(_hWnd, IsExpanded, TargetMonitor);
+            });
+            return Task.CompletedTask;
+        });
+    }
+
+    public void InitializeForMonitor(MonitorInfo monitor, bool isPrimary)
+    {
+        TargetMonitor = monitor;
+        IsPrimaryInstance = isPrimary;
+
+        _positioningService.ConfigureDockWindow(_hWnd, monitor);
+
+        if (isPrimary)
+        {
+            NativeMethods.AddClipboardFormatListener(_hWnd);
+
+            if (_notificationService is NotificationService concreteNotificationService)
+            {
+                concreteNotificationService.RegisterTrayHandle(_hWnd);
+            }
+
             _hotkeyService.Register(_hWnd, () =>
             {
                 DispatcherQueue.TryEnqueue(() =>
@@ -167,7 +217,6 @@ public sealed partial class MainWindow : Window
                 });
             });
 
-            // Initialize System Tray
             _systemTrayService.Initialize(
                 _hWnd,
                 onToggleDock: () => DispatcherQueue.TryEnqueue(() =>
@@ -206,32 +255,140 @@ public sealed partial class MainWindow : Window
                 })
             );
         }
+    }
 
-        // Fullscreen detection
-        if (_fullscreenService is FullscreenDetectionService concreteFullscreenService)
+    private void SetupAnimations()
+    {
+        // 1. Expand Storyboard (180ms CubicEase)
+        _expandStoryboard = new Storyboard();
+
+        var expandWidthAnim = new DoubleAnimation
         {
-            concreteFullscreenService.SetDockHandle(_hWnd);
-        }
-        _fullscreenService.FullscreenStateChanged += OnFullscreenStateChanged;
-        _fullscreenService.StartMonitoring();
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(expandWidthAnim, DockSurface);
+        Storyboard.SetTargetProperty(expandWidthAnim, "Width");
+        _expandStoryboard.Children.Add(expandWidthAnim);
 
-        // Auto-collapse when losing focus
-        Activated += OnWindowActivated;
-        Closed += OnWindowClosed;
-
-        ApplyTheme(_settingsManager.CurrentSettings.Appearance.Theme);
-        ApplyBackdrop(_settingsManager.CurrentSettings.Appearance.Backdrop);
-        _eventBus.Subscribe<SettingsChangedEvent>((e, ct) =>
+        var expandHeightAnim = new DoubleAnimation
         {
-            DispatcherQueue.TryEnqueue(() =>
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(expandHeightAnim, DockSurface);
+        Storyboard.SetTargetProperty(expandHeightAnim, "Height");
+        _expandStoryboard.Children.Add(expandHeightAnim);
+
+        var idleFadeOut = new DoubleAnimation
+        {
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(70)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(idleFadeOut, IdleContentGrid);
+        Storyboard.SetTargetProperty(idleFadeOut, "Opacity");
+        _expandStoryboard.Children.Add(idleFadeOut);
+
+        var expandedFadeIn = new DoubleAnimation
+        {
+            To = 1,
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(expandedFadeIn, ExpandedContentGrid);
+        Storyboard.SetTargetProperty(expandedFadeIn, "Opacity");
+        _expandStoryboard.Children.Add(expandedFadeIn);
+
+        _expandStoryboard.Completed += (s, e) =>
+        {
+            IdleContentGrid.Visibility = Visibility.Collapsed;
+        };
+
+        // 2. Collapse Storyboard (180ms CubicEase)
+        _collapseStoryboard = new Storyboard();
+
+        var collapseWidthAnim = new DoubleAnimation
+        {
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(collapseWidthAnim, DockSurface);
+        Storyboard.SetTargetProperty(collapseWidthAnim, "Width");
+        _collapseStoryboard.Children.Add(collapseWidthAnim);
+
+        var collapseHeightAnim = new DoubleAnimation
+        {
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseInOut },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(collapseHeightAnim, DockSurface);
+        Storyboard.SetTargetProperty(collapseHeightAnim, "Height");
+        _collapseStoryboard.Children.Add(collapseHeightAnim);
+
+        var expandedFadeOut = new DoubleAnimation
+        {
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(70)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(expandedFadeOut, ExpandedContentGrid);
+        Storyboard.SetTargetProperty(expandedFadeOut, "Opacity");
+        _collapseStoryboard.Children.Add(expandedFadeOut);
+
+        var idleFadeIn = new DoubleAnimation
+        {
+            To = 1,
+            Duration = new Duration(TimeSpan.FromMilliseconds(180)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+            EnableDependentAnimation = true
+        };
+        Storyboard.SetTarget(idleFadeIn, IdleContentGrid);
+        Storyboard.SetTargetProperty(idleFadeIn, "Opacity");
+        _collapseStoryboard.Children.Add(idleFadeIn);
+
+        _collapseStoryboard.Completed += (s, e) =>
+        {
+            ExpandedContentGrid.Visibility = Visibility.Collapsed;
+            // Shrink physical HWND down to idle compact footprint so desktop receives clicks
+            _positioningService.SetDockState(_hWnd, isExpanded: false, TargetMonitor);
+        };
+    }
+
+    private void SetupClipboardNotification()
+    {
+        var clipboardService = _serviceProvider.GetService<IClipboardService>();
+        if (clipboardService != null)
+        {
+            clipboardService.ClipboardItemAdded += (s, item) =>
             {
-                ApplyTheme(e.Settings.Appearance.Theme);
-                ApplyBackdrop(e.Settings.Appearance.Backdrop);
-                _positioningService.SetAlwaysOnTop(_hWnd, e.Settings.Behavior.AlwaysOnTop);
-                _positioningService.Reposition(_hWnd, IsExpanded, TargetMonitor);
-            });
-            return Task.CompletedTask;
-        });
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    if (IsExpanded) return; // Never cover expanded view
+
+                    ClipboardNotificationText.Text = string.IsNullOrWhiteSpace(item.Preview) ? "Copied" : item.Preview.Trim();
+                    ClipboardNotificationPill.Visibility = Visibility.Visible;
+                    ClipboardNotificationPill.Opacity = 1;
+
+                    _clipboardPillTimer?.Stop();
+                    _clipboardPillTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2.2) };
+                    _clipboardPillTimer.Tick += (ts, te) =>
+                    {
+                        _clipboardPillTimer.Stop();
+                        ClipboardNotificationPill.Opacity = 0;
+                        ClipboardNotificationPill.Visibility = Visibility.Collapsed;
+                    };
+                    _clipboardPillTimer.Start();
+                });
+            };
+        }
     }
 
     public void Expand()
@@ -240,10 +397,27 @@ public sealed partial class MainWindow : Window
         IsExpanded = true;
         _logger.LogInformation("Notch window expanded on monitor {Monitor}", TargetMonitor?.DeviceName ?? "Default");
 
-        IdleDockBorder.Visibility = Visibility.Collapsed;
-        ExpandedPanelBorder.Visibility = Visibility.Visible;
+        _collapseStoryboard?.Stop();
 
+        // Enlarge HWND physically with SWP_NOACTIVATE before animating
         _positioningService.SetDockState(_hWnd, isExpanded: true, TargetMonitor);
+
+        IdleContentGrid.Visibility = Visibility.Visible;
+        ExpandedContentGrid.Visibility = Visibility.Visible;
+
+        if (_expandStoryboard?.Children[0] is DoubleAnimation wAnim)
+        {
+            wAnim.From = DockSurface.Width;
+            wAnim.To = 820;
+        }
+        if (_expandStoryboard?.Children[1] is DoubleAnimation hAnim)
+        {
+            hAnim.From = DockSurface.Height;
+            hAnim.To = 540;
+        }
+
+        _expandStoryboard?.Begin();
+
         if (IsPrimaryInstance)
         {
             _systemTrayService.UpdateDockState(true);
@@ -262,10 +436,24 @@ public sealed partial class MainWindow : Window
         IsExpanded = false;
         _logger.LogInformation("Notch window collapsed on monitor {Monitor}", TargetMonitor?.DeviceName ?? "Default");
 
-        ExpandedPanelBorder.Visibility = Visibility.Collapsed;
-        IdleDockBorder.Visibility = Visibility.Visible;
+        _expandStoryboard?.Stop();
 
-        _positioningService.SetDockState(_hWnd, isExpanded: false, TargetMonitor);
+        IdleContentGrid.Visibility = Visibility.Visible;
+        ExpandedContentGrid.Visibility = Visibility.Visible;
+
+        if (_collapseStoryboard?.Children[0] is DoubleAnimation wAnim)
+        {
+            wAnim.From = DockSurface.Width;
+            wAnim.To = 290;
+        }
+        if (_collapseStoryboard?.Children[1] is DoubleAnimation hAnim)
+        {
+            hAnim.From = DockSurface.Height;
+            hAnim.To = 34;
+        }
+
+        _collapseStoryboard?.Begin();
+
         if (IsPrimaryInstance)
         {
             _systemTrayService.UpdateDockState(false);
@@ -292,6 +480,19 @@ public sealed partial class MainWindow : Window
                 CapturePreviousForeground();
                 Expand();
                 BringToFront();
+            });
+            return IntPtr.Zero;
+        }
+
+        if (uMsg == NativeMethods.WM_CLIPBOARDUPDATE)
+        {
+            DispatcherQueue.TryEnqueue(async () =>
+            {
+                var clip = _serviceProvider.GetService<IClipboardService>();
+                if (clip != null)
+                {
+                    await clip.ProcessCurrentClipboardAsync();
+                }
             });
             return IntPtr.Zero;
         }
@@ -538,10 +739,17 @@ public sealed partial class MainWindow : Window
     private void OnWindowClosed(object sender, WindowEventArgs args)
     {
         _tickTimer.Stop();
+        _expandStoryboard?.Stop();
+        _collapseStoryboard?.Stop();
+        _clipboardPillTimer?.Stop();
         _fullscreenService.StopMonitoring();
         _fullscreenService.Dispose();
-        _hotkeyService.Dispose();
-        _systemTrayService.Dispose();
+        if (IsPrimaryInstance)
+        {
+            NativeMethods.RemoveClipboardFormatListener(_hWnd);
+            _hotkeyService.Dispose();
+            _systemTrayService.Dispose();
+        }
         NativeMethods.RemoveWindowSubclass(_hWnd, _windowSubclassProc, MainWindowSubclassId);
     }
 }

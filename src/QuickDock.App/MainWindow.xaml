@@ -12,11 +12,14 @@
 
     <Grid x:Name="RootWindowGrid" Background="Transparent" KeyDown="OnRootKeyDown">
 
-        <!-- ==================== IDLE COMPACT NOTCH ==================== -->
-        <Border x:Name="IdleDockBorder"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Background="#000000"
+        <!-- ==================== UNIFIED DOCK SURFACE ==================== -->
+        <!-- Starts at idle size (290x34) and animates smoothly to expanded size (820x540) -->
+        <Border x:Name="DockSurface"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Width="290"
+                Height="34"
+                Background="#0B0B0D"
                 BorderBrush="#27272A"
                 BorderThickness="1,0,1,1"
                 CornerRadius="0,0,14,14"
@@ -25,450 +28,455 @@
                 PointerExited="OnIdlePointerExited"
                 PointerPressed="OnIdlePointerPressed">
 
-            <Border.Transitions>
-                <TransitionCollection>
-                    <EntranceThemeTransition FromVerticalOffset="-10" />
-                </TransitionCollection>
-            </Border.Transitions>
-
-            <Grid VerticalAlignment="Center">
-                <Grid.ColumnDefinitions>
-                    <!-- Left: Clock 11:59 AM -->
-                    <ColumnDefinition Width="Auto" />
-                    <!-- Spacer / Notch Center -->
-                    <ColumnDefinition Width="*" />
-                    <!-- Right: Battery 80 -->
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Left Time -->
-                <TextBlock Grid.Column="0"
-                           Text="{x:Bind ViewModel.Home.CurrentTime, Mode=OneWay}"
-                           FontWeight="Bold"
-                           FontSize="12"
-                           Foreground="#FFFFFF"
-                           VerticalAlignment="Center"
-                           Margin="18,0,0,0" />
-
-                <!-- Right Battery Level -->
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            Spacing="4"
-                            VerticalAlignment="Center"
-                            Margin="0,0,18,0">
-                    <!-- Battery Outline -->
-                    <Border Width="22" Height="11"
-                            CornerRadius="3"
-                            BorderThickness="1"
-                            BorderBrush="#88FFFFFF"
-                            Padding="1"
-                            VerticalAlignment="Center">
-                        <!-- Battery Fill Bar -->
-                        <Border HorizontalAlignment="Left"
-                                CornerRadius="1.5"
-                                Width="{x:Bind ViewModel.Home.BatteryFillWidth, Mode=OneWay}"
-                                Height="7"
-                                Background="#22C55E" />
-                    </Border>
-                    <!-- Battery Nipple -->
-                    <Border Width="1.5" Height="4"
-                            CornerRadius="0.5"
-                            Background="#88FFFFFF"
-                            VerticalAlignment="Center"
-                            Margin="-2,0,3,0" />
-                    <!-- Battery Percentage Text -->
-                    <TextBlock Text="{x:Bind ViewModel.Home.BatteryPercent, Mode=OneWay}"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="#FFFFFF"
-                               VerticalAlignment="Center" />
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <!-- ==================== EXPANDED MAIN PANEL ==================== -->
-        <Border x:Name="ExpandedPanelBorder"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                Background="#0D0D10"
-                BorderBrush="#27272A"
-                BorderThickness="1,0,1,1"
-                CornerRadius="0,0,20,20"
-                Padding="0"
-                PointerEntered="OnExpandedPointerEntered"
-                PointerExited="OnExpandedPointerExited"
-                Visibility="Collapsed">
-
-            <Border.Transitions>
-                <TransitionCollection>
-                    <EntranceThemeTransition FromVerticalOffset="-12" />
-                </TransitionCollection>
-            </Border.Transitions>
-
             <Grid>
-                <Grid.RowDefinitions>
-                    <!-- Top Header Bar -->
-                    <RowDefinition Height="Auto" />
-                    <!-- Main Content Views -->
-                    <RowDefinition Height="*" />
-                    <!-- Floating Bottom Dock Navbar -->
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-
-                <!-- ==================== TOP HEADER BAR ==================== -->
-                <Grid Grid.Row="0" Margin="20,14,20,4">
+                <!-- ==================== IDLE COMPACT CONTENT ==================== -->
+                <Grid x:Name="IdleContentGrid"
+                      Height="34"
+                      VerticalAlignment="Top"
+                      Opacity="1"
+                      Visibility="Visible">
                     <Grid.ColumnDefinitions>
+                        <!-- Left: Clock 11:59 AM -->
                         <ColumnDefinition Width="Auto" />
+                        <!-- Spacer / Notch Center -->
                         <ColumnDefinition Width="*" />
+                        <!-- Right: Battery 80 -->
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Left: Back button (when not on Home) + Squircle Logo + Dynamic Title + Separator + Subtitle -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <!-- Back button if not on Home view -->
-                        <Button ToolTipService.ToolTip="Back to Home"
-                                Command="{x:Bind ViewModel.OpenHomeCommand, Mode=OneWay}"
-                                Visibility="{x:Bind IsBackVisible(ViewModel.CurrentView), Mode=OneWay}"
-                                Background="Transparent"
-                                BorderBrush="Transparent"
-                                Padding="6"
-                                Margin="0,0,2,0"
-                                CornerRadius="6"
+                    <!-- Left Time -->
+                    <TextBlock Grid.Column="0"
+                               Text="{x:Bind ViewModel.Home.CurrentTime, Mode=OneWay}"
+                               FontWeight="Bold"
+                               FontSize="12"
+                               Foreground="#FFFFFF"
+                               VerticalAlignment="Center"
+                               Margin="18,0,0,0" />
+
+                    <!-- Right Battery Level -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="4"
+                                VerticalAlignment="Center"
+                                Margin="0,0,18,0">
+                        <!-- Battery Outline -->
+                        <Border Width="22" Height="11"
+                                CornerRadius="3"
+                                BorderThickness="1"
+                                BorderBrush="#88FFFFFF"
+                                Padding="1"
                                 VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE72B;" FontSize="13" Foreground="#A1A1AA" />
-                        </Button>
-                        <controls:QuickDockIcon Width="22" Height="22" VerticalAlignment="Center" />
-                        <TextBlock Text="{x:Bind ViewModel.CurrentViewTitle, Mode=OneWay}"
+                            <!-- Battery Fill Bar -->
+                            <Border HorizontalAlignment="Left"
+                                    CornerRadius="1.5"
+                                    Width="{x:Bind ViewModel.Home.BatteryFillWidth, Mode=OneWay}"
+                                    Height="7"
+                                    Background="#22C55E" />
+                        </Border>
+                        <!-- Battery Nipple -->
+                        <Border Width="1.5" Height="4"
+                                CornerRadius="0.5"
+                                Background="#88FFFFFF"
+                                VerticalAlignment="Center"
+                                Margin="-2,0,3,0" />
+                        <!-- Battery Percentage Text -->
+                        <TextBlock Text="{x:Bind ViewModel.Home.BatteryPercent, Mode=OneWay}"
+                                   FontSize="11"
                                    FontWeight="SemiBold"
-                                   FontSize="16"
                                    Foreground="#FFFFFF"
                                    VerticalAlignment="Center" />
-                        <Border Width="1" Height="14" Background="#333338" Margin="4,0,4,0" VerticalAlignment="Center" />
-                        <TextBlock Text="{x:Bind ViewModel.CurrentViewSubtitle, Mode=OneWay}"
-                                   FontSize="12"
-                                   Foreground="#8E8E93"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
-
-                    <!-- Right Controls: Battery Pill + Separator + Quick Notes (Pen) + Settings + Close -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                        <!-- Battery Status Pill -->
-                        <Border Background="#1C1C1F"
-                                BorderBrush="#27272A"
-                                BorderThickness="1"
-                                CornerRadius="12"
-                                Padding="8,4"
-                                VerticalAlignment="Center">
-                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                <TextBlock Text="{x:Bind ViewModel.Home.BatteryPercentText, Mode=OneWay}"
-                                           FontSize="11"
-                                           FontWeight="Medium"
-                                           Foreground="#E4E4E7"
-                                           VerticalAlignment="Center" />
-                                <Border Width="18" Height="9"
-                                        CornerRadius="2.5"
-                                        BorderThickness="1"
-                                        BorderBrush="#88FFFFFF"
-                                        Padding="1"
-                                        VerticalAlignment="Center">
-                                    <Border HorizontalAlignment="Left"
-                                            CornerRadius="1"
-                                            Width="{x:Bind ViewModel.Home.BatteryFillWidth, Mode=OneWay}"
-                                            Height="5"
-                                            Background="#22C55E" />
-                                </Border>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Width="1" Height="14" Background="#333338" Margin="4,0,4,0" VerticalAlignment="Center" />
-
-                        <!-- Quick Notes / Pen -->
-                        <Button ToolTipService.ToolTip="Notes &amp; Scratchpad"
-                                Command="{x:Bind ViewModel.OpenNotesCommand, Mode=OneWay}"
-                                Background="Transparent"
-                                BorderBrush="Transparent"
-                                Padding="7"
-                                CornerRadius="8"
-                                VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE70F;" FontSize="13" Foreground="#A1A1AA" />
-                        </Button>
-
-                        <!-- Settings Gear Button -->
-                        <Button ToolTipService.ToolTip="Settings"
-                                Command="{x:Bind ViewModel.OpenSettingsCommand, Mode=OneWay}"
-                                Background="Transparent"
-                                BorderBrush="Transparent"
-                                Padding="7"
-                                CornerRadius="8"
-                                VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE713;" FontSize="13" Foreground="#A1A1AA" />
-                        </Button>
-
-                        <!-- Close/Collapse Button -->
-                        <Button ToolTipService.ToolTip="Collapse dock (Esc)"
-                                Click="OnCloseButtonClick"
-                                Background="Transparent"
-                                BorderBrush="Transparent"
-                                Padding="7"
-                                CornerRadius="8"
-                                VerticalAlignment="Center">
-                            <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#A1A1AA" />
-                        </Button>
                     </StackPanel>
                 </Grid>
 
-                <!-- ==================== MAIN CONTENT VIEWS ==================== -->
-                <Grid Grid.Row="1">
-                    <views:HomeView x:Name="MainHomeView"
-                                    ViewModel="{x:Bind ViewModel.Home, Mode=OneWay}"
-                                    MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                    Visibility="{x:Bind IsHomeVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                <!-- ==================== EXPANDED DASHBOARD CONTENT ==================== -->
+                <Grid x:Name="ExpandedContentGrid"
+                      VerticalAlignment="Stretch"
+                      Opacity="0"
+                      Visibility="Collapsed">
+                    <Grid.RowDefinitions>
+                        <!-- Top Header Bar -->
+                        <RowDefinition Height="Auto" />
+                        <!-- Main Content Views -->
+                        <RowDefinition Height="*" />
+                        <!-- Floating Bottom Dock Navbar -->
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                    <views:SystemView x:Name="MainSystemView"
-                                      ViewModel="{x:Bind ViewModel.System, Mode=OneWay}"
-                                      MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                      Visibility="{x:Bind IsSystemVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                    <!-- Top Header Bar -->
+                    <Grid Grid.Row="0" Margin="20,14,20,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <views:SettingsView x:Name="MainSettingsView"
-                                        ViewModel="{x:Bind ViewModel.Settings, Mode=OneWay}"
+                        <!-- Left: Back button (when not on Home) + Squircle Logo + Dynamic Title + Separator + Subtitle -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <!-- Back button if not on Home view -->
+                            <Button ToolTipService.ToolTip="Back to Home"
+                                    Command="{x:Bind ViewModel.OpenHomeCommand, Mode=OneWay}"
+                                    Visibility="{x:Bind IsBackVisible(ViewModel.CurrentView), Mode=OneWay}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Padding="6"
+                                    Margin="0,0,2,0"
+                                    CornerRadius="6"
+                                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE72B;" FontSize="13" Foreground="#A1A1AA" />
+                            </Button>
+                            <controls:QuickDockIcon Width="22" Height="22" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind ViewModel.CurrentViewTitle, Mode=OneWay}"
+                                       FontWeight="SemiBold"
+                                       FontSize="16"
+                                       Foreground="#FFFFFF"
+                                       VerticalAlignment="Center" />
+                            <Border Width="1" Height="14" Background="#333338" Margin="4,0,4,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{x:Bind ViewModel.CurrentViewSubtitle, Mode=OneWay}"
+                                       FontSize="12"
+                                       Foreground="#8E8E93"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Right Controls: Battery Pill + Separator + Quick Notes (Pen) + Settings + Close -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                            <!-- Battery Status Pill -->
+                            <Border Background="#1C1C1F"
+                                    BorderBrush="#27272A"
+                                    BorderThickness="1"
+                                    CornerRadius="12"
+                                    Padding="8,4"
+                                    VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                    <TextBlock Text="{x:Bind ViewModel.Home.BatteryPercentText, Mode=OneWay}"
+                                               FontSize="11"
+                                               FontWeight="Medium"
+                                               Foreground="#E4E4E7"
+                                               VerticalAlignment="Center" />
+                                    <Border Width="18" Height="9"
+                                            CornerRadius="2.5"
+                                            BorderThickness="1"
+                                            BorderBrush="#88FFFFFF"
+                                            Padding="1"
+                                            VerticalAlignment="Center">
+                                        <Border HorizontalAlignment="Left"
+                                                CornerRadius="1"
+                                                Width="{x:Bind ViewModel.Home.BatteryFillWidth, Mode=OneWay}"
+                                                Height="5"
+                                                Background="#22C55E" />
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Width="1" Height="14" Background="#333338" Margin="4,0,4,0" VerticalAlignment="Center" />
+
+                            <!-- Quick Notes / Pen -->
+                            <Button ToolTipService.ToolTip="Notes &amp; Scratchpad"
+                                    Command="{x:Bind ViewModel.OpenNotesCommand, Mode=OneWay}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Padding="7"
+                                    CornerRadius="8"
+                                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE70F;" FontSize="13" Foreground="#A1A1AA" />
+                            </Button>
+
+                            <!-- Settings Gear Button -->
+                            <Button ToolTipService.ToolTip="Settings"
+                                    Command="{x:Bind ViewModel.OpenSettingsCommand, Mode=OneWay}"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Padding="7"
+                                    CornerRadius="8"
+                                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE713;" FontSize="13" Foreground="#A1A1AA" />
+                            </Button>
+
+                            <!-- Close/Collapse Button -->
+                            <Button ToolTipService.ToolTip="Collapse dock (Esc)"
+                                    Click="OnCloseButtonClick"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Padding="7"
+                                    CornerRadius="8"
+                                    VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE711;" FontSize="12" Foreground="#A1A1AA" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Main Content Views -->
+                    <Grid Grid.Row="1">
+                        <views:HomeView x:Name="MainHomeView"
+                                        ViewModel="{x:Bind ViewModel.Home, Mode=OneWay}"
                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                        Visibility="{x:Bind IsSettingsVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                                        Visibility="{x:Bind IsHomeVisible(ViewModel.CurrentView), Mode=OneWay}" />
 
-                    <views:ClipboardView x:Name="MainClipboardView"
-                                         ViewModel="{x:Bind ViewModel.Clipboard, Mode=OneWay}"
-                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                         Visibility="{x:Bind IsClipboardVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:TimerView x:Name="MainTimerView"
-                                     ViewModel="{x:Bind ViewModel.Timer, Mode=OneWay}"
-                                     MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                     Visibility="{x:Bind IsTimerVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:NotesView x:Name="MainNotesView"
-                                     ViewModel="{x:Bind ViewModel.Notes, Mode=OneWay}"
-                                     MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                     Visibility="{x:Bind IsNotesVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:CalendarView x:Name="MainCalendarView"
-                                        ViewModel="{x:Bind ViewModel.Calendar, Mode=OneWay}"
-                                        MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                        Visibility="{x:Bind IsCalendarVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:WeatherView x:Name="MainWeatherView"
-                                       ViewModel="{x:Bind ViewModel.Weather, Mode=OneWay}"
-                                       MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                       Visibility="{x:Bind IsWeatherVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:SavedLinksView x:Name="MainLinksView"
-                                          ViewModel="{x:Bind ViewModel.Links, Mode=OneWay}"
+                        <views:SystemView x:Name="MainSystemView"
+                                          ViewModel="{x:Bind ViewModel.System, Mode=OneWay}"
                                           MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                          Visibility="{x:Bind IsLinksVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                                          Visibility="{x:Bind IsSystemVisible(ViewModel.CurrentView), Mode=OneWay}" />
 
-                    <views:ScreenTimeView x:Name="MainScreenTimeView"
-                                          ViewModel="{x:Bind ViewModel.ScreenTime, Mode=OneWay}"
-                                          MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                          Visibility="{x:Bind IsScreenTimeVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                        <views:SettingsView x:Name="MainSettingsView"
+                                            ViewModel="{x:Bind ViewModel.Settings, Mode=OneWay}"
+                                            MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                            Visibility="{x:Bind IsSettingsVisible(ViewModel.CurrentView), Mode=OneWay}" />
 
-                    <views:FileShelfView x:Name="MainFileShelfView"
-                                         ViewModel="{x:Bind ViewModel.FileShelf, Mode=OneWay}"
-                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                         Visibility="{x:Bind IsFileShelfVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:QuickDropView x:Name="MainQuickDropView"
-                                         ViewModel="{x:Bind ViewModel.QuickDrop, Mode=OneWay}"
-                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                         Visibility="{x:Bind IsQuickDropVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:FileConverterView x:Name="MainConverterView"
-                                             ViewModel="{x:Bind ViewModel.Converter, Mode=OneWay}"
+                        <views:ClipboardView x:Name="MainClipboardView"
+                                             ViewModel="{x:Bind ViewModel.Clipboard, Mode=OneWay}"
                                              MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                             Visibility="{x:Bind IsConverterVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                                             Visibility="{x:Bind IsClipboardVisible(ViewModel.CurrentView), Mode=OneWay}" />
 
-                    <views:TransferManagerView x:Name="MainTransfersView"
-                                               ViewModel="{x:Bind ViewModel.Transfers, Mode=OneWay}"
-                                               MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                               Visibility="{x:Bind IsTransfersVisible(ViewModel.CurrentView), Mode=OneWay}" />
-
-                    <views:DeveloperView x:Name="MainDeveloperView"
-                                         ViewModel="{x:Bind ViewModel.Developer, Mode=OneWay}"
+                        <views:TimerView x:Name="MainTimerView"
+                                         ViewModel="{x:Bind ViewModel.Timer, Mode=OneWay}"
                                          MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                         Visibility="{x:Bind IsDeveloperVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                                         Visibility="{x:Bind IsTimerVisible(ViewModel.CurrentView), Mode=OneWay}" />
 
-                    <views:NetworkSecurityView x:Name="MainNetworkSecurityView"
-                                               ViewModel="{x:Bind ViewModel.NetworkSecurity, Mode=OneWay}"
-                                               MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                               Visibility="{x:Bind IsNetworkSecurityVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                        <views:NotesView x:Name="MainNotesView"
+                                         ViewModel="{x:Bind ViewModel.Notes, Mode=OneWay}"
+                                         MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                         Visibility="{x:Bind IsNotesVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:CalendarView x:Name="MainCalendarView"
+                                            ViewModel="{x:Bind ViewModel.Calendar, Mode=OneWay}"
+                                            MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                            Visibility="{x:Bind IsCalendarVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:WeatherView x:Name="MainWeatherView"
+                                           ViewModel="{x:Bind ViewModel.Weather, Mode=OneWay}"
+                                           MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                           Visibility="{x:Bind IsWeatherVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:SavedLinksView x:Name="MainLinksView"
+                                              ViewModel="{x:Bind ViewModel.Links, Mode=OneWay}"
+                                              MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                              Visibility="{x:Bind IsLinksVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:ScreenTimeView x:Name="MainScreenTimeView"
+                                              ViewModel="{x:Bind ViewModel.ScreenTime, Mode=OneWay}"
+                                              MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                              Visibility="{x:Bind IsScreenTimeVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:FileShelfView x:Name="MainFileShelfView"
+                                             ViewModel="{x:Bind ViewModel.FileShelf, Mode=OneWay}"
+                                             MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                             Visibility="{x:Bind IsFileShelfVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:QuickDropView x:Name="MainQuickDropView"
+                                             ViewModel="{x:Bind ViewModel.QuickDrop, Mode=OneWay}"
+                                             MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                             Visibility="{x:Bind IsQuickDropVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:FileConverterView x:Name="MainConverterView"
+                                                 ViewModel="{x:Bind ViewModel.Converter, Mode=OneWay}"
+                                                 MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                                 Visibility="{x:Bind IsConverterVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:TransferManagerView x:Name="MainTransfersView"
+                                                   ViewModel="{x:Bind ViewModel.Transfers, Mode=OneWay}"
+                                                   MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                                   Visibility="{x:Bind IsTransfersVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:DeveloperView x:Name="MainDeveloperView"
+                                             ViewModel="{x:Bind ViewModel.Developer, Mode=OneWay}"
+                                             MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                             Visibility="{x:Bind IsDeveloperVisible(ViewModel.CurrentView), Mode=OneWay}" />
+
+                        <views:NetworkSecurityView x:Name="MainNetworkSecurityView"
+                                                   ViewModel="{x:Bind ViewModel.NetworkSecurity, Mode=OneWay}"
+                                                   MainViewModel="{x:Bind ViewModel, Mode=OneWay}"
+                                                   Visibility="{x:Bind IsNetworkSecurityVisible(ViewModel.CurrentView), Mode=OneWay}" />
+                    </Grid>
+
+                    <!-- Floating Bottom Dock Navbar -->
+                    <Border Grid.Row="2"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Bottom"
+                            Background="#141416"
+                            BorderBrush="#242428"
+                            BorderThickness="1"
+                            CornerRadius="24"
+                            Padding="5,4"
+                            Margin="0,4,0,12">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <!-- Home -->
+                            <Button ToolTipService.ToolTip="Home"
+                                    Command="{x:Bind ViewModel.OpenHomeCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Home'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE80F;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Home'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- System -->
+                            <Button ToolTipService.ToolTip="System"
+                                    Command="{x:Bind ViewModel.OpenSystemCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'System'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE770;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'System'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Clipboard -->
+                            <Button ToolTipService.ToolTip="Clipboard"
+                                    Command="{x:Bind ViewModel.OpenClipboardCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Clipboard'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xF0E3;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Clipboard'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Notes -->
+                            <Button ToolTipService.ToolTip="Notes"
+                                    Command="{x:Bind ViewModel.OpenNotesCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Notes'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE70B;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Notes'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Focus / Timer -->
+                            <Button ToolTipService.ToolTip="Focus Timer"
+                                    Command="{x:Bind ViewModel.OpenTimerCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Timer'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE916;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Timer'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Files -->
+                            <Button ToolTipService.ToolTip="Files"
+                                    Command="{x:Bind ViewModel.OpenFileShelfCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'FileShelf'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xED43;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'FileShelf'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- QuickDrop -->
+                            <Button ToolTipService.ToolTip="QuickDrop"
+                                    Command="{x:Bind ViewModel.OpenQuickDropCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'QuickDrop'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE72D;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'QuickDrop'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Weather -->
+                            <Button ToolTipService.ToolTip="Weather"
+                                    Command="{x:Bind ViewModel.OpenWeatherCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Weather'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE753;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Weather'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Screen Time -->
+                            <Button ToolTipService.ToolTip="Screen Time"
+                                    Command="{x:Bind ViewModel.OpenScreenTimeCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'ScreenTime'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE9D9;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'ScreenTime'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- DevTools -->
+                            <Button ToolTipService.ToolTip="DevTools"
+                                    Command="{x:Bind ViewModel.OpenDeveloperDefaultCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Developer'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE943;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Developer'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Network -->
+                            <Button ToolTipService.ToolTip="Network Security"
+                                    Command="{x:Bind ViewModel.OpenNetworkSecurityDefaultCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'NetworkSecurity'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xEC27;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'NetworkSecurity'), Mode=OneWay}" />
+                            </Button>
+
+                            <!-- Settings -->
+                            <Button ToolTipService.ToolTip="Settings"
+                                    Command="{x:Bind ViewModel.OpenSettingsCommand}"
+                                    Width="36" Height="36"
+                                    CornerRadius="18"
+                                    Padding="0"
+                                    Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Settings'), Mode=OneWay}"
+                                    BorderBrush="Transparent">
+                                <FontIcon Glyph="&#xE713;"
+                                          FontSize="15"
+                                          Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Settings'), Mode=OneWay}" />
+                            </Button>
+                        </StackPanel>
+                    </Border>
                 </Grid>
 
-                <!-- ==================== FLOATING BOTTOM DOCK NAVBAR ==================== -->
-                <Border Grid.Row="2"
+                <!-- ==================== TRANSIENT CLIPBOARD NOTIFICATION ==================== -->
+                <Border x:Name="ClipboardNotificationPill"
                         HorizontalAlignment="Center"
-                        VerticalAlignment="Bottom"
-                        Background="#141416"
-                        BorderBrush="#242428"
+                        VerticalAlignment="Top"
+                        Background="#1C1C1F"
+                        BorderBrush="#343438"
                         BorderThickness="1"
-                        CornerRadius="24"
-                        Padding="5,4"
-                        Margin="0,4,0,12">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
-                        <!-- Home -->
-                        <Button ToolTipService.ToolTip="Home"
-                                Command="{x:Bind ViewModel.OpenHomeCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Home'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE80F;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Home'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- System -->
-                        <Button ToolTipService.ToolTip="System"
-                                Command="{x:Bind ViewModel.OpenSystemCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'System'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE770;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'System'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Clipboard -->
-                        <Button ToolTipService.ToolTip="Clipboard"
-                                Command="{x:Bind ViewModel.OpenClipboardCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Clipboard'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xF0E3;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Clipboard'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Notes -->
-                        <Button ToolTipService.ToolTip="Notes"
-                                Command="{x:Bind ViewModel.OpenNotesCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Notes'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE70B;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Notes'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Focus / Timer -->
-                        <Button ToolTipService.ToolTip="Focus Timer"
-                                Command="{x:Bind ViewModel.OpenTimerCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Timer'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE916;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Timer'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Files -->
-                        <Button ToolTipService.ToolTip="Files"
-                                Command="{x:Bind ViewModel.OpenFileShelfCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'FileShelf'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xED43;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'FileShelf'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- QuickDrop -->
-                        <Button ToolTipService.ToolTip="QuickDrop"
-                                Command="{x:Bind ViewModel.OpenQuickDropCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'QuickDrop'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE72D;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'QuickDrop'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Weather -->
-                        <Button ToolTipService.ToolTip="Weather"
-                                Command="{x:Bind ViewModel.OpenWeatherCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Weather'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE753;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Weather'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Screen Time -->
-                        <Button ToolTipService.ToolTip="Screen Time"
-                                Command="{x:Bind ViewModel.OpenScreenTimeCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'ScreenTime'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE9D9;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'ScreenTime'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- DevTools -->
-                        <Button ToolTipService.ToolTip="DevTools"
-                                Command="{x:Bind ViewModel.OpenDeveloperDefaultCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Developer'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE943;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Developer'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Network -->
-                        <Button ToolTipService.ToolTip="Network Security"
-                                Command="{x:Bind ViewModel.OpenNetworkSecurityDefaultCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'NetworkSecurity'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xEC27;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'NetworkSecurity'), Mode=OneWay}" />
-                        </Button>
-
-                        <!-- Settings -->
-                        <Button ToolTipService.ToolTip="Settings"
-                                Command="{x:Bind ViewModel.OpenSettingsCommand}"
-                                Width="36" Height="36"
-                                CornerRadius="18"
-                                Padding="0"
-                                Background="{x:Bind GetNavBackground(ViewModel.CurrentView, 'Settings'), Mode=OneWay}"
-                                BorderBrush="Transparent">
-                            <FontIcon Glyph="&#xE713;"
-                                      FontSize="15"
-                                      Foreground="{x:Bind GetNavForeground(ViewModel.CurrentView, 'Settings'), Mode=OneWay}" />
-                        </Button>
+                        CornerRadius="14"
+                        Padding="12,5"
+                        Margin="0,3,0,0"
+                        Visibility="Collapsed"
+                        Opacity="0"
+                        IsHitTestVisible="False">
+                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xF0E3;" FontSize="11" Foreground="#FFFFFF" />
+                        <TextBlock Text="Clipboard" FontWeight="SemiBold" FontSize="11" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                        <Border Width="1" Height="8" Background="#333338" />
+                        <TextBlock x:Name="ClipboardNotificationText" Text="Copied" FontSize="11" Foreground="#A1A1AA" VerticalAlignment="Center" MaxWidth="240" TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                 </Border>
-
             </Grid>
         </Border>
 

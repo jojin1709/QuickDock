@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using QuickDock.Core.Interfaces;
 using QuickDock.Core.Models;
@@ -81,6 +82,12 @@ public sealed class WindowsClipboardService : IClipboardService
         }
     }
 
+    public Task ProcessCurrentClipboardAsync()
+    {
+        OnClipboardContentChanged(this, EventArgs.Empty);
+        return Task.CompletedTask;
+    }
+
     private async void OnClipboardContentChanged(object? sender, object e)
     {
         var settings = _settingsManager.CurrentSettings.Clipboard;
@@ -95,77 +102,91 @@ public sealed class WindowsClipboardService : IClipboardService
             return;
         }
 
-        await _clipboardLock.WaitAsync().ConfigureAwait(false);
+        await _clipboardLock.WaitAsync();
         try
         {
-            var dataView = global::Windows.ApplicationModel.DataTransfer.Clipboard.GetContent();
-            if (dataView == null) return;
-
             ClipboardItem? item = null;
 
-            if (dataView.Contains(StandardDataFormats.Text))
+            try
             {
-                var text = await dataView.GetTextAsync();
-                if (!string.IsNullOrWhiteSpace(text))
+                var dataView = global::Windows.ApplicationModel.DataTransfer.Clipboard.GetContent();
+                if (dataView != null)
                 {
-                    var isSensitive = _sensitiveDetector.IsSensitive(text, out _);
-                    if (isSensitive && settings.SensitiveAction == SensitiveDataHandling.Ignore)
+                    if (dataView.Contains(StandardDataFormats.Text))
                     {
-                        return; // Privacy: ignore sensitive data
-                    }
-
-                    var isUrl = Uri.TryCreate(text.Trim(), UriKind.Absolute, out var uri) &&
-                                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
-
-                    var preview = text.Length > 120 ? text.Substring(0, 117) + "..." : text;
-                    item = new ClipboardItem
-                    {
-                        Type = isUrl ? ClipboardContentType.Url : ClipboardContentType.Text,
-                        Content = text,
-                        Preview = preview.Replace("\r", " ").Replace("\n", " "),
-                        IsSensitive = isSensitive
-                    };
-                }
-            }
-            else if (dataView.Contains(StandardDataFormats.StorageItems))
-            {
-                var items = await dataView.GetStorageItemsAsync();
-                if (items != null && items.Count > 0)
-                {
-                    var paths = items.Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)).ToList();
-                    if (paths.Count > 0)
-                    {
-                        var content = string.Join(Environment.NewLine, paths);
-                        var preview = paths.Count == 1 ? paths[0] : $"{paths.Count} files ({Path.GetFileName(paths[0])}, ...)";
-                        item = new ClipboardItem
+                        var text = await dataView.GetTextAsync();
+                        if (!string.IsNullOrWhiteSpace(text))
                         {
-                            Type = ClipboardContentType.Files,
-                            Content = content,
-                            Preview = preview
-                        };
+                            var isSensitive = _sensitiveDetector.IsSensitive(text, out _);
+                            if (isSensitive && settings.SensitiveAction == SensitiveDataHandling.Ignore)
+                            {
+                                return; // Privacy: ignore sensitive data
+                            }
+
+                            var isUrl = Uri.TryCreate(text.Trim(), UriKind.Absolute, out var uri) &&
+                                        (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+
+                            var preview = text.Length > 120 ? text.Substring(0, 117) + "..." : text;
+                            item = new ClipboardItem
+                            {
+                                Type = isUrl ? ClipboardContentType.Url : ClipboardContentType.Text,
+                                Content = text,
+                                Preview = preview.Replace("\r", " ").Replace("\n", " "),
+                                IsSensitive = isSensitive
+                            };
+                        }
+                    }
+                    else if (dataView.Contains(StandardDataFormats.StorageItems))
+                    {
+                        var items = await dataView.GetStorageItemsAsync();
+                        if (items != null && items.Count > 0)
+                        {
+                            var paths = items.Select(i => i.Path).Where(p => !string.IsNullOrEmpty(p)).ToList();
+                            if (paths.Count > 0)
+                            {
+                                var content = string.Join(Environment.NewLine, paths);
+                                var preview = paths.Count == 1 ? paths[0] : $"{paths.Count} files ({Path.GetFileName(paths[0])}, ...)";
+                                item = new ClipboardItem
+                                {
+                                    Type = ClipboardContentType.Files,
+                                    Content = content,
+                                    Preview = preview
+                                };
+                            }
+                        }
+                    }
+                    else if (dataView.Contains(StandardDataFormats.Bitmap))
+                    {
+                        var bmpRef = await dataView.GetBitmapAsync();
+                        if (bmpRef != null)
+                        {
+                            var fileName = $"clip_{Guid.NewGuid():N}.png";
+                            var filePath = Path.Combine(AppStoragePaths.CacheDirectory, fileName);
+                            using var stream = await bmpRef.OpenReadAsync();
+                            using var outStream = File.Create(filePath);
+                            using var netStream = stream.AsStreamForRead();
+                            await netStream.CopyToAsync(outStream).ConfigureAwait(false);
+
+                            item = new ClipboardItem
+                            {
+                                Type = ClipboardContentType.Image,
+                                Content = filePath,
+                                Preview = "[Image Snapshot]",
+                                ImageThumbnailPath = filePath
+                            };
+                        }
                     }
                 }
             }
-            else if (dataView.Contains(StandardDataFormats.Bitmap))
+            catch (Exception ex) when (ex is COMException or InvalidOperationException)
             {
-                var bmpRef = await dataView.GetBitmapAsync();
-                if (bmpRef != null)
-                {
-                    var fileName = $"clip_{Guid.NewGuid():N}.png";
-                    var filePath = Path.Combine(AppStoragePaths.CacheDirectory, fileName);
-                    using var stream = await bmpRef.OpenReadAsync();
-                    using var outStream = File.Create(filePath);
-                    using var netStream = stream.AsStreamForRead();
-                    await netStream.CopyToAsync(outStream).ConfigureAwait(false);
+                // Fall back to robust Win32 clipboard read if WinRT encounters thread or container restrictions
+                item = TryReadWin32Clipboard(settings);
+            }
 
-                    item = new ClipboardItem
-                    {
-                        Type = ClipboardContentType.Image,
-                        Content = filePath,
-                        Preview = "[Image Snapshot]",
-                        ImageThumbnailPath = filePath
-                    };
-                }
+            if (item == null)
+            {
+                item = TryReadWin32Clipboard(settings);
             }
 
             if (item != null)
@@ -253,6 +274,70 @@ public sealed class WindowsClipboardService : IClipboardService
     {
         await _databaseService.ClearClipboardHistoryAsync(clearPinned).ConfigureAwait(false);
         ClipboardCleared?.Invoke(this, EventArgs.Empty);
+    }
+
+    private ClipboardItem? TryReadWin32Clipboard(ClipboardModuleSettings settings)
+    {
+        try
+        {
+            if (!QuickDock.Infrastructure.Windows.NativeMethods.OpenClipboard(IntPtr.Zero))
+            {
+                return null;
+            }
+
+            try
+            {
+                if (QuickDock.Infrastructure.Windows.NativeMethods.IsClipboardFormatAvailable(QuickDock.Infrastructure.Windows.NativeMethods.CF_UNICODETEXT))
+                {
+                    IntPtr hData = QuickDock.Infrastructure.Windows.NativeMethods.GetClipboardData(QuickDock.Infrastructure.Windows.NativeMethods.CF_UNICODETEXT);
+                    if (hData != IntPtr.Zero)
+                    {
+                        IntPtr ptr = QuickDock.Infrastructure.Windows.NativeMethods.GlobalLock(hData);
+                        if (ptr != IntPtr.Zero)
+                        {
+                            try
+                            {
+                                string? text = Marshal.PtrToStringUni(ptr);
+                                if (!string.IsNullOrWhiteSpace(text))
+                                {
+                                    var isSensitive = _sensitiveDetector.IsSensitive(text, out _);
+                                    if (isSensitive && settings.SensitiveAction == SensitiveDataHandling.Ignore)
+                                    {
+                                        return null;
+                                    }
+
+                                    var isUrl = Uri.TryCreate(text.Trim(), UriKind.Absolute, out var uri) &&
+                                                (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+
+                                    var preview = text.Length > 120 ? text.Substring(0, 117) + "..." : text;
+                                    return new ClipboardItem
+                                    {
+                                        Type = isUrl ? ClipboardContentType.Url : ClipboardContentType.Text,
+                                        Content = text,
+                                        Preview = preview.Replace("\r", " ").Replace("\n", " "),
+                                        IsSensitive = isSensitive
+                                    };
+                                }
+                            }
+                            finally
+                            {
+                                QuickDock.Infrastructure.Windows.NativeMethods.GlobalUnlock(hData);
+                            }
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                QuickDock.Infrastructure.Windows.NativeMethods.CloseClipboard();
+            }
+        }
+        catch
+        {
+            // Best effort fallback
+        }
+
+        return null;
     }
 
     public void Dispose()

@@ -20,6 +20,7 @@ public interface IClipboardService : IDisposable
     Task ClearHistoryAsync(bool clearPinned = false);
     Task StartListeningAsync();
     void StopListening();
+    Task ProcessCurrentClipboardAsync();
 }
 
 public interface ITimerService : IDisposable

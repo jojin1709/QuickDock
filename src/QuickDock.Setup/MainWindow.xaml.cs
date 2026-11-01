@@ -346,7 +346,7 @@ public partial class MainWindow : Window
             if (key != null)
             {
                 key.SetValue("DisplayName", "QuickDock");
-                key.SetValue("DisplayVersion", "1.0.0");
+                key.SetValue("DisplayVersion", "1.0.1");
                 key.SetValue("Publisher", "JOJIN JOHN");
                 key.SetValue("DisplayIcon", $"{appExe},0");
                 key.SetValue("InstallLocation", installDir);

@@ -138,6 +138,7 @@ public sealed partial class MainViewModel : ObservableObject
     public void SetDispatcherQueue(DispatcherQueue dispatcherQueue)
     {
         _dispatcherQueue = dispatcherQueue;
+        Home.SetDispatcherQueue(dispatcherQueue);
     }
 
     private void OnHomeNavigationRequested(string targetView)
