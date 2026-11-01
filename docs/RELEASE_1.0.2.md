@@ -52,11 +52,12 @@ Engineered strictly on **C# 13, .NET 10, WinUI 3, and Windows App SDK 2.6.4**, Q
 
 ---
 
-## 4. Release Distribution Assets
+## 4. Release Distribution Assets & Cryptographic Checksums
 
-| Artifact | Architecture | Description |
-| :--- | :--- | :--- |
-| **`QuickDock-Setup.exe`** | x64 | **Standalone Windows Installer (Recommended)** |
-| **`QuickDock-v1.0.2-win-x64.exe`** | x64 | Named Standalone Installer |
-| **`QuickDock-v1.0.2-win-x64.zip`** | x64 | Portable Application Package Archive |
-| **`SHA256SUMS.txt`** | - | Official Checksum Manifest |
+| Artifact | Architecture | File Size | Description | SHA-256 Checksum |
+| :--- | :--- | :--- | :--- | :--- |
+| **`QuickDock-Setup.exe`** | x64 | **~178 MB** | **Standalone Windows Installer (Recommended)** | `BA4FBE44154FDDCE80EB4F156FA20696A7DB9F102CF1668E6CA035611DF101AC` |
+| **`QuickDock-v1.0.2-win-x64.exe`** | x64 | **~178 MB** | Named Standalone Installer | `BA4FBE44154FDDCE80EB4F156FA20696A7DB9F102CF1668E6CA035611DF101AC` |
+| **`QuickDock-v1.0.2-win-x64.zip`** | x64 | **~109 MB** | Portable Application Package Archive | `94D6DD4CF5C4F687B9E073B0D7141D1DB772334E1C293699844357ACC0457A14` |
+| **`SHA256SUMS.txt`** | - | **250 B** | Official Checksum Manifest | See Release Page |
+
