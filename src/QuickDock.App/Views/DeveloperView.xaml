@@ -82,7 +82,11 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Text="{x:Bind ViewModel.GitRepoPath, Mode=TwoWay}" PlaceholderText="Repository Directory..." CornerRadius="4" />
+                    <TextBox Grid.Column="0"
+                             Text="{x:Bind ViewModel.GitRepoPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             KeyDown="OnGitRepoPathKeyDown"
+                             PlaceholderText="Repository Directory..."
+                             CornerRadius="4" />
                     <Button Grid.Column="1" Content="Browse..." Click="OnBrowseGitRepoClicked" CornerRadius="4" />
                     <Button Grid.Column="2" Content="Refresh" Command="{x:Bind ViewModel.RefreshGitCommand, Mode=OneWay}" CornerRadius="4" />
                     <Button Grid.Column="3" Content="Fetch" Command="{x:Bind ViewModel.FetchCommand, Mode=OneWay}" CornerRadius="4" />

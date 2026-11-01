@@ -12,6 +12,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using QuickDock.Core.Interfaces;
 using QuickDock.Core.Models;
+using QuickDock.Core.Settings;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 
@@ -33,6 +34,7 @@ public sealed partial class DeveloperViewModel : ObservableObject
     private readonly IHttpToolkitService _httpService;
     private readonly ILocalDevelopmentService _localDevService;
     private readonly IDeveloperProcessService _processService;
+    private readonly ISettingsManager _settingsManager;
     private readonly ILogger<DeveloperViewModel> _logger;
 
     private CancellationTokenSource? _httpCts;
@@ -43,7 +45,7 @@ public sealed partial class DeveloperViewModel : ObservableObject
     #region Git Properties
 
     [ObservableProperty]
-    private string _gitRepoPath = Environment.CurrentDirectory;
+    private string _gitRepoPath = string.Empty;
 
     [ObservableProperty]
     private bool _isGitInstalled = true;
@@ -350,6 +352,7 @@ public sealed partial class DeveloperViewModel : ObservableObject
         IHttpToolkitService httpService,
         ILocalDevelopmentService localDevService,
         IDeveloperProcessService processService,
+        ISettingsManager settingsManager,
         ILogger<DeveloperViewModel> logger)
     {
         _gitService = gitService;
@@ -366,35 +369,39 @@ public sealed partial class DeveloperViewModel : ObservableObject
         _httpService = httpService;
         _localDevService = localDevService;
         _processService = processService;
+        _settingsManager = settingsManager;
         _logger = logger;
 
         try
         {
-            if (Directory.Exists(Path.Combine(Environment.CurrentDirectory, ".git")))
+            var saved = _settingsManager.CurrentSettings.Developer.DefaultGitRepository;
+            if (!string.IsNullOrWhiteSpace(saved) && Directory.Exists(saved) && Directory.Exists(Path.Combine(saved, ".git")))
+            {
+                _gitRepoPath = saved;
+            }
+            else if (Directory.Exists(Path.Combine(Environment.CurrentDirectory, ".git")))
             {
                 _gitRepoPath = Environment.CurrentDirectory;
-            }
-            else if (Directory.Exists(@"D:\QuickDock\.git"))
-            {
-                _gitRepoPath = @"D:\QuickDock";
             }
             else
             {
                 var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                string? discovered = null;
                 while (dir != null && dir.Exists)
                 {
                     if (Directory.Exists(Path.Combine(dir.FullName, ".git")))
                     {
-                        _gitRepoPath = dir.FullName;
+                        discovered = dir.FullName;
                         break;
                     }
                     dir = dir.Parent;
                 }
+                _gitRepoPath = discovered ?? string.Empty;
             }
         }
         catch
         {
-            _gitRepoPath = Environment.CurrentDirectory;
+            _gitRepoPath = string.Empty;
         }
     }
 
@@ -441,19 +448,44 @@ public sealed partial class DeveloperViewModel : ObservableObject
                 return;
             }
 
-            string targetDir = string.IsNullOrWhiteSpace(GitRepoPath) ? Environment.CurrentDirectory : GitRepoPath;
-            IsGitRepo = await _gitService.IsGitRepositoryAsync(targetDir);
-
-            if (!IsGitRepo)
+            string targetDir = GitRepoPath?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(targetDir))
             {
-                GitStatusMessage = $"'{targetDir}' is not a Git repository.";
+                IsGitRepo = false;
+                GitStatusMessage = "Select a local Git repository to inspect branches, file status, and commit history.";
                 GitFiles.Clear();
                 GitCommits.Clear();
                 GitBranches.Clear();
                 GitBranch = string.Empty;
                 GitHeadMessage = string.Empty;
+                GitDiffText = string.Empty;
                 return;
             }
+
+            IsGitRepo = await _gitService.IsGitRepositoryAsync(targetDir);
+
+            if (!IsGitRepo)
+            {
+                GitStatusMessage = $"'{targetDir}' is not a Git repository. Click Browse to select a repository.";
+                GitFiles.Clear();
+                GitCommits.Clear();
+                GitBranches.Clear();
+                GitBranch = string.Empty;
+                GitHeadMessage = string.Empty;
+                GitDiffText = string.Empty;
+                return;
+            }
+
+            try
+            {
+                var s = _settingsManager.CurrentSettings;
+                if (s.Developer.DefaultGitRepository != targetDir)
+                {
+                    s.Developer.DefaultGitRepository = targetDir;
+                    _ = _settingsManager.SaveAsync(s);
+                }
+            }
+            catch { }
 
             var status = await _gitService.GetRepositoryStatusAsync(targetDir);
             GitBranch = status.CurrentBranch;

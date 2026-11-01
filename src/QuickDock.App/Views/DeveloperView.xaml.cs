@@ -56,6 +56,15 @@ public sealed partial class DeveloperView : UserControl
     public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
     public Visibility GetInvertedBoolVisibility(bool isVisible) => isVisible ? Visibility.Collapsed : Visibility.Visible;
 
+    private void OnGitRepoPathKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter && ViewModel != null)
+        {
+            _ = ViewModel.RefreshGitCommand.ExecuteAsync(null);
+            e.Handled = true;
+        }
+    }
+
     private async void OnBrowseGitRepoClicked(object sender, RoutedEventArgs e)
     {
         try
