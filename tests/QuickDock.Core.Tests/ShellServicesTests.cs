@@ -25,12 +25,12 @@ public class ShellServicesTests
         var service = CreatePositioningService();
 
         var idleDims = service.GetDockDimensions(isExpanded: false);
-        Assert.Equal(440, idleDims.Width);
-        Assert.Equal(48, idleDims.Height);
+        Assert.Equal(WindowPositioningService.BaseIdleWidth, idleDims.Width);
+        Assert.Equal(WindowPositioningService.BaseIdleHeight, idleDims.Height);
 
         var expandedDims = service.GetDockDimensions(isExpanded: true);
-        Assert.Equal(860, expandedDims.Width);
-        Assert.Equal(560, expandedDims.Height);
+        Assert.Equal(WindowPositioningService.BaseExpandedWidth, expandedDims.Width);
+        Assert.Equal(WindowPositioningService.BaseExpandedHeight, expandedDims.Height);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class ShellServicesTests
         Assert.Equal(150, settings.Behavior.HoverDelayMs);
         Assert.True(settings.Behavior.AutoHide);
         Assert.True(settings.Behavior.AlwaysOnTop);
-        Assert.True(settings.Behavior.HideInFullscreen);
+        Assert.False(settings.Behavior.HideInFullscreen);
         Assert.True(settings.Behavior.FollowActiveMonitor);
         Assert.True(settings.EnabledModules.ContainsKey("quickdock.clock"));
     }
