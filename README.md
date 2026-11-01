@@ -22,12 +22,14 @@ It docks subtly at the top center of your display, providing instant access to r
 
 **This repository contains QuickDock: the native Windows 11 utility and productivity dock, authored by JOJIN JOHN. This software is proprietary and strictly NOT open source.**
 
-<p><strong>Download & Run QuickDock</strong></p>
+<p><strong>Download & Install QuickDock</strong></p>
 
 ```powershell
-# Download QuickDock-v1.0.0-win-x64.zip from Releases, extract, and run:
-.\QuickDock.App.exe
+# 1. Download QuickDock-Setup.exe from Releases
+# 2. Run QuickDock-Setup.exe to install (no unzipping needed!)
 ```
+
+[![Download Installer](https://img.shields.io/badge/Download-QuickDock--Setup.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0)
 
 <sub>Press <code>Ctrl + Space</code> or mouse over the top-center edge to expand your dock.</sub>
 

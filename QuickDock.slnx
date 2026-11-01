@@ -5,6 +5,7 @@
     <Project Path="src/QuickDock.Infrastructure/QuickDock.Infrastructure.csproj" />
     <Project Path="src/QuickDock.Modules/QuickDock.Modules.csproj" />
     <Project Path="src/QuickDock.Services/QuickDock.Services.csproj" />
+    <Project Path="src/QuickDock.Setup/QuickDock.Setup.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/QuickDock.Core.Tests/QuickDock.Core.Tests.csproj" />

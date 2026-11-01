@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets/AppIcon.ico</ApplicationIcon>
+    <RootNamespace>QuickDock.Setup</RootNamespace>
+    <AssemblyName>QuickDock-Setup</AssemblyName>
+    
+    <!-- Single-file release packaging -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    
+    <!-- Versioning and Attribution -->
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Product>QuickDock Setup</Product>
+    <Company>JOJIN JOHN</Company>
+    <Authors>JOJIN JOHN</Authors>
+    <Copyright>Copyright © 2026 JOJIN JOHN. All rights reserved.</Copyright>
+    <Description>Standalone Installer for QuickDock Windows 11 Utility Dock</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets/AppIcon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets/icon-64x64.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <!-- Embedded installation payload archive -->
+    <EmbeddedResource Include="payload.zip" Condition="Exists('payload.zip')" />
+  </ItemGroup>
+</Project>

@@ -21,5 +21,6 @@ startup.txt
 *.tmp
 [Pp]ublish/
 [Dd]ist/
+src/QuickDock.Setup/payload.zip
 
 
