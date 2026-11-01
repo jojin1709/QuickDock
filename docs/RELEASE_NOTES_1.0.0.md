@@ -48,3 +48,4 @@ QuickDock 1.0.0 is the definitive release of the native Windows 11 utility dock.
 - **Build Status:** 0 errors, 0 warnings.
 - **Memory Footprint:** Idle ~45 MB RAM, Active ~75 MB RAM.
 - **CPU Footprint:** Idle < 0.2% CPU.
+

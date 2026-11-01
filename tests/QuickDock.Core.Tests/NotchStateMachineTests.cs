@@ -211,3 +211,4 @@ public class NotchStateMachineTests
         Assert.True(collapseTriggered);
     }
 }
+
