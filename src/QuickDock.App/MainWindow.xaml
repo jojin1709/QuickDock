@@ -29,6 +29,23 @@
                 PointerPressed="OnIdlePointerPressed">
 
             <Grid>
+                <!-- Perimeter Highlight Animated Border (Restrained traveling light on hover/expand, 0% idle CPU) -->
+                <Border x:Name="PerimeterHighlight"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"
+                        CornerRadius="0,0,14,14"
+                        BorderThickness="1,0,1,1"
+                        Opacity="0"
+                        IsHitTestVisible="False">
+                    <Border.BorderBrush>
+                        <LinearGradientBrush x:Name="PerimeterGlowBrush" StartPoint="0,0" EndPoint="1,0.5">
+                            <GradientStop Color="#00FFFFFF" Offset="0.0" />
+                            <GradientStop Color="#80FFFFFF" Offset="0.5" />
+                            <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Border.BorderBrush>
+                </Border>
+
                 <!-- ==================== IDLE COMPACT CONTENT ==================== -->
                 <Grid x:Name="IdleContentGrid"
                       Height="34"

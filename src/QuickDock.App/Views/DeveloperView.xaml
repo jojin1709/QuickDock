@@ -80,16 +80,18 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" Text="{x:Bind ViewModel.GitRepoPath, Mode=TwoWay}" PlaceholderText="Repository Directory..." CornerRadius="4" />
-                    <Button Grid.Column="1" Content="Refresh" Command="{x:Bind ViewModel.RefreshGitCommand, Mode=OneWay}" CornerRadius="4" />
-                    <Button Grid.Column="2" Content="Fetch" Command="{x:Bind ViewModel.FetchCommand, Mode=OneWay}" CornerRadius="4" />
-                    <Button Grid.Column="3" Content="Pull" Command="{x:Bind ViewModel.PullCommand, Mode=OneWay}" CornerRadius="4" />
-                    <Button Grid.Column="4" Content="Push" Command="{x:Bind ViewModel.PushCommand, Mode=OneWay}" CornerRadius="4" />
+                    <Button Grid.Column="1" Content="Browse..." Click="OnBrowseGitRepoClicked" CornerRadius="4" />
+                    <Button Grid.Column="2" Content="Refresh" Command="{x:Bind ViewModel.RefreshGitCommand, Mode=OneWay}" CornerRadius="4" />
+                    <Button Grid.Column="3" Content="Fetch" Command="{x:Bind ViewModel.FetchCommand, Mode=OneWay}" CornerRadius="4" />
+                    <Button Grid.Column="4" Content="Pull" Command="{x:Bind ViewModel.PullCommand, Mode=OneWay}" CornerRadius="4" />
+                    <Button Grid.Column="5" Content="Push" Command="{x:Bind ViewModel.PushCommand, Mode=OneWay}" CornerRadius="4" />
                 </Grid>
 
-                <!-- Git Content Split -->
-                <Grid Grid.Row="1" ColumnSpacing="10">
+                <!-- Git Content Split (Visible when repository is open) -->
+                <Grid Grid.Row="1" ColumnSpacing="10" Visibility="{x:Bind GetBoolVisibility(ViewModel.IsGitRepo), Mode=OneWay}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="320" />
                         <ColumnDefinition Width="*" />
@@ -178,6 +180,32 @@
                         </Grid>
                     </Border>
                 </Grid>
+                            <!-- Git Empty State (Visible when not a repository) -->
+                <Border Grid.Row="1"
+                        Visibility="{x:Bind GetInvertedBoolVisibility(ViewModel.IsGitRepo), Mode=OneWay}"
+                        Background="{ThemeResource CardBackgroundBrush}"
+                        BorderBrush="{ThemeResource TileStrokeBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="24">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                        <FontIcon Glyph="&#xE8B7;" FontSize="36" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" HorizontalAlignment="Center" />
+                        <TextBlock Text="No Git Repository Detected" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" />
+                        <TextBlock Text="{x:Bind ViewModel.GitStatusMessage, Mode=OneWay}"
+                                   FontSize="12"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   MaxWidth="450"
+                                   TextAlignment="Center" />
+                        <Button Content="Browse Repository..."
+                                Click="OnBrowseGitRepoClicked"
+                                Style="{ThemeResource AccentButtonStyle}"
+                                HorizontalAlignment="Center"
+                                Margin="0,8,0,0"
+                                CornerRadius="4" />
+                    </StackPanel>
+                </Border>
             </Grid>
 
             <!-- 2. DOCKER SECTION -->

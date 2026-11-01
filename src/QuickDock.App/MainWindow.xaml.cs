@@ -103,8 +103,16 @@ public sealed partial class MainWindow : Window
         _settingsManager = settingsManager;
         _eventBus = eventBus;
 
-        InitializeComponent();
-        _logger.LogInformation("MainWindow InitializeComponent finished.");
+        try
+        {
+            InitializeComponent();
+            _logger.LogInformation("MainWindow InitializeComponent finished.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Exception during MainWindow InitializeComponent!");
+            throw;
+        }
 
         _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
         _logger.LogInformation("MainWindow: HWND is {hWnd}.", _hWnd);
@@ -357,6 +365,7 @@ public sealed partial class MainWindow : Window
         _collapseStoryboard.Completed += (s, e) =>
         {
             ExpandedContentGrid.Visibility = Visibility.Collapsed;
+            PerimeterHighlight.Opacity = 0;
             // Shrink physical HWND down to idle compact footprint so desktop receives clicks
             _positioningService.SetDockState(_hWnd, isExpanded: false, TargetMonitor);
         };
@@ -417,6 +426,7 @@ public sealed partial class MainWindow : Window
         }
 
         _expandStoryboard?.Begin();
+        StartPerimeterGlow(0.9, 180);
 
         if (IsPrimaryInstance)
         {
@@ -597,8 +607,45 @@ public sealed partial class MainWindow : Window
         Collapse();
     }
 
-    private void OnIdlePointerEntered(object sender, PointerRoutedEventArgs e) { }
-    private void OnIdlePointerExited(object sender, PointerRoutedEventArgs e) { }
+    private void StartPerimeterGlow(double targetOpacity, int durationMs = 180)
+    {
+        try
+        {
+            var anim = new DoubleAnimation
+            {
+                To = targetOpacity,
+                Duration = new Duration(TimeSpan.FromMilliseconds(durationMs)),
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                EnableDependentAnimation = true
+            };
+            Storyboard.SetTarget(anim, PerimeterHighlight);
+            Storyboard.SetTargetProperty(anim, "Opacity");
+            var sb = new Storyboard();
+            sb.Children.Add(anim);
+            sb.Begin();
+        }
+        catch
+        {
+            PerimeterHighlight.Opacity = targetOpacity;
+        }
+    }
+
+    private void OnIdlePointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (!IsExpanded)
+        {
+            StartPerimeterGlow(0.85, 180);
+        }
+    }
+
+    private void OnIdlePointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (!IsExpanded)
+        {
+            StartPerimeterGlow(0.0, 200);
+        }
+    }
+
     private void OnExpandedPointerEntered(object sender, PointerRoutedEventArgs e) { }
     private void OnExpandedPointerExited(object sender, PointerRoutedEventArgs e) { }
 

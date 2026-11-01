@@ -36,7 +36,32 @@ public sealed partial class NetworkSecurityView : UserControl
     public NetworkSecurityView()
     {
         InitializeComponent();
+        Loaded += OnLoaded;
     }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel != null)
+        {
+            var section = string.IsNullOrEmpty(ViewModel.SelectedSection) ? "Overview" : ViewModel.SelectedSection;
+            _ = ViewModel.InitializeSectionAsync(section);
+        }
+    }
+
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush ActiveNavBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x27, 0x27, 0x2A));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush InactiveNavBrush =
+        new(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush ActiveNavBorderBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x3F, 0x3F, 0x46));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush InactiveNavBorderBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x22, 0x22, 0x26));
+
+    public Microsoft.UI.Xaml.Media.SolidColorBrush GetNavBackground(string currentSection, string targetSection) =>
+        string.Equals(currentSection, targetSection, StringComparison.OrdinalIgnoreCase) ? ActiveNavBrush : InactiveNavBrush;
+
+    public Microsoft.UI.Xaml.Media.SolidColorBrush GetNavBorder(string currentSection, string targetSection) =>
+        string.Equals(currentSection, targetSection, StringComparison.OrdinalIgnoreCase) ? ActiveNavBorderBrush : InactiveNavBorderBrush;
 
     private Visibility GetSectionVisibility(string currentSection, string targetSection)
     {

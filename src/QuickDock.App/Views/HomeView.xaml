@@ -23,11 +23,15 @@
 
         <!-- ==================== CARD 1: SCREEN TIME ==================== -->
         <Border Grid.Row="0" Grid.Column="0"
+                x:Name="ScreenTimeCard"
                 Background="#18181B"
                 BorderBrush="#27272A"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="16,14">
+                Padding="16,14"
+                Tapped="OnScreenTimeCardTapped"
+                PointerEntered="OnCardPointerEntered"
+                PointerExited="OnCardPointerExited">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -84,11 +88,15 @@
 
         <!-- ==================== CARD 2: SYSTEM (3 Radial Rings) ==================== -->
         <Border Grid.Row="0" Grid.Column="1"
+                x:Name="SystemCard"
                 Background="#18181B"
                 BorderBrush="#27272A"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="16,14">
+                Padding="16,14"
+                Tapped="OnSystemCardTapped"
+                PointerEntered="OnCardPointerEntered"
+                PointerExited="OnCardPointerExited">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -176,11 +184,15 @@
 
         <!-- ==================== CARD 3: WEATHER ==================== -->
         <Border Grid.Row="0" Grid.Column="2"
+                x:Name="WeatherCard"
                 Background="#18181B"
                 BorderBrush="#27272A"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="16,14">
+                Padding="16,14"
+                Tapped="OnWeatherCardTapped"
+                PointerEntered="OnCardPointerEntered"
+                PointerExited="OnCardPointerExited">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -245,11 +257,15 @@
 
         <!-- ==================== CARD 4: FOCUS (Pomodoro Timer) ==================== -->
         <Border Grid.Row="1" Grid.Column="0"
+                x:Name="FocusCard"
                 Background="#18181B"
                 BorderBrush="#27272A"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="16,14">
+                Padding="16,14"
+                Tapped="OnFocusCardTapped"
+                PointerEntered="OnCardPointerEntered"
+                PointerExited="OnCardPointerExited">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -307,11 +323,15 @@
 
         <!-- ==================== CARD 5: CLIPBOARD ==================== -->
         <Border Grid.Row="1" Grid.Column="1"
+                x:Name="ClipboardCard"
                 Background="#18181B"
                 BorderBrush="#27272A"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="16,14">
+                Padding="16,14"
+                Tapped="OnClipboardCardTapped"
+                PointerEntered="OnCardPointerEntered"
+                PointerExited="OnCardPointerExited">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -398,11 +418,15 @@
 
         <!-- ==================== CARD 6: NOTES ==================== -->
         <Border Grid.Row="1" Grid.Column="2"
+                x:Name="NotesCard"
                 Background="#18181B"
                 BorderBrush="#27272A"
                 BorderThickness="1"
                 CornerRadius="16"
-                Padding="16,14">
+                Padding="16,14"
+                Tapped="OnNotesCardTapped"
+                PointerEntered="OnCardPointerEntered"
+                PointerExited="OnCardPointerExited">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

@@ -34,6 +34,8 @@ public sealed partial class NotesView : UserControl
         set => SetValue(MainViewModelProperty, value);
     }
 
+    public Visibility GetEmptyVisibility(int count) => count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
     public NotesView()
     {
         InitializeComponent();

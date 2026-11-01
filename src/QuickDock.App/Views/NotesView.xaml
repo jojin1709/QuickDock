@@ -87,7 +87,21 @@
 
             <!-- Notes List -->
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-                <ItemsControl ItemsSource="{x:Bind ViewModel.Notes, Mode=OneWay}">
+                <StackPanel>
+                    <Border Visibility="{x:Bind GetEmptyVisibility(ViewModel.Notes.Count), Mode=OneWay}"
+                            Background="#18181B"
+                            BorderBrush="#242428"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="12"
+                            Margin="0,0,0,8">
+                        <TextBlock Text="No notes yet. Click '+ New Note' to create one."
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap" />
+                    </Border>
+
+                    <ItemsControl ItemsSource="{x:Bind ViewModel.Notes, Mode=OneWay}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:NoteItem">
                             <Border Margin="0,0,0,6"
@@ -133,6 +147,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                </StackPanel>
             </ScrollViewer>
 
             <!-- Note Editor -->

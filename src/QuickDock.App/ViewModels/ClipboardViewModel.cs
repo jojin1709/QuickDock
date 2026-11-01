@@ -26,6 +26,15 @@ public sealed partial class ClipboardViewModel : ObservableObject
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool _hasPinnedItems;
+
+    [ObservableProperty]
+    private bool _hasRecentItems;
+
+    [ObservableProperty]
+    private bool _isEmpty = true;
+
     public ObservableCollection<ClipboardItem> PinnedItems { get; } = new();
     public ObservableCollection<ClipboardItem> RecentItems { get; } = new();
 
@@ -76,6 +85,9 @@ public sealed partial class ClipboardViewModel : ObservableObject
                         RecentItems.Add(item);
                     }
                 }
+                HasPinnedItems = PinnedItems.Count > 0;
+                HasRecentItems = RecentItems.Count > 0;
+                IsEmpty = PinnedItems.Count == 0 && RecentItems.Count == 0;
             });
         }
         catch (Exception)

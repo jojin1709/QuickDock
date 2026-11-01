@@ -38,6 +38,15 @@ Engineered strictly on **C# 13, .NET 10, WinUI 3, and Windows App SDK 2.6.4**, Q
 - **Single-File Setup:** Modern self-contained `QuickDock-Setup.exe` with embedded payload.
 - **Silent Self-Deleting Uninstaller:** Uninstaller worker completely purges installation binaries, Start Menu shortcuts, Desktop icons, and Windows Registry keys, then self-deletes without leaving residual files.
 
+### 2.5. Full UI/UX & Functional Remediation Pass
+- **Real Windows WASAPI Audio Endpoint Control:** Replaced placeholder volume logic with true low-level WASAPI `IAudioEndpointVolume` COM interop, enabling master volume level synchronization, real-time volume slider manipulation, and instant audio notifications with 0 thread-marshaling exceptions.
+- **Developer Toolkit Repository Discovery:** Implemented intelligent Git repository auto-discovery and integrated a native Windows App SDK `FolderPicker` ("Browse...") dialog. Displays live branch name, recent commits, working directory diffs, and staged status with zero hardcoded paths, plus an honest empty state for non-git folders.
+- **Network & Security Diagnostic Suite:** Resolved navigation section mapping across all diagnostic modules (Overview, Adapters, DNS/Ping, Connections, TLS, Headers, Firewall, Security Checks, Integrity, and Reports) with active navigation pill indicators.
+- **Screen Time Analytics:** Real foreground application tracking via `IScreenTimeService` and SQLite storage, presenting live usage percentages, daily app time limits, and 7-day sparklines.
+- **Interactive Home Cards:** All primary dashboard cards (Screen Time, System, Weather, Focus, Clipboard, Notes) now provide interactive hover border feedback and direct navigation on tap/click.
+- **Event-Driven Notch Perimeter Highlight:** Replaced static solid white border with a restrained, hardware-accelerated animated gradient perimeter glow that activates on hover/expand and settles gracefully with 0% idle CPU usage.
+- **Clipboard & Notes Empty States:** Added real image thumbnail previews for image clipboard entries and polished empty states for empty history.
+
 ---
 
 ## 3. Automated Test Verification
@@ -73,3 +82,4 @@ Engineered strictly on **C# 13, .NET 10, WinUI 3, and Windows App SDK 2.6.4**, Q
 **GitHub Profile:** [https://github.com/jojin1709](https://github.com/jojin1709)  
 **LinkedIn:** [https://www.linkedin.com/in/jojin-john/](https://www.linkedin.com/in/jojin-john/)  
 **License:** [Proprietary License (All Rights Reserved)](../LICENSE)
+

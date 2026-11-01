@@ -41,6 +41,49 @@ public sealed partial class DeveloperView : UserControl
     public DeveloperView()
     {
         InitializeComponent();
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        if (ViewModel != null)
+        {
+            var sec = string.IsNullOrEmpty(ViewModel.SelectedSection) ? "Git" : ViewModel.SelectedSection;
+            _ = ViewModel.InitializeSectionAsync(sec);
+        }
+    }
+
+    public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility GetInvertedBoolVisibility(bool isVisible) => isVisible ? Visibility.Collapsed : Visibility.Visible;
+
+    private async void OnBrowseGitRepoClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new Windows.Storage.Pickers.FolderPicker();
+            picker.FileTypeFilter.Add("*");
+
+            var window = App.MainWindowInstance;
+            if (window != null)
+            {
+                var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
+                WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            }
+
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder != null && ViewModel != null)
+            {
+                ViewModel.GitRepoPath = folder.Path;
+                await ViewModel.RefreshGitCommand.ExecuteAsync(null);
+            }
+        }
+        catch (Exception ex)
+        {
+            if (ViewModel != null)
+            {
+                ViewModel.GitStatusMessage = $"Browse folder error: {ex.Message}";
+            }
+        }
     }
 
     private static void OnViewModelChangedStatic(DependencyObject d, DependencyPropertyChangedEventArgs e)

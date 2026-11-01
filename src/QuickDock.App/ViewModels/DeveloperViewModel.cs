@@ -367,6 +367,35 @@ public sealed partial class DeveloperViewModel : ObservableObject
         _localDevService = localDevService;
         _processService = processService;
         _logger = logger;
+
+        try
+        {
+            if (Directory.Exists(Path.Combine(Environment.CurrentDirectory, ".git")))
+            {
+                _gitRepoPath = Environment.CurrentDirectory;
+            }
+            else if (Directory.Exists(@"D:\QuickDock\.git"))
+            {
+                _gitRepoPath = @"D:\QuickDock";
+            }
+            else
+            {
+                var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+                while (dir != null && dir.Exists)
+                {
+                    if (Directory.Exists(Path.Combine(dir.FullName, ".git")))
+                    {
+                        _gitRepoPath = dir.FullName;
+                        break;
+                    }
+                    dir = dir.Parent;
+                }
+            }
+        }
+        catch
+        {
+            _gitRepoPath = Environment.CurrentDirectory;
+        }
     }
 
     public async Task InitializeSectionAsync(string section)

@@ -1,7 +1,9 @@
+using System.Net.NetworkInformation;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
+using QuickDock.Core.Interfaces;
 using QuickDock.Services.System;
 
 namespace QuickDock.App.ViewModels;
@@ -9,8 +11,14 @@ namespace QuickDock.App.ViewModels;
 public sealed partial class SystemViewModel : ObservableObject
 {
     private readonly ISystemMetricsService _metricsService;
+    private readonly IAudioService _audioService;
     private readonly ILogger<SystemViewModel> _logger;
     private DispatcherQueueTimer? _refreshTimer;
+    private DispatcherQueue? _dispatcherQueue;
+    private bool _isInternalVolumeUpdate;
+    private long _lastBytesReceived;
+    private long _lastBytesSent;
+    private DateTime _lastSpeedCheck = DateTime.UtcNow;
 
     [ObservableProperty]
     private string _cpuUsageText = "0%";
@@ -96,11 +104,42 @@ public sealed partial class SystemViewModel : ObservableObject
     [ObservableProperty]
     private string _volumeDeviceName = "Realtek(R) Audio";
 
-    public SystemViewModel(ISystemMetricsService metricsService, ILogger<SystemViewModel> logger)
+    public SystemViewModel(ISystemMetricsService metricsService, IAudioService audioService, ILogger<SystemViewModel> logger)
     {
         _metricsService = metricsService;
+        _audioService = audioService;
         _logger = logger;
+
+        _audioService.VolumeChanged += (s, e) =>
+        {
+            _dispatcherQueue?.TryEnqueue(() =>
+            {
+                _isInternalVolumeUpdate = true;
+                try
+                {
+                    VolumePercent = (int)Math.Round(e.NewVolume * 100);
+                    VolumeDeviceName = _audioService.GetDefaultDeviceName();
+                }
+                finally
+                {
+                    _isInternalVolumeUpdate = false;
+                }
+            });
+        };
     }
+
+    partial void OnVolumePercentChanged(int value)
+    {
+        if (_isInternalVolumeUpdate) return;
+        _audioService.SetMasterVolume(Math.Clamp(value / 100f, 0f, 1f));
+    }
+
+    private static string FormatThroughput(double bytesPerSec) => bytesPerSec switch
+    {
+        >= 1_048_576 => $"{(bytesPerSec / 1_048_576):0.#} MB/s",
+        >= 1024 => $"{(bytesPerSec / 1024):0.#} KB/s",
+        _ => $"{(int)bytesPerSec} B/s"
+    };
 
     public void Refresh()
     {
@@ -152,12 +191,20 @@ public sealed partial class SystemViewModel : ObservableObject
             DiskUsagePercentageText = $"{snapshot.Disk.UsedPercentage}% used";
         }
 
-        if (snapshot.Battery != null)
+        if (snapshot.Battery != null && snapshot.Battery.HasBattery)
         {
+            BatteryPercentValue = snapshot.Battery.Percentage;
+            BatteryPercentText = $"{snapshot.Battery.Percentage}%";
+            BatteryStateText = snapshot.Battery.IsCharging ? "Charging" : (snapshot.Battery.IsOnBattery ? "On Battery" : "Plugged In");
+            BatteryHealthText = snapshot.Battery.StateDescription;
             BatteryText = snapshot.Battery.StateDescription;
         }
         else
         {
+            BatteryPercentValue = 100;
+            BatteryPercentText = "AC Power";
+            BatteryStateText = "Wall Power";
+            BatteryHealthText = "Desktop (No Battery)";
             BatteryText = "AC Power";
         }
 
@@ -165,7 +212,67 @@ public sealed partial class SystemViewModel : ObservableObject
         {
             NetworkTypeText = snapshot.Network.InterfaceType;
             NetworkStatusText = snapshot.Network.IsConnected ? "Connected" : "Disconnected";
+            NetworkSsidText = string.IsNullOrEmpty(snapshot.Network.ConnectionName) ? snapshot.Network.InterfaceType : snapshot.Network.ConnectionName;
+
+            try
+            {
+                var now = DateTime.UtcNow;
+                double elapsedSec = (now - _lastSpeedCheck).TotalSeconds;
+                if (elapsedSec > 0.5)
+                {
+                    long totalRx = 0;
+                    long totalTx = 0;
+                    long maxLinkSpeed = 0;
+                    foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+                    {
+                        if (ni.OperationalStatus == OperationalStatus.Up &&
+                            ni.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                            ni.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
+                        {
+                            var stats = ni.GetIPStatistics();
+                            totalRx += stats.BytesReceived;
+                            totalTx += stats.BytesSent;
+                            if (ni.Speed > maxLinkSpeed) maxLinkSpeed = ni.Speed;
+                        }
+                    }
+
+                    if (_lastBytesReceived > 0 && totalRx >= _lastBytesReceived)
+                    {
+                        double rxSpeed = (totalRx - _lastBytesReceived) / elapsedSec;
+                        double txSpeed = (totalTx - _lastBytesSent) / elapsedSec;
+                        NetworkDownSpeedText = FormatThroughput(rxSpeed);
+                        NetworkUpSpeedText = FormatThroughput(txSpeed);
+                    }
+
+                    if (maxLinkSpeed > 0)
+                    {
+                        NetworkSpeedText = $"{snapshot.Network.InterfaceType} · {maxLinkSpeed / 1_000_000} Mbps";
+                    }
+
+                    _lastBytesReceived = totalRx;
+                    _lastBytesSent = totalTx;
+                    _lastSpeedCheck = now;
+                }
+            }
+            catch { }
         }
+
+        // Live Audio Volume
+        try
+        {
+            float vol = _audioService.GetMasterVolume();
+            _isInternalVolumeUpdate = true;
+            try
+            {
+                VolumePercent = (int)Math.Round(vol * 100);
+                VolumeDeviceName = _audioService.GetDefaultDeviceName();
+            }
+            finally
+            {
+                _isInternalVolumeUpdate = false;
+            }
+        }
+        catch { }
 
         if (snapshot.Uptime != null)
         {
@@ -175,6 +282,7 @@ public sealed partial class SystemViewModel : ObservableObject
 
     public void StartLiveUpdates(DispatcherQueue dispatcherQueue)
     {
+        _dispatcherQueue = dispatcherQueue;
         Refresh();
 
         if (_refreshTimer == null)

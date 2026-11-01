@@ -303,23 +303,31 @@ public sealed class NotchWindowManager : IDisposable
             if (!_dockStates.TryGetValue(monitor.DeviceId, out var state))
             {
                 _logger.LogInformation("Creating notch window for monitor {Device} (Primary={Primary}, Scale={Scale:F2}).", monitor.DeviceId, monitor.IsPrimary, monitor.ScaleFactor);
-                var win = _serviceProvider.GetRequiredService<MainWindow>();
-                win.InitializeForMonitor(monitor, monitor.IsPrimary);
-
-                IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(win);
-
-                state = new DockWindowState
+                try
                 {
-                    Window = win,
-                    Monitor = monitor,
-                    HWnd = hWnd
-                };
+                    var win = _serviceProvider.GetRequiredService<MainWindow>();
+                    win.InitializeForMonitor(monitor, monitor.IsPrimary);
 
-                SetupStateTimers(state);
-                RecalculateBounds(state);
+                    IntPtr hWnd = WinRT.Interop.WindowNative.GetWindowHandle(win);
 
-                _dockStates[monitor.DeviceId] = state;
-                win.Activate();
+                    state = new DockWindowState
+                    {
+                        Window = win,
+                        Monitor = monitor,
+                        HWnd = hWnd
+                    };
+
+                    SetupStateTimers(state);
+                    RecalculateBounds(state);
+
+                    _dockStates[monitor.DeviceId] = state;
+                    win.Activate();
+                    _logger.LogInformation("Notch window initialized and activated for monitor {Device}.", monitor.DeviceId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to create notch window for monitor {Device}.", monitor.DeviceId);
+                }
             }
             else
             {

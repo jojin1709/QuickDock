@@ -32,9 +32,18 @@ public sealed partial class ScreenTimeView : UserControl
         set => SetValue(MainViewModelProperty, value);
     }
 
+    public Visibility GetEmptyVisibility(int count) =>
+        count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
     public ScreenTimeView()
     {
         InitializeComponent();
+        Loaded += OnLoaded;
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        _ = ViewModel?.LoadUsageAsync();
     }
 
     private void OnToggleViewModeClicked(object sender, RoutedEventArgs e)

@@ -66,6 +66,61 @@ public sealed partial class HomeView : UserControl
         }
     }
 
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush DefaultCardBorderBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x27, 0x27, 0x2A));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush HoverCardBorderBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x4F, 0x4F, 0x56));
+
+    private void OnCardPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Border border)
+        {
+            border.BorderBrush = HoverCardBorderBrush;
+        }
+    }
+
+    private void OnCardPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if (sender is Border border)
+        {
+            border.BorderBrush = DefaultCardBorderBrush;
+        }
+    }
+
+    private void OnScreenTimeCardTapped(object sender, TappedRoutedEventArgs e)
+    {
+        MainViewModel?.OpenScreenTime();
+    }
+
+    private void OnSystemCardTapped(object sender, TappedRoutedEventArgs e)
+    {
+        MainViewModel?.OpenSystem();
+    }
+
+    private void OnWeatherCardTapped(object sender, TappedRoutedEventArgs e)
+    {
+        MainViewModel?.OpenWeather();
+    }
+
+    private void OnFocusCardTapped(object sender, TappedRoutedEventArgs e)
+    {
+        MainViewModel?.OpenTimer();
+    }
+
+    private void OnClipboardCardTapped(object sender, TappedRoutedEventArgs e)
+    {
+        MainViewModel?.OpenClipboard();
+    }
+
+    private void OnNotesCardTapped(object sender, TappedRoutedEventArgs e)
+    {
+        // If clicking inside the Quick Note text box, let user type; otherwise navigate to Notes
+        if (e.OriginalSource is not TextBox)
+        {
+            MainViewModel?.OpenNotes();
+        }
+    }
+
     public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
 
     private Visibility HasSystemModules(HomeViewModel? vm) => vm?.FilteredSystemModules.Count > 0 ? Visibility.Visible : Visibility.Collapsed;

@@ -52,15 +52,21 @@
             <Button Content="Timers"
                     Click="OnTabTimersClicked"
                     Padding="14,6"
-                    CornerRadius="6" />
+                    CornerRadius="6"
+                    Background="{x:Bind GetTabBackground(ViewModel.SelectedTabIndex, 0), Mode=OneWay}"
+                    BorderBrush="{x:Bind GetTabBorder(ViewModel.SelectedTabIndex, 0), Mode=OneWay}" />
             <Button Content="Stopwatch"
                     Click="OnTabStopwatchClicked"
                     Padding="14,6"
-                    CornerRadius="6" />
+                    CornerRadius="6"
+                    Background="{x:Bind GetTabBackground(ViewModel.SelectedTabIndex, 1), Mode=OneWay}"
+                    BorderBrush="{x:Bind GetTabBorder(ViewModel.SelectedTabIndex, 1), Mode=OneWay}" />
             <Button Content="Pomodoro"
                     Click="OnTabPomodoroClicked"
                     Padding="14,6"
-                    CornerRadius="6" />
+                    CornerRadius="6"
+                    Background="{x:Bind GetTabBackground(ViewModel.SelectedTabIndex, 2), Mode=OneWay}"
+                    BorderBrush="{x:Bind GetTabBorder(ViewModel.SelectedTabIndex, 2), Mode=OneWay}" />
         </StackPanel>
 
         <!-- Content Panels based on SelectedTabIndex -->
@@ -94,6 +100,19 @@
                                FontWeight="SemiBold"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                Margin="0,8,0,0" />
+
+                    <!-- Empty State when no active timers -->
+                    <Border Visibility="{x:Bind GetEmptyVisibility(ViewModel.Timers.Count), Mode=OneWay}"
+                            Background="#18181B"
+                            BorderBrush="#242428"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16">
+                        <StackPanel HorizontalAlignment="Center" Spacing="4">
+                            <TextBlock Text="No active timers" FontSize="13" FontWeight="SemiBold" Foreground="#A1A1AA" HorizontalAlignment="Center" />
+                            <TextBlock Text="Choose a preset above or set a custom timer below." FontSize="11" Foreground="#71717A" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
 
                     <ItemsControl ItemsSource="{x:Bind ViewModel.Timers, Mode=OneWay}">
                         <ItemsControl.ItemTemplate>

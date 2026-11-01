@@ -44,7 +44,7 @@ public sealed class CoreAudioService : IAudioService
             }
 
             Guid iid = ComGuids.IID_IAudioEndpointVolume;
-            hr = _defaultDevice.Activate(ref iid, CLSCTX.CLSCTX_ALL, IntPtr.Zero, out object volumeObj);
+            hr = _defaultDevice.Activate(ref iid, CLSCTX.CLSCTX_INPROC_SERVER, IntPtr.Zero, out object volumeObj);
             if (hr != 0 || volumeObj == null)
             {
                 _logger.LogWarning("Failed to activate IAudioEndpointVolume (hr=0x{Hr:X8}).", hr);
@@ -207,7 +207,7 @@ public sealed class CoreAudioService : IAudioService
     {
         public static readonly Guid CLSID_MMDeviceEnumerator = new("BCDE0395-E52F-467C-8E3D-C4579291692E");
         public static readonly Guid IID_IMMDeviceEnumerator = new("A95664D2-9614-4F35-A746-DE8DB63617E6");
-        public static readonly Guid IID_IAudioEndpointVolume = new("5BC64874-38B4-4B78-9B04-273F65E10777");
+        public static readonly Guid IID_IAudioEndpointVolume = new("5CDF2C82-841E-4546-9722-0CF74078229A");
         public static readonly PropertyKey PKEY_Device_FriendlyName = new(new Guid("A45C254E-DF1C-4EFD-8020-67D146A850E0"), 14);
     }
 
@@ -319,7 +319,7 @@ public sealed class CoreAudioService : IAudioService
     }
 
     [ComImport]
-    [Guid("5BC64874-38B4-4B78-9B04-273F65E10777")]
+    [Guid("5CDF2C82-841E-4546-9722-0CF74078229A")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IAudioEndpointVolume
     {
@@ -350,7 +350,7 @@ public sealed class CoreAudioService : IAudioService
     }
 
     [ComImport]
-    [Guid("657804FA-D6AD-4496-8560-E5D526D0C169")]
+    [Guid("657804FA-D6AD-4496-8A60-352752AF4F89")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     private interface IAudioEndpointVolumeCallback
     {

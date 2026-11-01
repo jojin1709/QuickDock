@@ -241,14 +241,32 @@ public sealed partial class NetworkSecurityViewModel : ObservableObject
             case "Adapters":
                 await RefreshAdaptersAsync();
                 break;
+            case "DnsPing":
+                if (DnsResult == null) await ExecuteDnsQueryAsync();
+                if (PingResult == null) await ExecutePingAsync();
+                break;
             case "Connections":
                 await RefreshConnectionsAsync();
+                break;
+            case "Tls":
+                if (TlsResult == null) await InspectTlsAsync();
+                break;
+            case "Headers":
+                if (HeadersResult == null) await InspectHeadersAsync();
                 break;
             case "Firewall":
                 await RefreshFirewallAsync();
                 break;
+            case "Posture":
             case "SecurityChecks":
                 await RunSecurityChecksAsync();
+                break;
+            case "Integrity":
+                break;
+            case "Report":
+                if (Overview == null) await RefreshOverviewAsync();
+                if (SecurityChecksResult == null) await RunSecurityChecksAsync();
+                await GenerateReportAsync();
                 break;
         }
     }
@@ -262,6 +280,10 @@ public sealed partial class NetworkSecurityViewModel : ObservableObject
         try
         {
             Overview = await _networkService.GetNetworkOverviewAsync();
+            if (Adapters.Count == 0)
+            {
+                await RefreshAdaptersAsync();
+            }
         }
         catch (Exception ex)
         {

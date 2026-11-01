@@ -32,6 +32,24 @@ public sealed partial class TimerView : UserControl
         set => SetValue(MainViewModelProperty, value);
     }
 
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush ActiveTabBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x27, 0x27, 0x2A));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush InactiveTabBrush =
+        new(Windows.UI.Color.FromArgb(0, 0, 0, 0));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush ActiveTabBorderBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x3F, 0x3F, 0x46));
+    private static readonly Microsoft.UI.Xaml.Media.SolidColorBrush InactiveTabBorderBrush =
+        new(Windows.UI.Color.FromArgb(255, 0x22, 0x22, 0x26));
+
+    public Microsoft.UI.Xaml.Media.SolidColorBrush GetTabBackground(int selectedIndex, int targetIndex) =>
+        selectedIndex == targetIndex ? ActiveTabBrush : InactiveTabBrush;
+
+    public Microsoft.UI.Xaml.Media.SolidColorBrush GetTabBorder(int selectedIndex, int targetIndex) =>
+        selectedIndex == targetIndex ? ActiveTabBorderBrush : InactiveTabBorderBrush;
+
+    public Visibility GetEmptyVisibility(int count) =>
+        count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
     public TimerView()
     {
         InitializeComponent();

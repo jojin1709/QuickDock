@@ -67,7 +67,7 @@
                             </Grid>
                             <StackPanel VerticalAlignment="Center">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <TextBlock Text="6h 59m" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" />
+                                    <TextBlock Text="{x:Bind ViewModel.LimitRemainingText, Mode=OneWay}" FontSize="18" FontWeight="Bold" Foreground="#FFFFFF" />
                                     <FontIcon Glyph="&#xE70F;" FontSize="10" Foreground="#71717A" VerticalAlignment="Center" />
                                 </StackPanel>
                                 <TextBlock Text="left of 7h limit" FontSize="11" Foreground="#8E8E93" />
@@ -76,7 +76,7 @@
 
                         <!-- Apps Used -->
                         <StackPanel Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="5" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
+                            <TextBlock Text="{x:Bind ViewModel.AppsUsedCount, Mode=OneWay}" FontSize="28" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
                             <TextBlock Text="Apps used" FontSize="11" Foreground="#8E8E93" HorizontalAlignment="Center" Margin="0,2,0,0" />
                         </StackPanel>
                     </Grid>
@@ -108,64 +108,32 @@
                         </StackPanel>
                         <StackPanel Grid.Column="1" HorizontalAlignment="Right">
                             <TextBlock Text="avg &lt;1m" FontSize="10" Foreground="#71717A" HorizontalAlignment="Right" />
-                            <TextBlock Text="&lt;1m" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Right" />
+                            <TextBlock Text="{x:Bind ViewModel.WeeklyAverageText, Mode=OneWay}" FontSize="12" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Right" />
                         </StackPanel>
                     </Grid>
 
                     <!-- Days Sparkline Bars -->
-                    <Grid Grid.Row="1" Margin="0,12,0,4" VerticalAlignment="Bottom">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Mon -->
-                        <StackPanel Grid.Column="0" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="3" Background="#2E2E33" CornerRadius="1.5" />
-                            <TextBlock Text="Mon" FontSize="10" Foreground="#71717A" HorizontalAlignment="Center" />
-                        </StackPanel>
-
-                        <!-- Tue -->
-                        <StackPanel Grid.Column="1" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="3" Background="#2E2E33" CornerRadius="1.5" />
-                            <TextBlock Text="Tue" FontSize="10" Foreground="#71717A" HorizontalAlignment="Center" />
-                        </StackPanel>
-
-                        <!-- Wed -->
-                        <StackPanel Grid.Column="2" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="3" Background="#2E2E33" CornerRadius="1.5" />
-                            <TextBlock Text="Wed" FontSize="10" Foreground="#71717A" HorizontalAlignment="Center" />
-                        </StackPanel>
-
-                        <!-- Thu -->
-                        <StackPanel Grid.Column="3" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="3" Background="#2E2E33" CornerRadius="1.5" />
-                            <TextBlock Text="Thu" FontSize="10" Foreground="#71717A" HorizontalAlignment="Center" />
-                        </StackPanel>
-
-                        <!-- Fri -->
-                        <StackPanel Grid.Column="4" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="3" Background="#2E2E33" CornerRadius="1.5" />
-                            <TextBlock Text="Fri" FontSize="10" Foreground="#71717A" HorizontalAlignment="Center" />
-                        </StackPanel>
-
-                        <!-- Sat -->
-                        <StackPanel Grid.Column="5" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="3" Background="#2E2E33" CornerRadius="1.5" />
-                            <TextBlock Text="Sat" FontSize="10" Foreground="#71717A" HorizontalAlignment="Center" />
-                        </StackPanel>
-
-                        <!-- Sun (Active) -->
-                        <StackPanel Grid.Column="6" HorizontalAlignment="Center" Spacing="8">
-                            <Border Width="12" Height="4" Background="#FFFFFF" CornerRadius="2" />
-                            <TextBlock Text="Sun" FontSize="10" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Grid>
+                    <ItemsControl Grid.Row="1" ItemsSource="{x:Bind ViewModel.WeekDays, Mode=OneWay}" Margin="0,12,0,4" VerticalAlignment="Bottom">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="18" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:DaySparklineItem">
+                                <StackPanel HorizontalAlignment="Center" Spacing="8">
+                                    <Border Width="12" Height="{x:Bind BarHeight}"
+                                            Background="{x:Bind SparklineColor}"
+                                            CornerRadius="2"
+                                            VerticalAlignment="Bottom" />
+                                    <TextBlock Text="{x:Bind DayName}"
+                                               FontSize="10"
+                                               Foreground="{x:Bind DayTextColor}"
+                                               HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </Border>
         </Grid>
@@ -193,7 +161,7 @@
                         <FontIcon Glyph="&#xE9D9;" FontSize="11" Foreground="#A1A1AA" />
                         <TextBlock Text="By app" FontSize="12" FontWeight="SemiBold" Foreground="#E4E4E7" VerticalAlignment="Center" />
                     </StackPanel>
-                    <Button Grid.Column="1" Background="Transparent" BorderBrush="Transparent" Padding="4">
+                    <Button Grid.Column="1" Background="Transparent" BorderBrush="Transparent" Padding="4" Click="OnToggleViewModeClicked">
                         <FontIcon Glyph="&#xE72C;" FontSize="11" Foreground="#71717A" />
                     </Button>
                 </Grid>
@@ -201,95 +169,40 @@
                 <!-- App List -->
                 <ScrollViewer Grid.Row="1" Margin="0,8,0,0" VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="10">
-                        <!-- App 1: QuickDock -->
-                        <StackPanel Spacing="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <controls:QuickDockIcon Grid.Column="0" Width="16" Height="16" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="QuickDock" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="8,0,0,0" VerticalAlignment="Center" />
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
-                                    <TextBlock Text="&lt;1m" FontSize="11" Foreground="#FFFFFF" HorizontalAlignment="Right" />
-                                    <TextBlock Text="43%" FontSize="9" Foreground="#71717A" HorizontalAlignment="Right" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar Value="43" Maximum="100" Height="3" Foreground="#FFFFFF" Background="#27272A" Margin="24,2,0,0" />
+                        <!-- Empty State if no usage recorded -->
+                        <StackPanel Visibility="{x:Bind GetEmptyVisibility(ViewModel.AppUsages.Count), Mode=OneWay}"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Margin="0,40,0,0"
+                                    Spacing="8">
+                            <FontIcon Glyph="&#xE9D9;" FontSize="32" Foreground="#71717A" HorizontalAlignment="Center" />
+                            <TextBlock Text="No activity recorded yet today" FontSize="13" FontWeight="SemiBold" Foreground="#A1A1AA" HorizontalAlignment="Center" />
+                            <TextBlock Text="Active app time will appear here automatically." FontSize="11" Foreground="#71717A" HorizontalAlignment="Center" />
                         </StackPanel>
 
-                        <!-- App 2: Google Chrome -->
-                        <StackPanel Spacing="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <FontIcon Grid.Column="0" Glyph="&#xE774;" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="Google Chrome" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="8,0,0,0" VerticalAlignment="Center" />
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
-                                    <TextBlock Text="&lt;1m" FontSize="11" Foreground="#FFFFFF" HorizontalAlignment="Right" />
-                                    <TextBlock Text="32%" FontSize="9" Foreground="#71717A" HorizontalAlignment="Right" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar Value="32" Maximum="100" Height="3" Foreground="#FFFFFF" Background="#27272A" Margin="24,2,0,0" />
-                        </StackPanel>
-
-                        <!-- App 3: File Explorer -->
-                        <StackPanel Spacing="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <FontIcon Grid.Column="0" Glyph="&#xED25;" FontSize="14" Foreground="#EAB308" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="File Explorer" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="8,0,0,0" VerticalAlignment="Center" />
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
-                                    <TextBlock Text="&lt;1m" FontSize="11" Foreground="#FFFFFF" HorizontalAlignment="Right" />
-                                    <TextBlock Text="11%" FontSize="9" Foreground="#71717A" HorizontalAlignment="Right" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar Value="11" Maximum="100" Height="3" Foreground="#FFFFFF" Background="#27272A" Margin="24,2,0,0" />
-                        </StackPanel>
-
-                        <!-- App 4: SnippingTool -->
-                        <StackPanel Spacing="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <FontIcon Grid.Column="0" Glyph="&#xE8B9;" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="SnippingTool" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="8,0,0,0" VerticalAlignment="Center" />
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
-                                    <TextBlock Text="&lt;1m" FontSize="11" Foreground="#FFFFFF" HorizontalAlignment="Right" />
-                                    <TextBlock Text="7%" FontSize="9" Foreground="#71717A" HorizontalAlignment="Right" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar Value="7" Maximum="100" Height="3" Foreground="#FFFFFF" Background="#27272A" Margin="24,2,0,0" />
-                        </StackPanel>
-
-                        <!-- App 5: Antigravity IDE -->
-                        <StackPanel Spacing="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <FontIcon Grid.Column="0" Glyph="&#xE7BE;" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1" Text="Antigravity IDE" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="8,0,0,0" VerticalAlignment="Center" />
-                                <StackPanel Grid.Column="2" HorizontalAlignment="Right">
-                                    <TextBlock Text="&lt;1m" FontSize="11" Foreground="#FFFFFF" HorizontalAlignment="Right" />
-                                    <TextBlock Text="4%" FontSize="9" Foreground="#71717A" HorizontalAlignment="Right" />
-                                </StackPanel>
-                            </Grid>
-                            <ProgressBar Value="4" Maximum="100" Height="3" Foreground="#FFFFFF" Background="#27272A" Margin="24,2,0,0" />
-                        </StackPanel>
+                        <!-- Live Recorded Apps -->
+                        <ItemsControl ItemsSource="{x:Bind ViewModel.AppUsages, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:AppUsageDisplayItem">
+                                    <StackPanel Spacing="3" Margin="0,0,0,8">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <FontIcon Grid.Column="0" Glyph="{x:Bind IconGlyph}" FontSize="14" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{x:Bind AppName}" FontSize="12" FontWeight="SemiBold" Foreground="#FFFFFF" Margin="8,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                            <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                                <TextBlock Text="{x:Bind DurationText}" FontSize="11" Foreground="#FFFFFF" HorizontalAlignment="Right" />
+                                                <TextBlock Text="{x:Bind PercentageText}" FontSize="9" Foreground="#71717A" HorizontalAlignment="Right" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <ProgressBar Value="{x:Bind Percentage}" Maximum="100" Height="3" Foreground="#FFFFFF" Background="#27272A" Margin="22,2,0,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </ScrollViewer>
             </Grid>

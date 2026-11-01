@@ -52,13 +52,26 @@
         <!-- Items View -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
             <StackPanel Spacing="12">
+                <!-- Empty State -->
+                <StackPanel Visibility="{x:Bind GetBoolVisibility(ViewModel.IsEmpty), Mode=OneWay}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="0,50,0,0"
+                            Spacing="10">
+                    <FontIcon Glyph="&#xF0E3;" FontSize="36" Foreground="#71717A" HorizontalAlignment="Center" />
+                    <TextBlock Text="Clipboard is Empty" FontSize="15" FontWeight="SemiBold" Foreground="#A1A1AA" HorizontalAlignment="Center" />
+                    <TextBlock Text="Copied text, links, and screenshots will appear here." FontSize="11" Foreground="#71717A" HorizontalAlignment="Center" />
+                </StackPanel>
+
                 <!-- Pinned Items -->
                 <TextBlock Text="PINNED"
                            FontSize="11"
                            FontWeight="SemiBold"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Visibility="{x:Bind GetBoolVisibility(ViewModel.HasPinnedItems), Mode=OneWay}" />
 
-                <ItemsControl ItemsSource="{x:Bind ViewModel.PinnedItems, Mode=OneWay}">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.PinnedItems, Mode=OneWay}"
+                              Visibility="{x:Bind GetBoolVisibility(ViewModel.HasPinnedItems), Mode=OneWay}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:ClipboardItem">
                             <Border Margin="0,0,0,6"
@@ -67,13 +80,24 @@
                                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                     BorderThickness="1"
                                     CornerRadius="6">
-                                <Grid ColumnSpacing="8">
+                                <Grid ColumnSpacing="10">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="0" Spacing="2">
+                                    <!-- Thumbnail for copied images -->
+                                    <Border Grid.Column="0"
+                                            Width="38"
+                                            Height="38"
+                                            CornerRadius="4"
+                                            Background="#27272A"
+                                            Visibility="{x:Bind ThumbnailVisibility}">
+                                        <Image Source="{x:Bind ImageThumbnailPath}" Stretch="UniformToFill" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Preview}"
                                                    FontSize="13"
                                                    TextTrimming="CharacterEllipsis"
@@ -83,7 +107,7 @@
                                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                         <Button Tag="{x:Bind}"
                                                 Click="OnCopyItemClicked"
                                                 Background="Transparent"
@@ -116,9 +140,11 @@
                 <TextBlock Text="RECENT"
                            FontSize="11"
                            FontWeight="SemiBold"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                           Visibility="{x:Bind GetBoolVisibility(ViewModel.HasRecentItems), Mode=OneWay}" />
 
-                <ItemsControl ItemsSource="{x:Bind ViewModel.RecentItems, Mode=OneWay}">
+                <ItemsControl ItemsSource="{x:Bind ViewModel.RecentItems, Mode=OneWay}"
+                              Visibility="{x:Bind GetBoolVisibility(ViewModel.HasRecentItems), Mode=OneWay}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="models:ClipboardItem">
                             <Border Margin="0,0,0,6"
@@ -127,13 +153,24 @@
                                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                     BorderThickness="1"
                                     CornerRadius="6">
-                                <Grid ColumnSpacing="8">
+                                <Grid ColumnSpacing="10">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="0" Spacing="2">
+                                    <!-- Thumbnail for copied images -->
+                                    <Border Grid.Column="0"
+                                            Width="38"
+                                            Height="38"
+                                            CornerRadius="4"
+                                            Background="#27272A"
+                                            Visibility="{x:Bind ThumbnailVisibility}">
+                                        <Image Source="{x:Bind ImageThumbnailPath}" Stretch="UniformToFill" />
+                                    </Border>
+
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
                                         <TextBlock Text="{x:Bind Preview}"
                                                    FontSize="13"
                                                    TextTrimming="CharacterEllipsis"
@@ -143,7 +180,7 @@
                                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                         <Button Tag="{x:Bind}"
                                                 Click="OnCopyItemClicked"
                                                 Background="Transparent"

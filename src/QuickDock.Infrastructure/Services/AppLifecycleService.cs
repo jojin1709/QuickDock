@@ -85,6 +85,8 @@ public sealed class AppLifecycleService : IAppLifecycleService
             _logger.LogError(ex, "Error encountered while stopping modules during shutdown.");
         }
 
+        _logger.LogInformation("Graceful shutdown completed.");
+
         try
         {
             // Flush Serilog buffer
@@ -94,8 +96,6 @@ public sealed class AppLifecycleService : IAppLifecycleService
         {
             // Best effort log flush during shutdown
         }
-
-        _logger.LogInformation("Graceful shutdown completed.");
     }
 
     public void RequestShutdown()

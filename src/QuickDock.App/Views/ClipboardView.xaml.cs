@@ -33,6 +33,8 @@ public sealed partial class ClipboardView : UserControl
         set => SetValue(MainViewModelProperty, value);
     }
 
+    public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
+
     public ClipboardView()
     {
         InitializeComponent();

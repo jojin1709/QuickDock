@@ -19,6 +19,8 @@ public sealed class ClipboardItem
     public bool IsPinned { get; set; }
     public bool IsSensitive { get; set; }
     public string? ImageThumbnailPath { get; set; }
+    public bool HasImageThumbnail => !string.IsNullOrEmpty(ImageThumbnailPath);
+    public string ThumbnailVisibility => !string.IsNullOrEmpty(ImageThumbnailPath) ? "Visible" : "Collapsed";
     public string FormattedTime => CreatedAt.ToLocalTime().ToString("g");
 }
 

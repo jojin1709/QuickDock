@@ -51,16 +51,36 @@
             <!-- Navigation Bar for Network & Security Sections -->
             <ScrollViewer Grid.Column="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" HorizontalAlignment="Right">
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <Button Content="Overview" Click="OnNavOverviewClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="Adapters" Click="OnNavAdaptersClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="DNS &amp; Ping" Click="OnNavDnsPingClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="Connections" Click="OnNavConnectionsClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="TLS Inspector" Click="OnNavTlsClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="Headers Audit" Click="OnNavHeadersClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="Firewall &amp; AV" Click="OnNavFirewallClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="Security Posture" Click="OnNavPostureClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="File Integrity" Click="OnNavIntegrityClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
-                    <Button Content="Report" Click="OnNavReportClicked" Padding="10,4" CornerRadius="4" FontSize="12" />
+                    <Button Content="Overview" Click="OnNavOverviewClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Overview'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Overview'), Mode=OneWay}" />
+                    <Button Content="Adapters" Click="OnNavAdaptersClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Adapters'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Adapters'), Mode=OneWay}" />
+                    <Button Content="DNS &amp; Ping" Click="OnNavDnsPingClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'DnsPing'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'DnsPing'), Mode=OneWay}" />
+                    <Button Content="Connections" Click="OnNavConnectionsClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Connections'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Connections'), Mode=OneWay}" />
+                    <Button Content="TLS Inspector" Click="OnNavTlsClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Tls'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Tls'), Mode=OneWay}" />
+                    <Button Content="Headers Audit" Click="OnNavHeadersClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Headers'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Headers'), Mode=OneWay}" />
+                    <Button Content="Firewall &amp; AV" Click="OnNavFirewallClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Firewall'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Firewall'), Mode=OneWay}" />
+                    <Button Content="Security Posture" Click="OnNavPostureClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Posture'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Posture'), Mode=OneWay}" />
+                    <Button Content="File Integrity" Click="OnNavIntegrityClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Integrity'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Integrity'), Mode=OneWay}" />
+                    <Button Content="Report" Click="OnNavReportClicked" Padding="10,4" CornerRadius="4" FontSize="12"
+                            Background="{x:Bind GetNavBackground(ViewModel.SelectedSection, 'Report'), Mode=OneWay}"
+                            BorderBrush="{x:Bind GetNavBorder(ViewModel.SelectedSection, 'Report'), Mode=OneWay}" />
                 </StackPanel>
             </ScrollViewer>
         </Grid>
