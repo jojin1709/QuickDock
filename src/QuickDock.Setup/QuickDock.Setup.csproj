@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
     <ApplicationIcon>Assets/AppIcon.ico</ApplicationIcon>
     <RootNamespace>QuickDock.Setup</RootNamespace>
     <AssemblyName>QuickDock-Setup</AssemblyName>
@@ -21,17 +21,13 @@
     <Company>JOJIN JOHN</Company>
     <Authors>JOJIN JOHN</Authors>
     <Copyright>Copyright © 2026 JOJIN JOHN. All rights reserved.</Copyright>
-    <Description>Standalone Installer for QuickDock Windows 11 Utility Dock</Description>
+    <Description>Modern Setup Experience for QuickDock Windows 11 Utility Dock</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Assets/AppIcon.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets/icon-64x64.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <!-- Embedded installation payload archive -->
-    <EmbeddedResource Include="payload.zip" Condition="Exists('payload.zip')" />
+    <Resource Include="Assets/AppIcon.ico" />
+    <Resource Include="Assets/icon-64x64.png" />
+    <!-- Embedded installation payload archive with fixed logical name -->
+    <EmbeddedResource Include="payload.zip" LogicalName="payload.zip" Condition="Exists('payload.zip')" />
   </ItemGroup>
 </Project>

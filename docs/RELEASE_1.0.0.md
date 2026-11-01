@@ -191,7 +191,7 @@ To completely remove QuickDock:
 
 | Artifact | Architecture | File Size | Description | SHA-256 Checksum |
 | :--- | :--- | :--- | :--- | :--- |
-| **`QuickDock-Setup.exe`** | x64 | **~164 MB** | **Standalone Windows Installer (Recommended — No zip/unzip required)** | `74010695C711AA3D501940A661A82DCEF4A9400F0604DC6FDFDF16FAA17CC693` |
+| **`QuickDock-Setup.exe`** | x64 | **~177 MB** | **Standalone Windows Installer (Recommended — Modern Setup Experience)** | `C1AB32386ED7B3021B6C94841ABAB1ADE094347AFF4294F75AEA311825D03FE8` |
 | **`QuickDock-v1.0.0-win-x64.zip`** | x64 | **109.13 MB** | Portable Application Package Archive | `B6A5389D9F6A31899E70B2F6ECCAAE01C86CBFC21CAEAEC2316F509108AEE318` |
 
 ---
