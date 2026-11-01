@@ -197,24 +197,7 @@ public partial class App : Application
                 services.AddSingleton<DeveloperViewModel>();
                 services.AddSingleton<NetworkSecurityViewModel>();
                 services.AddSingleton<MainViewModel>();
-
-                services.AddTransient<MainWindow>(sp =>
-                {
-                    _logger?.LogInformation("MainWindow factory lambda starting...");
-                    var vm = sp.GetRequiredService<MainViewModel>();
-                    var pos = sp.GetRequiredService<IWindowPositioningService>();
-                    var mon = sp.GetRequiredService<IMonitorService>();
-                    var full = sp.GetRequiredService<IFullscreenService>();
-                    var start = sp.GetRequiredService<IStartupService>();
-                    var notif = sp.GetRequiredService<INotificationService>();
-                    var hotkey = sp.GetRequiredService<IGlobalHotkeyService>();
-                    var tray = sp.GetRequiredService<ISystemTrayService>();
-                    var settings = sp.GetRequiredService<ISettingsManager>();
-                    var bus = sp.GetRequiredService<IEventBus>();
-                    var logger = sp.GetRequiredService<ILogger<MainWindow>>();
-
-                    return new MainWindow(vm, pos, mon, full, start, notif, hotkey, tray, settings, bus, logger);
-                });
+                services.AddTransient<MainWindow>();
             })
             .Build();
 
@@ -235,6 +218,9 @@ public partial class App : Application
 
     protected override async void OnLaunched(LaunchActivatedEventArgs args)
     {
+        var uiDispatcher = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
+        _logger?.LogInformation("Entered OnLaunched on UI thread.");
         try
         {
             var lifecycle = Services.GetRequiredService<IAppLifecycleService>();
@@ -252,21 +238,25 @@ public partial class App : Application
                 screenTime.StartTracking();
             }
 
-            _logger?.LogInformation("Resolving MainViewModel...");
-            var vm = Services.GetRequiredService<MainViewModel>();
-            _logger?.LogInformation("MainViewModel resolved.");
-
-            _logger?.LogInformation("Resolving MainWindow...");
-            _window = Services.GetRequiredService<MainWindow>();
-            _logger?.LogInformation("MainWindow resolved.");
-
-            _window.Closed += async (s, e) =>
+            uiDispatcher.TryEnqueue(() =>
             {
-                await lifecycle.StopAsync();
-            };
+                try
+                {
+                    _window = Services.GetRequiredService<MainWindow>();
 
-            _window.Activate();
-            _logger?.LogInformation("QuickDock MainWindow activated successfully.");
+                    _window.Closed += async (s, e) =>
+                    {
+                        await lifecycle.StopAsync();
+                    };
+
+                    _window.Activate();
+                    _logger?.LogInformation("QuickDock MainWindow activated successfully on UI thread.");
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogCritical(ex, "Failed to instantiate or activate MainWindow on UI thread.");
+                }
+            });
         }
         catch (Exception ex)
         {

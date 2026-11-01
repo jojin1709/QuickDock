@@ -88,10 +88,58 @@ public partial class MainWindow : Window
         };
     }
 
-    private void Theme_PureBlack_Click(object sender, MouseButtonEventArgs e) { }
-    private void Theme_Vivid_Click(object sender, MouseButtonEventArgs e) { }
-    private void Theme_Ember_Click(object sender, MouseButtonEventArgs e) { }
-    private void Theme_Silver_Click(object sender, MouseButtonEventArgs e) { }
+    private void SelectTheme(int index)
+    {
+        var activeBrush = new SolidColorBrush(Colors.White);
+        var inactiveBrush = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x2E));
+        var activeText = new SolidColorBrush(Colors.White);
+        var inactiveText = new SolidColorBrush(Color.FromRgb(0x88, 0x88, 0x88));
+
+        ThemePureBlackBorder.BorderBrush = index == 0 ? activeBrush : inactiveBrush;
+        ThemePureBlackBorder.BorderThickness = new Thickness(index == 0 ? 1.5 : 1);
+        ThemePureBlackText.Foreground = index == 0 ? activeText : inactiveText;
+
+        ThemeVividBorder.BorderBrush = index == 1 ? activeBrush : inactiveBrush;
+        ThemeVividBorder.BorderThickness = new Thickness(index == 1 ? 1.5 : 1);
+        ThemeVividText.Foreground = index == 1 ? activeText : inactiveText;
+
+        ThemeEmberBorder.BorderBrush = index == 2 ? activeBrush : inactiveBrush;
+        ThemeEmberBorder.BorderThickness = new Thickness(index == 2 ? 1.5 : 1);
+        ThemeEmberText.Foreground = index == 2 ? activeText : inactiveText;
+
+        ThemeSilverBorder.BorderBrush = index == 3 ? activeBrush : inactiveBrush;
+        ThemeSilverBorder.BorderThickness = new Thickness(index == 3 ? 1.5 : 1);
+        ThemeSilverText.Foreground = index == 3 ? activeText : inactiveText;
+    }
+
+    private void Theme_PureBlack_Click(object sender, MouseButtonEventArgs e) => SelectTheme(0);
+    private void Theme_Vivid_Click(object sender, MouseButtonEventArgs e) => SelectTheme(1);
+    private void Theme_Ember_Click(object sender, MouseButtonEventArgs e) => SelectTheme(2);
+    private void Theme_Silver_Click(object sender, MouseButtonEventArgs e) => SelectTheme(3);
+
+    private void SelectStyle(int index)
+    {
+        var activeBg = new SolidColorBrush(Colors.White);
+        var inactiveBg = new SolidColorBrush(Color.FromRgb(0x22, 0x22, 0x26));
+        var activeFg = new SolidColorBrush(Colors.Black);
+        var inactiveFg = new SolidColorBrush(Color.FromRgb(0x99, 0x99, 0x99));
+
+        StyleCometPill.Background = index == 0 ? activeBg : inactiveBg;
+        StyleCometText.Foreground = index == 0 ? activeFg : inactiveFg;
+        StyleCometText.FontWeight = index == 0 ? FontWeights.SemiBold : FontWeights.Normal;
+
+        StyleTwinCometsPill.Background = index == 1 ? activeBg : inactiveBg;
+        StyleTwinCometsText.Foreground = index == 1 ? activeFg : inactiveFg;
+        StyleTwinCometsText.FontWeight = index == 1 ? FontWeights.SemiBold : FontWeights.Normal;
+
+        StyleBreathePill.Background = index == 2 ? activeBg : inactiveBg;
+        StyleBreatheText.Foreground = index == 2 ? activeFg : inactiveFg;
+        StyleBreatheText.FontWeight = index == 2 ? FontWeights.SemiBold : FontWeights.Normal;
+    }
+
+    private void StyleComet_Click(object sender, MouseButtonEventArgs e) => SelectStyle(0);
+    private void StyleTwinComets_Click(object sender, MouseButtonEventArgs e) => SelectStyle(1);
+    private void StyleBreathe_Click(object sender, MouseButtonEventArgs e) => SelectStyle(2);
 
     private async Task RunInstallationAsync()
     {

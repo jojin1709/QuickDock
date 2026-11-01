@@ -27,6 +27,8 @@
   <ItemGroup>
     <Resource Include="Assets/AppIcon.ico" />
     <Resource Include="Assets/icon-64x64.png" />
+    <Resource Include="Assets/icon-256x256.png" />
+    <Resource Include="Assets/QuickDock-Logo.png" />
     <!-- Embedded installation payload archive with fixed logical name -->
     <EmbeddedResource Include="payload.zip" LogicalName="payload.zip" Condition="Exists('payload.zip')" />
   </ItemGroup>

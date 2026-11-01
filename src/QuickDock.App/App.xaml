@@ -49,6 +49,7 @@
             <SolidColorBrush x:Key="StatusWarningBrush" Color="#D83B01" />
             <SolidColorBrush x:Key="StatusAccentBrush" Color="#0078D4" />
             <SolidColorBrush x:Key="StatusNeutralBrush" Color="#8A8886" />
+            <SolidColorBrush x:Key="StatusInactiveBrush" Color="#6E6E73" />
 
         </ResourceDictionary>
     </Application.Resources>

@@ -69,6 +69,8 @@ public sealed partial class MainWindow : Window
         _logger.LogInformation("MainWindow InitializeComponent finished.");
 
         _hWnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        _logger.LogInformation("MainWindow: HWND is {hWnd}.", _hWnd);
+
         ViewModel.SetDispatcherQueue(DispatcherQueue);
 
         // Suppress QuickDock from Alt+Tab switcher and taskbar
@@ -90,7 +92,6 @@ public sealed partial class MainWindow : Window
             // Mica fallback
         }
 
-        // Configure dock window layout and positioning
         _positioningService.ConfigureDockWindow(_hWnd);
 
         // Register custom activation message for single-instance

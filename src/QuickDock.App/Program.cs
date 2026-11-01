@@ -11,6 +11,8 @@ public static class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "QuickDock");
+        Directory.CreateDirectory(dir);
         string mutexName = $"Global\\QuickDock_SingleInstance_{Environment.UserName}";
         _instanceMutex = new Mutex(true, mutexName, out bool isInitialInstance);
 
@@ -27,6 +29,30 @@ public static class Program
             return;
         }
 
+        AppDomain.CurrentDomain.FirstChanceException += (s, e) =>
+        {
+            try
+            {
+                string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "QuickDock");
+                Directory.CreateDirectory(dir);
+                File.AppendAllText(Path.Combine(dir, "firstchance.log"),
+                    $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] (HR: 0x{e.Exception.HResult:X8}) {e.Exception}\n\n");
+            }
+            catch { }
+        };
+
+        AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+        {
+            try
+            {
+                string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "QuickDock");
+                Directory.CreateDirectory(dir);
+                File.AppendAllText(Path.Combine(dir, "crash.log"),
+                    $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] UnhandledException: {e.ExceptionObject}\n\n");
+            }
+            catch { }
+        };
+
         try
         {
             WinRT.ComWrappersSupport.InitializeComWrappers();
@@ -42,18 +68,8 @@ public static class Program
                 isPackaged = false;
             }
 
-            if (!isPackaged)
-            {
-                try
-                {
-                    const int majorMinorVersion = 0x00020006; // Version 2.6
-                    Microsoft.Windows.ApplicationModel.DynamicDependency.Bootstrap.Initialize(majorMinorVersion);
-                }
-                catch
-                {
-                    // Fall back to self-contained binaries if dynamic dependency registration is skipped
-                }
-            }
+            // In self-contained unpackaged WinUI 3 (WindowsAppSDKSelfContained=true),
+            // do not invoke Bootstrap.Initialize because all runtime binaries are deployed side-by-side.
 
             Application.Start((p) =>
             {
