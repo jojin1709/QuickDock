@@ -1,0 +1,8 @@
+# GitHub Sponsorship configuration for QuickDock
+# Displays the pink "Sponsor" button on https://github.com/jojin1709/QuickDock
+
+github:
+  - jojin1709
+
+custom:
+  - https://www.linkedin.com/in/jojin-john/

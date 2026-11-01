@@ -1,0 +1,12 @@
+# GitHub Issue Template Configuration for QuickDock
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Community Discussion
+    url: https://github.com/jojin1709/QuickDock/discussions
+    about: Ask questions, share ideas, and talk with the community.
+  - name: Security Vulnerability Reporting
+    url: https://github.com/jojin1709/QuickDock/security/policy
+    about: Report security issues privately according to our security policy.
+  - name: Contact Author (JOJIN JOHN)
+    url: https://www.linkedin.com/in/jojin-john/
+    about: For licensing inquiries, commercial permissions, or direct questions.

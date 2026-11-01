@@ -32,3 +32,4 @@ For general questions, licensing inquiries, feedback, or commercial discussions:
 ## Important Notice
 
 QuickDock is proprietary software authored by JOJIN JOHN. Pull requests containing source code modifications cannot be accepted. If you have feature suggestions or usability ideas, please submit them via GitHub Issues or reach out on LinkedIn.
+

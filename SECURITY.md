@@ -60,3 +60,4 @@ QuickDock is engineered from the ground up under a strict **Zero-Telemetry, Loca
 
 7. **Cryptographic Integrity:**
    - All official release packages include published SHA-256 checksums (`SHA256SUMS.txt`) to ensure binary verification prior to execution.
+
