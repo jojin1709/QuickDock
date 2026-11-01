@@ -1,5 +1,5 @@
 > [!NOTE]
-> **[QuickDock 1.0.0 Production Release](docs/RELEASE_1.0.0.md):** The official release of QuickDock for Windows 11 & Windows 10 is now live! Featuring self-contained deployment, zero-polling idle efficiency, zero-cloud QuickDrop file transfers, 100% offline security-audited diagnostics, and instant <kbd>Ctrl</kbd> + <kbd>Space</kbd> desktop control. See the [official 1.0.0 release notes](docs/RELEASE_1.0.0.md) (224 passing tests, 0 warnings, 0 errors).
+> **[QuickDock 1.0.0 Production Release](docs/RELEASE_1.0.0.md):** The official release of QuickDock for Windows 11 & Windows 10 is now live! Featuring self-contained deployment, zero-polling idle efficiency, zero-cloud QuickDrop file transfers, 100% offline security-audited diagnostics, and instant <kbd>Ctrl</kbd> + <kbd>Space</kbd> desktop control. See the [official 1.0.0 release notes](docs/RELEASE_1.0.0.md) (240 passing tests, 0 warnings, 0 errors).
 
 <div align="center">
 
@@ -11,7 +11,7 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2011%20%7C%20Windows%2010-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Framework](https://img.shields.io/badge/.NET-10.0.402-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![UI Engine](https://img.shields.io/badge/WinUI-3%20%2F%20Windows%20App%20SDK%202.6.4-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)](https://learn.microsoft.com/en-us/windows/apps/winui/winui3/)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-224%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-240%20Passed%20%7C%200%20Failed-107C41?style=for-the-badge&logo=checkmarx&logoColor=white)](https://github.com/jojin1709/QuickDock)
 [![Architecture](https://img.shields.io/badge/Architecture-Modular%20%2F%20Zero--Allocation-blue?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
 [![Security](https://img.shields.io/badge/Security-Audited%20%26%20Hardened-green?style=for-the-badge&logo=securityscorecard&logoColor=white)](docs/PHASE_11_TESTING_SECURITY_AUDIT.md)
 [![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local%20%26%20Private-2ea44f?style=for-the-badge)](https://github.com/jojin1709/QuickDock)
@@ -24,12 +24,8 @@ It docks subtly at the top center of your display, providing instant access to r
 
 <p><strong>Download & Install QuickDock</strong></p>
 
-```powershell
-# 1. Download QuickDock-Setup.exe from Releases
-# 2. Run QuickDock-Setup.exe to install (no unzipping needed!)
-```
-
 [![Download Installer](https://img.shields.io/badge/Download-QuickDock--Setup.exe-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0)
+[![Download Portable ZIP](https://img.shields.io/badge/Download-Portable%20ZIP-1F2328?style=for-the-badge&logo=archive&logoColor=white)](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0)
 
 <sub>Press <code>Ctrl + Space</code> or mouse over the top-center edge to expand your dock.</sub>
 
@@ -49,20 +45,20 @@ It docks subtly at the top center of your display, providing instant access to r
 
 ## Table of Contents
 
-- [What is QuickDock?](#-what-is-quickdock)
-- [Quick Start](#-quick-start)
-- [Key Capabilities](#-key-capabilities)
-- [Architecture & Design Philosophy](#-architecture--design-philosophy)
-- [Module Ecosystem](#-module-ecosystem)
-- [Security, Privacy & Local-First Guarantees](#-security-privacy--local-first-guarantees)
-- [Documentation Matrix](#-documentation-matrix)
-- [Developer & Author](#-developer--author)
-- [Frequently Asked Questions](#-frequently-asked-questions)
-- [License](#-license)
+- [What is QuickDock?](#what-is-quickdock)
+- [Download & Installation](#download--installation)
+- [Key Capabilities](#key-capabilities)
+- [Architecture & Design Philosophy](#architecture--design-philosophy)
+- [Module Ecosystem](#module-ecosystem)
+- [Security, Privacy & Local-First Guarantees](#security-privacy--local-first-guarantees)
+- [Documentation Matrix](#documentation-matrix)
+- [Developer & Author](#developer--author)
+- [Frequently Asked Questions](#frequently-asked-questions)
+- [License & Terms of Use](#license--terms-of-use)
 
 ---
 
-## 💡 What is QuickDock?
+## What is QuickDock?
 
 <details>
 <summary><strong>Why QuickDock Exists</strong></summary>
@@ -95,48 +91,41 @@ CORE STAYS ALIVE. MODULES DO NOT.
 
 ---
 
-## ⚡ Quick Start
+## Download & Installation
 
-### Prerequisites
+QuickDock is distributed as verified, pre-compiled, self-contained Windows application binaries. No external .NET runtime, SDK, or developer tools are required.
 
-| Requirement | Supported Version |
+> [!IMPORTANT]
+> **Proprietary Software Notice:** QuickDock is proprietary software authored by JOJIN JOHN. Source code copying, cloning (`git clone`), mirroring, or decompiling is strictly prohibited. Users must download and run the official pre-compiled executables from GitHub Releases.
+
+### Option 1: Standalone Installer (Recommended)
+
+1. Download **[`QuickDock-Setup.exe`](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0)** from the [Official Releases](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0).
+2. Run `QuickDock-Setup.exe`.
+3. QuickDock installs seamlessly to your user profile (`%LOCALAPPDATA%\Programs\QuickDock`), creates Start Menu and Desktop shortcuts, registers a clean uninstaller in Windows Settings, and launches automatically.
+
+### Option 2: Portable Package (Zero Installation)
+
+1. Download **[`QuickDock-v1.0.0-win-x64.zip`](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0)** from the [Official Releases](https://github.com/jojin1709/QuickDock/releases/tag/v1.0.0).
+2. Extract the archive to any directory (e.g. `%LOCALAPPDATA%\Programs\QuickDock` or a USB drive).
+3. Run `QuickDock.App.exe`.
+4. 100% self-contained: no installation, no registry modifications, and no system dependencies needed.
+
+### System Requirements
+
+| Requirement | Specification |
 | :--- | :--- |
-| **Operating System** | Windows 11 (22H2+) or Windows 10 (Build 19045+) |
-| **SDK** | [.NET 10 SDK (v10.0.402 or higher)](https://dotnet.microsoft.com/download/dotnet/10.0) |
-| **Windows App SDK** | 2.6.4 (Restored automatically via NuGet) |
-| **Terminal** | PowerShell 7+ or Windows Terminal |
-
-### 1. Clone & Build
-
-```powershell
-# Clone the repository
-git clone https://github.com/jojin1709/QuickDock.git
-cd QuickDock
-
-# Restore dependencies and build solution
-dotnet restore
-dotnet build --configuration Release
-```
-
-### 2. Run QuickDock
-
-```powershell
-# Launch the WinUI 3 desktop application
-dotnet run --project src/QuickDock.App
-```
-
-### 3. Run Test Suite
-
-```powershell
-# Execute all 109 unit and integration tests
-dotnet test --configuration Release
-```
+| **Operating System** | Windows 11 (Version 22H2 or higher) or Windows 10 (64-bit, Build 19045+) |
+| **Architecture** | x64 (ARM64 supported via Windows 11 emulation) |
+| **Runtime** | Completely self-contained (built with .NET 10 & WinUI 3) |
+| **Memory** | ~16 MB idle, ~36 MB active |
+| **Disk Space** | ~320 MB |
 
 ---
 
-## 🎯 Key Capabilities
+## Key Capabilities
 
-### 🖥️ Native Windows Shell & Positioning
+### Native Windows Shell & Positioning
 - **Top-Center Floating Dock**: Compact capsule anchored to the top of your display that expands into a rich command center.
 - **Multi-Monitor & DPI Aware**: Dynamically tracks monitor bounds, working areas, and per-monitor DPI scaling factors (`GetDpiForWindow`).
 - **Global Hotkey (`Ctrl + Space`)**: Registered via Win32 `RegisterHotKey` for instant invocation from any application.
@@ -144,7 +133,7 @@ dotnet test --configuration Release
 - **Single-Instance Mutex**: Prevents duplicate processes with named OS mutexes and redirects arguments to the active instance via named-pipe IPC.
 - **Native System Tray**: Low-profile tray icon with quick menus (Open, Settings, Exit) and native Windows toast alerts.
 
-### 📊 Real-Time Hardware & Media Telemetry (Zero Fake Data)
+### Real-Time Hardware & Media Telemetry (Zero Fake Data)
 - **CPU**: Real-time total processor utilization sampled directly via Windows Performance Counters.
 - **RAM**: Physical memory usage, free gigabytes, and load percentages via `GlobalMemoryStatusEx`.
 - **GPU**: Active hardware adapter detection and dedicated video memory usage via DirectX Graphics Infrastructure (DXGI).
@@ -152,7 +141,7 @@ dotnet test --configuration Release
 - **Audio Control**: Native master volume control and instant mute toggle via Windows Core Audio (WASAPI).
 - **Media Controls**: Windows Global System Media Transport Controls (GSMTC) integration for Play, Pause, Next, Previous, and live track metadata.
 
-### ⏱️ Productivity Suite
+### Productivity Suite
 - **Clipboard Manager**:
   - Event-driven clipboard listener (`Clipboard.ContentChanged`) capturing text, images, URLs, and file paths.
   - **Sensitive Data Shield**: Built-in pattern detection masks API keys (OpenAI, AWS, GitHub), JWT tokens, and private keys.
@@ -168,7 +157,7 @@ dotnet test --configuration Release
 - **Temporary Dock Message**: Persistent banner widget on the main dock panel with customizable expiration (1h, 4h, 24h).
 - **Screen Time Analytics**: Low-frequency foreground application tracker aggregating daily and weekly application usage.
 
-### 📁 File Staging & QuickDrop (Peer-to-Peer Transfer)
+### File Staging & QuickDrop (Peer-to-Peer Transfer)
 - **File Shelf**:
   - Temporary staging area supporting native Windows Explorer Drag & Drop (both in and out).
   - Metadata-only reference model that never creates unnecessary duplicate copies on disk.
@@ -184,7 +173,7 @@ dotnet test --configuration Release
   - Text encoding converter supporting UTF-8, UTF-16, and ASCII.
 - **Transfer Manager**: Real-time progress bars, transfer speed indicators (MB/s), and persistent SQLite transfer history with verified SHA-256 integrity checksums.
 
-### 🛠️ Developer Toolkit
+### Developer Toolkit
 - **Git Toolkit**: Inspect branch status, staged/unstaged files, commit history, and diffs; run commit, stage, unstage, push, pull, and fetch operations safely via direct CLI invocation with `ArgumentList`.
 - **Docker Toolkit**: Inspect Docker engine state, local containers (start, stop, restart, logs, inspect, remove), and images without background polling.
 - **Terminal Launcher**: One-click launcher for Windows Terminal, PowerShell, or Command Prompt at the project folder, active Git repo, or custom path with optional elevation.
@@ -198,7 +187,7 @@ dotnet test --configuration Release
 - **HTTP / REST Client**: Execute GET, POST, PUT, PATCH, DELETE, and HEAD requests with custom headers, JSON body formatting, round-trip timing, and size metrics.
 - **Localhost & Process Monitor**: Inspect active TCP listening sockets via native Windows `GetExtendedTcpTable`, associate listening ports with PIDs and process names, and open `http://localhost:<PORT>` in your default browser.
 
-### 🛡️ Defensive Network & Security Toolkit
+### Defensive Network & Security Toolkit
 - **Network Overview**: Real-time interface discovery, link speeds, IPv4/IPv6 addresses, gateway & DHCP detection, DNS servers, and live network traffic counters via .NET `NetworkInformation`.
 - **DNS Diagnostics**: Query A, AAAA, CNAME, MX, TXT, NS, PTR, SRV, and SOA records with round-trip latency metrics and direct Win32 `DnsQuery_W` (`dnsapi.dll`) resolution.
 - **Connectivity & Path Health**: ICMP ping with round-trip latency statistics (Min, Max, Avg, Packet Loss), MTU / packet fragmentation analysis, and TTL-stepped traceroute hop discovery.
@@ -211,7 +200,7 @@ dotnet test --configuration Release
 - **Local Security Posture & File Integrity**: Evaluates UAC, BitLocker, secure boot, guest accounts, and cryptographic hash verification with tamper detection.
 - **Defensive Security Reports**: Exportable Markdown / JSON security audits summarizing network and host posture.
 
-### ⚙️ Settings & Personalization
+### Settings & Personalization
 - **12 Comprehensive Configuration Sections**: General, Appearance, Dock, Modules, Shortcuts, Notifications, Privacy, Storage, Network, Developer, Accessibility, and About.
 - **Visual & Material Personalization**: Real-time Mica, Acrylic, and Solid backdrop selection, dark/light/system theme toggling, custom accent colors, dock sizing (Compact, Normal, Large), and Top / Bottom screen positioning.
 - **Shortcuts & Conflict Management**: Dynamic global hotkey registration (`RegisterHotKey`) with duplicate hotkey conflict detection, modifier requirements, and instant in-app remapping.
@@ -222,7 +211,7 @@ dotnet test --configuration Release
 
 ---
 
-## 🏗️ Architecture & Design Philosophy
+## Architecture & Design Philosophy
 
 QuickDock adheres to a strict modular design pattern where modules are decoupled through an in-memory event bus and reactive dependency injection.
 
@@ -294,7 +283,7 @@ flowchart TD
 
 ---
 
-## 🧩 Module Ecosystem
+## Module Ecosystem
 
 | Category | Module | Status | Data Source / Technology |
 | :--- | :--- | :--- | :--- |
@@ -338,7 +327,7 @@ flowchart TD
 
 ---
 
-## 🛡️ Security, Privacy & Local-First Guarantees
+## Security, Privacy & Local-First Guarantees
 
 QuickDock is engineered under a strict **Zero-Telemetry, Local-First** commitment:
 
@@ -352,7 +341,7 @@ QuickDock is engineered under a strict **Zero-Telemetry, Local-First** commitmen
 
 ---
 
-## 📚 Documentation Matrix
+## Documentation Matrix
 
 Detailed engineering specifications, design choices, and verification logs for each phase are preserved in the repository:
 
@@ -371,7 +360,7 @@ Detailed engineering specifications, design choices, and verification logs for e
 
 ---
 
-## 👨‍💻 Developer & Author
+## Developer & Author
 
 <div align="center">
 
@@ -388,7 +377,7 @@ For inquiries, permissions, or questions, reach out via [LinkedIn](https://www.l
 
 ---
 
-## ❓ Frequently Asked Questions
+## Frequently Asked Questions
 
 <details>
 <summary><strong>How is QuickDock different from standard Windows taskbar tools?</strong></summary>
@@ -416,7 +405,7 @@ No. The built-in fullscreen detection service monitors the active foreground win
 
 ---
 
-## 📄 License & Terms of Use
+## License & Terms of Use
 
 **Copyright © 2026 JOJIN JOHN. All Rights Reserved.**
 
