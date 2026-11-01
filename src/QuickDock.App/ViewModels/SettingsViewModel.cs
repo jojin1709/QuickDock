@@ -369,7 +369,7 @@ public sealed partial class SettingsViewModel : ObservableObject
 
     // About
     [ObservableProperty]
-    private string _appVersion = "1.0.1";
+    private string _appVersion = "1.0.2";
 
     [ObservableProperty]
     private string _developerName = "JOJIN JOHN";

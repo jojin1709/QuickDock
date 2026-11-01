@@ -40,6 +40,35 @@
       
       <div class="timeline">
         
+        <!-- v1.0.2 -->
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-version">v1.0.2 — Full UI/UX & Functional Overhaul</div>
+          <div class="timeline-date">November 1, 2026 · Official Production Release</div>
+          
+          <div style="font-size: 14px; color: var(--text-dark); line-height: 1.6;">
+            <p>Comprehensive remediation across all modules, replacing mock placeholders with live Windows APIs, hardware telemetry, and interactive controls.</p>
+            
+            <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--text-muted);">Windows WASAPI Audio & Volume Synchronization</h4>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 13px;">
+              <li><strong>COM Endpoint Alignment:</strong> Fixed COM interface GUIDs for <code>IAudioEndpointVolume</code> and volume callbacks to official Windows SDK specifications.</li>
+              <li><strong>Interactive Mute Toggle:</strong> Mute button responds immediately and synchronizes two-way with the OS mixer.</li>
+            </ul>
+
+            <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--text-muted);">Live System Telemetry & Honest State</h4>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 13px;">
+              <li><strong>Zero Mock Data:</strong> Eliminated all hardcoded metrics (CPU, RAM, Disk, Battery, Network throughput) and mock clipboard items.</li>
+              <li><strong>Live Weather Search:</strong> Geocoding and weather retrieval execute on <code>Enter</code> key with honest offline indicators.</li>
+            </ul>
+
+            <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; margin: 16px 0 8px; color: var(--text-muted);">View Activation & File Shelf Pickers</h4>
+            <ul style="margin-left: 20px; color: var(--text-muted); font-size: 13px;">
+              <li><strong>Native File & Folder Pickers:</strong> Added "Add Files..." and "Add Folder..." action buttons in File Shelf via <code>WinRT.Interop.InitializeWithWindow</code>.</li>
+              <li><strong>View Loaded Hooks:</strong> Switching views automatically refreshes module telemetry and stored data.</li>
+            </ul>
+          </div>
+        </div>
+
         <!-- v1.0.1 -->
         <div class="timeline-item">
           <div class="timeline-dot"></div>
