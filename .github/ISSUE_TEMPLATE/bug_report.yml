@@ -1,0 +1,59 @@
+name: Bug Report
+description: Report a bug, crash, or unexpected behavior in QuickDock
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue in QuickDock.
+        Please provide clear details below to help us diagnose and fix the problem.
+  - type: input
+    id: version
+    attributes:
+      label: QuickDock Version
+      description: What version of QuickDock are you running? (e.g. 1.0.0)
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Windows Build / Version
+      description: Run `winver` in PowerShell/CMD and enter your Windows version.
+      placeholder: "Windows 11 Version 23H2 (OS Build 22631.4317)"
+    validations:
+      required: true
+  - type: input
+    id: monitors
+    attributes:
+      label: Display Setup
+      description: Number of monitors and scale factors (e.g. Dual monitor: 1080p @ 100%, 4K @ 150%)
+      placeholder: "Single 1440p @ 125%"
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this behavior step-by-step?
+      placeholder: |
+        1. Summon dock using Ctrl + Space
+        2. Click on ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
