@@ -49,7 +49,7 @@ public sealed partial class WeatherViewModel : ObservableObject
         _settingsManager = settingsManager ?? throw new ArgumentNullException(nameof(settingsManager));
         _dispatcherQueue = dispatcherQueue ?? DispatcherQueue.GetForCurrentThread();
 
-        ManualCityInput = _settingsManager.CurrentSettings.Weather.ManualLocationName ?? "Thrissur";
+        ManualCityInput = _settingsManager.CurrentSettings.Weather.ManualLocationName ?? string.Empty;
         _weatherService.WeatherUpdated += OnWeatherUpdated;
     }
 

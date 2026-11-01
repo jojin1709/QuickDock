@@ -4,6 +4,7 @@ using QuickDock.App.ViewModels;
 using QuickDock.Core.Models;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 
 namespace QuickDock.App.Views;
 
@@ -38,6 +39,58 @@ public sealed partial class FileShelfView : UserControl
     public FileShelfView()
     {
         InitializeComponent();
+        Loaded += async (s, e) =>
+        {
+            if (ViewModel != null)
+            {
+                await ViewModel.LoadItemsAsync();
+            }
+        };
+    }
+
+    private async void OnAddFilesClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new FileOpenPicker();
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            picker.FileTypeFilter.Add("*");
+
+            var files = await picker.PickMultipleFilesAsync();
+            if (files != null && files.Count > 0)
+            {
+                var paths = files.Select(f => f.Path).ToList();
+                await ViewModel.AddFilesAsync(paths);
+            }
+        }
+        catch
+        {
+            // Fail silently or handle error safely
+        }
+    }
+
+    private async void OnAddFolderClicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var picker = new FolderPicker();
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(App.MainWindowInstance);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, hwnd);
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            picker.FileTypeFilter.Add("*");
+
+            var folder = await picker.PickSingleFolderAsync();
+            if (folder != null)
+            {
+                await ViewModel.AddFilesAsync(new[] { folder.Path });
+            }
+        }
+        catch
+        {
+            // Fail silently or handle error safely
+        }
     }
 
     private void OnDragOver(object sender, DragEventArgs e)

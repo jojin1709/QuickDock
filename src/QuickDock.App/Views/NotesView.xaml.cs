@@ -39,6 +39,13 @@ public sealed partial class NotesView : UserControl
     public NotesView()
     {
         InitializeComponent();
+        Loaded += async (s, e) =>
+        {
+            if (ViewModel != null)
+            {
+                await ViewModel.LoadNotesAsync();
+            }
+        };
     }
 
     private void OnSelectNoteTapped(object sender, TappedRoutedEventArgs e)

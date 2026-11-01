@@ -53,6 +53,7 @@ public sealed partial class TimerView : UserControl
     public TimerView()
     {
         InitializeComponent();
+        Loaded += (s, e) => ViewModel?.RefreshTimersList();
     }
 
     public Visibility GetTabVisibility(int selectedIndex, int targetIndex)

@@ -35,6 +35,25 @@ public sealed partial class WeatherView : UserControl
     public WeatherView()
     {
         InitializeComponent();
+        Loaded += async (s, e) =>
+        {
+            if (ViewModel != null)
+            {
+                await ViewModel.RefreshWeatherAsync();
+            }
+        };
+    }
+
+    private void OnCityInputKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Enter)
+        {
+            if (ViewModel?.UpdateManualLocationCommand.CanExecute(null) == true)
+            {
+                ViewModel.UpdateManualLocationCommand.Execute(null);
+            }
+            e.Handled = true;
+        }
     }
 }
 

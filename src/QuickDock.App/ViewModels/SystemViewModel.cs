@@ -72,43 +72,52 @@ public sealed partial class SystemViewModel : ObservableObject
     private string _uptimeText = "—";
 
     [ObservableProperty]
-    private string _batteryPercentText = "80%";
+    private string _batteryPercentText = "—";
 
     [ObservableProperty]
-    private string _batteryStateText = "Plugged in";
+    private string _batteryStateText = "Detecting...";
 
     [ObservableProperty]
-    private string _batteryHealthText = "Health 92%";
+    private string _batteryHealthText = "—";
 
     [ObservableProperty]
-    private double _batteryPercentValue = 80;
+    private double _batteryPercentValue = 0;
 
     [ObservableProperty]
-    private string _networkSsidText = "D-Link";
+    private string _networkSsidText = "Detecting...";
 
     [ObservableProperty]
-    private string _networkSpeedText = "Wi-Fi 4 · 162 Mbps";
+    private string _networkSpeedText = "—";
 
     [ObservableProperty]
-    private string _networkDownSpeedText = "5 KB/s";
+    private string _networkDownSpeedText = "0 B/s";
 
     [ObservableProperty]
-    private string _networkUpSpeedText = "128 KB/s";
+    private string _networkUpSpeedText = "0 B/s";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(VolumePercentText))]
-    private int _volumePercent = 32;
+    [NotifyPropertyChangedFor(nameof(VolumeGlyph))]
+    private int _volumePercent = 0;
 
     public string VolumePercentText => $"{VolumePercent}%";
 
     [ObservableProperty]
-    private string _volumeDeviceName = "Realtek(R) Audio";
+    [NotifyPropertyChangedFor(nameof(VolumeGlyph))]
+    private bool _isMuted;
+
+    public string VolumeGlyph => IsMuted || VolumePercent == 0 ? "\uE74F" : "\uE767";
+
+    [ObservableProperty]
+    private string _volumeDeviceName = "Default Audio";
 
     public SystemViewModel(ISystemMetricsService metricsService, IAudioService audioService, ILogger<SystemViewModel> logger)
     {
         _metricsService = metricsService;
         _audioService = audioService;
         _logger = logger;
+
+        Refresh();
 
         _audioService.VolumeChanged += (s, e) =>
         {
@@ -118,6 +127,7 @@ public sealed partial class SystemViewModel : ObservableObject
                 try
                 {
                     VolumePercent = (int)Math.Round(e.NewVolume * 100);
+                    IsMuted = _audioService.GetMuteState();
                     VolumeDeviceName = _audioService.GetDefaultDeviceName();
                 }
                 finally
@@ -126,6 +136,13 @@ public sealed partial class SystemViewModel : ObservableObject
                 }
             });
         };
+    }
+
+    [RelayCommand]
+    private void ToggleMute()
+    {
+        _audioService.ToggleMute();
+        IsMuted = _audioService.GetMuteState();
     }
 
     partial void OnVolumePercentChanged(int value)
@@ -261,10 +278,12 @@ public sealed partial class SystemViewModel : ObservableObject
         try
         {
             float vol = _audioService.GetMasterVolume();
+            bool muted = _audioService.GetMuteState();
             _isInternalVolumeUpdate = true;
             try
             {
                 VolumePercent = (int)Math.Round(vol * 100);
+                IsMuted = muted;
                 VolumeDeviceName = _audioService.GetDefaultDeviceName();
             }
             finally

@@ -50,6 +50,24 @@
                        Margin="12,0,0,0" />
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                <Button Click="OnAddFilesClicked"
+                        FontSize="11"
+                        Padding="8,4"
+                        CornerRadius="4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <FontIcon Glyph="&#xE8B7;" FontSize="11" />
+                        <TextBlock Text="Add Files..." FontSize="11" />
+                    </StackPanel>
+                </Button>
+                <Button Click="OnAddFolderClicked"
+                        FontSize="11"
+                        Padding="8,4"
+                        CornerRadius="4">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <FontIcon Glyph="&#xED25;" FontSize="11" />
+                        <TextBlock Text="Add Folder..." FontSize="11" />
+                    </StackPanel>
+                </Button>
                 <Button Content="Remove Missing"
                         Command="{x:Bind ViewModel.RemoveMissingCommand, Mode=OneWay}"
                         FontSize="11"

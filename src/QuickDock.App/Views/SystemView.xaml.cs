@@ -35,5 +35,7 @@ public sealed partial class SystemView : UserControl
     public SystemView()
     {
         InitializeComponent();
+        Loaded += (s, e) => ViewModel?.StartLiveUpdates(DispatcherQueue);
+        Unloaded += (s, e) => ViewModel?.StopLiveUpdates();
     }
 }

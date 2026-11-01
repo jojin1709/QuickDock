@@ -64,40 +64,40 @@ public sealed partial class HomeViewModel : ObservableObject
 
     // 2x3 Dashboard Card Properties
     [ObservableProperty]
-    private double _cpuPercent = 45;
+    private double _cpuPercent = 0;
 
     [ObservableProperty]
-    private string _cpuPercentText = "45%";
+    private string _cpuPercentText = "—";
 
     [ObservableProperty]
-    private double _ramPercent = 65;
+    private double _ramPercent = 0;
 
     [ObservableProperty]
-    private string _ramPercentText = "65%";
+    private string _ramPercentText = "—";
 
     [ObservableProperty]
-    private double _diskPercent = 25;
+    private double _diskPercent = 0;
 
     [ObservableProperty]
-    private string _diskPercentText = "25%";
+    private string _diskPercentText = "—";
 
     [ObservableProperty]
-    private int _batteryPercent = 80;
+    private int _batteryPercent = 100;
 
     [ObservableProperty]
-    private string _batteryPercentText = "80%";
+    private string _batteryPercentText = "—";
 
     [ObservableProperty]
     private double _batteryFillWidth = 14;
 
     [ObservableProperty]
-    private string _weatherTempText = "32°";
+    private string _weatherTempText = "—";
 
     [ObservableProperty]
-    private string _weatherConditionText = "Light Drizzle · Thrissur";
+    private string _weatherConditionText = "Loading...";
 
     [ObservableProperty]
-    private string _weatherHighLowText = "H 32°  L 24°";
+    private string _weatherHighLowText = "—";
 
     [ObservableProperty]
     private string _screenTimeBigText = "<1m";
@@ -271,8 +271,7 @@ public sealed partial class HomeViewModel : ObservableObject
                 }
                 else
                 {
-                    RecentClips.Add(new RecentClipDisplayItem("\uEB9F", "Image · 1115 x 792", "now", "Image snippet"));
-                    RecentClips.Add(new RecentClipDisplayItem("\uE8C4", "QuickDock Windows 11", "2m ago", "QuickDock Windows 11"));
+                    ClipboardSnippetText = "Clipboard is empty";
                 }
 
                 RefreshWeatherSummary(weather);
@@ -354,9 +353,10 @@ public sealed partial class HomeViewModel : ObservableObject
         }
         else
         {
-            WeatherTempText = "32°";
-            WeatherConditionText = "Light Drizzle · Thrissur";
-            WeatherHighLowText = "H 32°  L 24°";
+            WeatherTempText = "—";
+            WeatherConditionText = "Weather Unavailable";
+            WeatherHighLowText = "Check network or location";
+            WeatherSnippetText = "Weather: Unavailable";
         }
     }
 
@@ -470,9 +470,9 @@ public sealed partial class HomeViewModel : ObservableObject
             }
             else
             {
-                CpuPercent = 45;
-                CpuPercentText = "45%";
-                CpuMetricText = "45% CPU";
+                CpuPercent = 0;
+                CpuPercentText = "—";
+                CpuMetricText = "CPU —";
             }
 
             if (mem != null)
@@ -483,9 +483,9 @@ public sealed partial class HomeViewModel : ObservableObject
             }
             else
             {
-                RamPercent = 65;
-                RamPercentText = "65%";
-                MemoryMetricText = "65% RAM";
+                RamPercent = 0;
+                RamPercentText = "—";
+                MemoryMetricText = "RAM —";
             }
 
             if (disk != null)
@@ -495,8 +495,8 @@ public sealed partial class HomeViewModel : ObservableObject
             }
             else
             {
-                DiskPercent = 25;
-                DiskPercentText = "25%";
+                DiskPercent = 0;
+                DiskPercentText = "—";
             }
 
             if (bat != null && bat.HasBattery)
@@ -508,10 +508,10 @@ public sealed partial class HomeViewModel : ObservableObject
             }
             else
             {
-                BatteryPercent = 80;
-                BatteryPercentText = "80%";
-                BatteryMetricText = "80% AC Power";
-                BatteryFillWidth = 14;
+                BatteryPercent = 100;
+                BatteryPercentText = "AC";
+                BatteryMetricText = "AC Connected";
+                BatteryFillWidth = 16;
             }
         });
 

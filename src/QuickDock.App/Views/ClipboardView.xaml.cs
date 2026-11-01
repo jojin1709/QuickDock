@@ -35,9 +35,32 @@ public sealed partial class ClipboardView : UserControl
 
     public Visibility GetBoolVisibility(bool isVisible) => isVisible ? Visibility.Visible : Visibility.Collapsed;
 
+    public static Visibility GetImageVisibility(string? path) =>
+        !string.IsNullOrEmpty(path) ? Visibility.Visible : Visibility.Collapsed;
+
+    public static Microsoft.UI.Xaml.Media.ImageSource? GetImageSource(string? path)
+    {
+        if (string.IsNullOrEmpty(path) || !System.IO.File.Exists(path)) return null;
+        try
+        {
+            return new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(path));
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public ClipboardView()
     {
         InitializeComponent();
+        Loaded += async (s, e) =>
+        {
+            if (ViewModel != null)
+            {
+                await ViewModel.LoadHistoryAsync();
+            }
+        };
     }
 
     private void OnCopyItemClicked(object sender, RoutedEventArgs e)
@@ -64,4 +87,3 @@ public sealed partial class ClipboardView : UserControl
         }
     }
 }
-

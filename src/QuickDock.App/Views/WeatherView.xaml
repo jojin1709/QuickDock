@@ -62,8 +62,10 @@
             </Grid.ColumnDefinitions>
 
             <TextBox Grid.Column="0"
+                     x:Name="CityInputTextBox"
                      PlaceholderText="Enter city name (e.g. Thrissur, London)..."
-                     Text="{x:Bind ViewModel.ManualCityInput, Mode=TwoWay}"
+                     Text="{x:Bind ViewModel.ManualCityInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     KeyDown="OnCityInputKeyDown"
                      CornerRadius="6" />
 
             <Button Grid.Column="1"
